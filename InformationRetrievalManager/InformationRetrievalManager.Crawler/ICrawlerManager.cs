@@ -5,5 +5,6 @@
     /// </summary>
     public interface ICrawlerManager
     {
+        // TODO : manager stuff
     }
 }

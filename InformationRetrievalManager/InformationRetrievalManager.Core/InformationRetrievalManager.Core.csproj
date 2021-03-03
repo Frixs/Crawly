@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\InformationRetrievalManager.Core\InformationRetrievalManager.Core.csproj" />
+    <PackageReference Include="Ixs.DNA.Framework" Version="1.0.7.15004" />
   </ItemGroup>
 
 </Project>
