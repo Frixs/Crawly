@@ -53,6 +53,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="HtmlAgilityPack, Version=1.11.31.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
+      <HintPath>..\packages\HtmlAgilityPack.1.11.31\lib\Net45\HtmlAgilityPack.dll</HintPath>
+    </Reference>
     <Reference Include="Ixs.DNA.Framework, Version=1.0.7.15004, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Ixs.DNA.Framework.1.0.7.15004\lib\netstandard2.0\Ixs.DNA.Framework.dll</HintPath>
     </Reference>
