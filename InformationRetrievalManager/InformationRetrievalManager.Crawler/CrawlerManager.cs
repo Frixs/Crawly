@@ -50,7 +50,7 @@ namespace InformationRetrievalManager.Crawler
             return await AsyncLock.LockResultAsync(nameof(CrawlerManager), async () =>
             {
                 _crawlers.Add(crawler.Identifier, crawler);
-                _logger.LogDebugSource($"Crawler '{crawler.Identifier}' has been added to the crawler manager successfully.");
+                _logger.LogTraceSource($"Crawler '{crawler.Identifier}' has been added to the crawler manager successfully.");
                 return true;
             });
         }
@@ -81,8 +81,8 @@ namespace InformationRetrievalManager.Crawler
             {
                 bool result = _crawlers.Remove(cid);
 
-                if (result) _logger.LogDebugSource($"Crawler '{cid}' has been removed from the crawler manager.");
-                else _logger.LogDebugSource($"Crawler '{cid}' could not be removed from the crawler manager.");
+                if (result) _logger.LogTraceSource($"Crawler '{cid}' has been removed from the crawler manager.");
+                else _logger.LogTraceSource($"Crawler '{cid}' could not be removed from the crawler manager.");
 
                 return result;
             });

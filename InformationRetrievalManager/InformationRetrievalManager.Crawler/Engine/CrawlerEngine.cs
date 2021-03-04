@@ -55,7 +55,7 @@ namespace InformationRetrievalManager.Crawler
             IsCurrentlyCrawlingFlag = true;
 
             // TODO: add process
-            Console.WriteLine($"TODO: crawler start '{Identifier}'");
+            Console.WriteLine($"TODO: crawler start '{Identifier} process is gonna be here'");
 
             return true;
         }

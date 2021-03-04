@@ -69,9 +69,10 @@ namespace InformationRetrievalManager
         /// <returns></returns>
         private async Task StartCrawlerCommandRoutineAsync()
         {
-            // TODO: start crawler here
-            System.Console.WriteLine("TODO: start crawler");
+            // HACK: crawler starter
             var crawler = await _crawlerManager.GetCrawlerAsync("bdo-sea");
+            crawler.Start();
+
             await Task.Delay(1);
         }
 
