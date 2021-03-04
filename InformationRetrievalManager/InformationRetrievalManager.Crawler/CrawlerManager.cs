@@ -1,7 +1,7 @@
 ﻿namespace InformationRetrievalManager.Crawler
 {
     /// <summary>
-    /// UNDONE
+    /// Base crawler manager
     /// </summary>
     public class CrawlerManager : ICrawlerManager
     {
@@ -12,6 +12,28 @@
         /// </summary>
         public CrawlerManager()
         {
+        }
+
+        #endregion
+
+        #region Interface Methods
+
+        /// <inheritdoc/>
+        public bool AddCrawler(ICrawlerEngine crawler)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        /// <inheritdoc/>
+        public ICrawlerEngine GetCrawler(string cid)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        /// <inheritdoc/>
+        public bool RemoveCrawler(string cid)
+        {
+            throw new System.NotImplementedException();
         }
 
         #endregion

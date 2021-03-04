@@ -3,7 +3,7 @@
     /// <summary>
     /// UNDONE
     /// </summary>
-    interface ICrawlerEngine
+    public interface ICrawlerEngine
     {
         #region Properties
 
