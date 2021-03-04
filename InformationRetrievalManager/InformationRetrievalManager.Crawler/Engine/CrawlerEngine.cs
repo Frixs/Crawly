@@ -3,7 +3,8 @@ using InformationRetrievalManager.Core;
 using Ixs.DNA;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Threading.Tasks;
+using System.Collections.Generic;
+using System.IO;
 
 namespace InformationRetrievalManager.Crawler
 {
@@ -15,6 +16,7 @@ namespace InformationRetrievalManager.Crawler
         #region Private Members (Injects)
 
         private readonly ILogger _logger;
+        private readonly IFileManager _fileManager;
         private readonly ITaskManager _taskManager;
 
         #endregion
@@ -64,6 +66,7 @@ namespace InformationRetrievalManager.Crawler
 
             // HACK: DI injections
             _logger = FrameworkDI.Logger ?? throw new ArgumentNullException(nameof(_logger));
+            _fileManager = CoreDI.File ?? throw new ArgumentNullException(nameof(_fileManager));
             _taskManager = CoreDI.Task ?? throw new ArgumentNullException(nameof(_taskManager));
         }
 
@@ -119,22 +122,51 @@ namespace InformationRetrievalManager.Crawler
         {
             const string hrefKeyword = "href";
             const string defaultArticleLink = "#";
+            // TODO - move it on better location
+            const string dataStorageSubfolder = "storage/";
 
             // Log it
             _logger.LogTraceSource($"Crawler '{Identifier}' started processing.");
 
-            HtmlWeb web = new HtmlWeb();
-            // Go through the pages of articles...
-            for (int i = StartPageNo; i <= MaxPageNo; i += PageNoModifier)
-            {
-                HtmlDocument doc = web.Load("https://www.sea.playblackdesert.com/News/Notice?boardType=2&Page=" + i);
+            string compoundUrl = "https://www.sea.playblackdesert.com/News/Notice?boardType=2&Page={0}";
 
-                // Go through the specific page...
-                foreach (var item in doc.DocumentNode.SelectNodes("//article[@class='content']//ul[@class='thumb_nail_list']//a"))
+            HtmlWeb web = new HtmlWeb();
+            HashSet<string> urls = new HashSet<string>();
+            string urlsFilename = $"urls_{Identifier}_{compoundUrl.GetHashCode()}_{StartPageNo}_{MaxPageNo}_{PageNoModifier}.txt";
+
+            // Check if we have already scanned urls...
+            if (File.Exists(dataStorageSubfolder + urlsFilename))
+            {
+                foreach (var line in _fileManager.ReadLines(dataStorageSubfolder + urlsFilename))
+                    urls.Add(line);
+            }
+            // Otherwise, scan the website...
+            else
+            {
+                // Go through the pages of articles...
+                for (int i = StartPageNo; i <= MaxPageNo; i += PageNoModifier)
                 {
-                    // TODO: continue in processing .... now we have page links
-                    if (item.HasAttributes)
-                        Console.WriteLine(item.GetAttributeValue(hrefKeyword, defaultArticleLink));
+                    HtmlDocument doc = web.Load(compoundUrl.Replace("{0}", i.ToString()));
+
+                    // Go through the specific page...
+                    foreach (var item in doc.DocumentNode.SelectNodes("//article[@class='content']//ul[@class='thumb_nail_list']//a"))
+                    {
+                        // Check for cancelation
+                        if (_cancelationFlag)
+                            break;
+
+                        if (item.HasAttributes)
+                        {
+                            // TODO: continue in processing .... now we have page links
+                            Console.WriteLine(item.GetAttributeValue(hrefKeyword, defaultArticleLink));
+                            // TODO save file
+                            //urls.Add();
+                        }
+                    }
+
+                    // Check for cancelation
+                    if (_cancelationFlag)
+                        break;
                 }
             }
 
