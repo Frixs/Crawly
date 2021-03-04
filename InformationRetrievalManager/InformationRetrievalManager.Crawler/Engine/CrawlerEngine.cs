@@ -1,12 +1,20 @@
-﻿using System;
+﻿using Ixs.DNA;
+using Microsoft.Extensions.Logging;
+using System;
 
 namespace InformationRetrievalManager.Crawler
 {
     /// <summary>
     /// UNDONE
     /// </summary>
-    class CrawlerEngine : ICrawlerEngine
+    public class CrawlerEngine : ICrawlerEngine
     {
+        #region Private Members (Injects)
+
+        private readonly ILogger _logger;
+
+        #endregion
+
         #region Interface Properties
 
         /// <inheritdoc/>
@@ -25,12 +33,14 @@ namespace InformationRetrievalManager.Crawler
         /// <summary>
         /// Default constructor
         /// </summary>
-        /// <param name="name">It makes a unique identifier among all crawlers in this system</param>
+        /// <param name="name">It makes an unique identifier among all crawlers in this system</param>
         public CrawlerEngine(string name)
         {
             Identifier = name ?? throw new ArgumentNullException(nameof(name));
             IsCurrentlyCrawlingFlag = false;
             CrawlingProgressPct = -1;
+
+            _logger = FrameworkDI.Logger ?? throw new ArgumentNullException(nameof(_logger)); // HACK: DI injection
         }
 
         #endregion
