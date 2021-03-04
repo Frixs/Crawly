@@ -1,0 +1,22 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:system="clr-namespace:System;assembly=mscorlib">
+
+    <!--#region Global-->
+    <Color x:Key="Transparent">#00000000</Color>
+    <SolidColorBrush x:Key="TransparentBrushKey" Color="{StaticResource Transparent}" />
+
+    <Color x:Key="DisabledBackground">#88BDBDC3</Color>
+    <SolidColorBrush x:Key="DisabledBackgroundBrushKey" Color="{StaticResource DisabledBackground}" />
+
+    <Color x:Key="Background">#f7f7fc</Color>
+    <SolidColorBrush x:Key="BackgroundBrushKey" Color="{StaticResource Background}" />
+
+    <SolidColorBrush x:Key="ForegroundBrushKey" Color="{StaticResource ChameleonDark}" />
+
+    <SolidColorBrush x:Key="ForegroundInvBrushKey" Color="{StaticResource ChameleonPureLight}" />
+
+    <!--#endregion-->
+
+</ResourceDictionary>
