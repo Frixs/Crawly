@@ -8,6 +8,11 @@
         #region Properties
 
         /// <summary>
+        /// represents the crawler and makes it unique identifier for a certain crawler
+        /// </summary>
+        string Identifier { get; }
+
+        /// <summary>
         /// Indicates if the engine is currently crawling data
         /// </summary>
         bool IsCurrentlyCrawlingFlag { get; }

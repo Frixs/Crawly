@@ -1,4 +1,6 @@
-﻿namespace InformationRetrievalManager.Crawler
+﻿using System;
+
+namespace InformationRetrievalManager.Crawler
 {
     /// <summary>
     /// UNDONE
@@ -8,10 +10,13 @@
         #region Interface Properties
 
         /// <inheritdoc/>
-        public bool IsCurrentlyCrawlingFlag { get; private set; }
+        public string Identifier { get; private set; } //; ctor
 
         /// <inheritdoc/>
-        public short CrawlingProgressPct { get; private set; }
+        public bool IsCurrentlyCrawlingFlag { get; private set; } //; ctor
+
+        /// <inheritdoc/>
+        public short CrawlingProgressPct { get; private set; } //; ctor
 
         #endregion
 
@@ -20,8 +25,10 @@
         /// <summary>
         /// Default constructor
         /// </summary>
-        public CrawlerEngine()
+        /// <param name="name">It makes a unique identifier among all crawlers in this system</param>
+        public CrawlerEngine(string name)
         {
+            Identifier = name ?? throw new ArgumentNullException(nameof(name));
             IsCurrentlyCrawlingFlag = false;
             CrawlingProgressPct = -1;
         }
@@ -38,6 +45,7 @@
             IsCurrentlyCrawlingFlag = true;
 
             // TODO: add process
+            Console.WriteLine($"TODO: crawler start '{Identifier}'");
 
             return true;
         }

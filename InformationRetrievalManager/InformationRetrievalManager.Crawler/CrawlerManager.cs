@@ -1,10 +1,23 @@
-﻿namespace InformationRetrievalManager.Crawler
+﻿using Ixs.DNA;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+
+namespace InformationRetrievalManager.Crawler
 {
     /// <summary>
     /// Base crawler manager
     /// </summary>
     public class CrawlerManager : ICrawlerManager
     {
+        #region Private Members
+
+        /// <summary>
+        ///  Dict of all crawlers the manager serves
+        /// </summary>
+        private Dictionary<string, ICrawlerEngine> _crawlers = new Dictionary<string, ICrawlerEngine>();
+
+        #endregion
+
         #region Constructor
 
         /// <summary>
@@ -19,21 +32,45 @@
         #region Interface Methods
 
         /// <inheritdoc/>
-        public bool AddCrawler(ICrawlerEngine crawler)
+        public async Task<bool> AddCrawlerAsync(ICrawlerEngine crawler)
         {
-            throw new System.NotImplementedException();
+            if (crawler == null)
+                return false;
+
+            // Lock the task
+            return await AsyncLock.LockResultAsync(nameof(CrawlerManager), async () =>
+            {
+                _crawlers.Add(crawler.Identifier, crawler);
+                return true;
+            });
         }
 
         /// <inheritdoc/>
-        public ICrawlerEngine GetCrawler(string cid)
+        public async Task<ICrawlerEngine> GetCrawlerAsync(string cid)
         {
-            throw new System.NotImplementedException();
+            if (cid == null)
+                return null;
+
+            // Lock the task
+            return await AsyncLock.LockResultAsync(nameof(CrawlerManager), async () =>
+            {
+                if (_crawlers.ContainsKey(cid))
+                    return _crawlers[cid];
+                return null;
+            });
         }
 
         /// <inheritdoc/>
-        public bool RemoveCrawler(string cid)
+        public async Task<bool> RemoveCrawlerAsync(string cid)
         {
-            throw new System.NotImplementedException();
+            if (cid == null)
+                return false;
+
+            // Lock the task
+            return await AsyncLock.LockResultAsync(nameof(CrawlerManager), async () =>
+            {
+                return _crawlers.Remove(cid);
+            });
         }
 
         #endregion
