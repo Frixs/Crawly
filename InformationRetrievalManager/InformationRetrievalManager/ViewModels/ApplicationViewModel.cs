@@ -14,7 +14,7 @@ namespace InformationRetrievalManager
         /// <summary>
         /// <see cref="ApplicationPage"/> index limit definition for form pages
         /// </summary>
-        private readonly int mFormPagesStartIndex = 1000;
+        private readonly int _formPagesStartIndex = 1000;
 
         #endregion
 
@@ -125,7 +125,7 @@ namespace InformationRetrievalManager
                 SwitchPage(switchPage, switchViewModel);
 
                 // Set window title page name
-                if (pageVal < mFormPagesStartIndex)
+                if (pageVal < _formPagesStartIndex)
                     SetWindowTitlePostfixOnly = pageVal > 0 ? switchPage.GetDescription() : "";
             }
         }

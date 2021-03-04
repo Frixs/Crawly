@@ -10,7 +10,7 @@ namespace InformationRetrievalManager
         /// <summary>
         /// The action to run.
         /// </summary>
-        private Action mAction;
+        private Action _action;
 
         #endregion
 
@@ -30,7 +30,7 @@ namespace InformationRetrievalManager
         /// </summary>
         public RelayCommand(Action action)
         {
-            mAction = action;
+            _action = action;
         }
 
         #endregion
@@ -53,7 +53,7 @@ namespace InformationRetrievalManager
         /// <param name="parameter"></param>
         public void Execute(object parameter)
         {
-            mAction();
+            _action();
         }
 
         #endregion
