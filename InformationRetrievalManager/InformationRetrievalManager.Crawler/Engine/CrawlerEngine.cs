@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace InformationRetrievalManager.Crawler
@@ -222,16 +223,14 @@ namespace InformationRetrievalManager.Crawler
                             break;
 
                         if (item.HasAttributes)
-                        {
-                            // TODO: continue in processing .... now we have page links
-                            Console.WriteLine(item.GetAttributeValue(hrefKeyword, defaultArticleLink));
-                            // TODO save file
-                            //urls.Add();
-                        }
+                            result.Add(item.GetAttributeValue(hrefKeyword, defaultArticleLink));
                     }
 
                     await Task.Delay(SearchInterval);
                 }
+
+                // Save it to the file
+                await _fileManager.WriteLinesToFileAsync(result.ToList(), urlsFilePath, false);
             }
 
             return result;

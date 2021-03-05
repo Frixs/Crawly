@@ -1,4 +1,5 @@
 ﻿using Ixs.DNA;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
@@ -11,15 +12,12 @@ namespace InformationRetrievalManager.Core
     /// </summary>
     public class BaseFileManager : IFileManager
     {
-        /// <summary>
-        /// Writes the text to the specified file.
-        /// </summary>
-        /// <param name="text">The text to write.</param>
-        /// <param name="path">The path of the file to write to.</param>
-        /// <param name="append">If true, writes the text to the end of the file, otherwise overrides any existing file.</param>
-        /// <returns></returns>
+        /// <inheritdoc/>
         public async Task WriteTextToFileAsync(string text, string path, bool append = false)
         {
+            if (text == null)
+                throw new ArgumentNullException(nameof(text));
+
             // Normalize path.
             path = NormalizedPath(path);
 
@@ -39,11 +37,33 @@ namespace InformationRetrievalManager.Core
             });
         }
 
-        /// <summary>
-        /// Count lines in the specified file.
-        /// </summary>
-        /// <param name="path"></param>
-        /// <returns></returns>
+        /// <inheritdoc/>
+        public async Task WriteLinesToFileAsync(List<string> lines, string path, bool append = false)
+        {
+            if (lines == null)
+                throw new ArgumentNullException(nameof(lines));
+
+            // Normalize path.
+            path = NormalizedPath(path);
+
+            // Resolve to absolute path.
+            path = ResolvePath(path);
+
+            // Lock the task.
+            await AsyncLock.LockAsync(nameof(WriteTextToFileAsync) + path, async () =>
+            {
+                // Run the synchronous file access as a new task.
+                await CoreDI.Task.Run(() =>
+                {
+                    // Write the log message to file.
+                    using (var writer = (TextWriter)new StreamWriter(File.Open(path, append ? FileMode.Append : FileMode.Create)))
+                        for (int i = 0; i < lines.Count; ++i)
+                            writer.WriteLine(lines[0]);
+                });
+            });
+        }
+
+        /// <inheritdoc/>
         public long LineCount(string path)
         {
             long lineCount = 0;
@@ -64,11 +84,7 @@ namespace InformationRetrievalManager.Core
             return lineCount;
         }
 
-        /// <summary>
-        /// Read all lines from specified file.
-        /// </summary>
-        /// <param name="path"></param>
-        /// <returns></returns>
+        /// <inheritdoc/>
         public List<string> ReadLines(string path)
         {
             var lines = new List<string>();
@@ -95,11 +111,7 @@ namespace InformationRetrievalManager.Core
             return lines;
         }
 
-        /// <summary>
-        /// Check if the file is in use or not.
-        /// </summary>
-        /// <param name="file"></param>
-        /// <returns></returns>
+        /// <inheritdoc/>
         public bool IsInUse(FileInfo file)
         {
             FileStream stream = null;
@@ -127,11 +139,7 @@ namespace InformationRetrievalManager.Core
             return isOpened;
         }
 
-        /// <summary>
-        /// Normalizing a path based on the current operating system.
-        /// </summary>
-        /// <param name="path">The path to normalize.</param>
-        /// <returns></returns>
+        /// <inheritdoc/>
         public string NormalizedPath(string path)
         {
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
@@ -140,11 +148,7 @@ namespace InformationRetrievalManager.Core
                 return path?.Replace('\\', '/').Trim();
         }
 
-        /// <summary>
-        /// Resolves any relative elements of the path to absolute.
-        /// </summary>
-        /// <param name="path">The path to resolve.</param>
-        /// <returns></returns>
+        /// <inheritdoc/>
         public string ResolvePath(string path)
         {
             // Resolve the path to absolute.
