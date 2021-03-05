@@ -30,6 +30,15 @@ namespace InformationRetrievalManager.Core
                 // Run the synchronous file access as a new task.
                 await CoreDI.Task.Run(() =>
                 {
+                    // Check if the file exists...
+                    if (!File.Exists(path))
+                    {
+                        // Create it
+                        Directory.CreateDirectory(Path.GetDirectoryName(path));
+                        var f = File.Create(path);
+                        f.Close();
+                    }
+
                     // Write the log message to file.
                     using (var writer = (TextWriter)new StreamWriter(File.Open(path, append ? FileMode.Append : FileMode.Create)))
                         writer.Write(text);
@@ -55,10 +64,19 @@ namespace InformationRetrievalManager.Core
                 // Run the synchronous file access as a new task.
                 await CoreDI.Task.Run(() =>
                 {
+                    // Check if the file exists...
+                    if (!File.Exists(path))
+                    {
+                        // Create it
+                        Directory.CreateDirectory(Path.GetDirectoryName(path));
+                        var f = File.Create(path);
+                        f.Close();
+                    }
+
                     // Write the log message to file.
                     using (var writer = (TextWriter)new StreamWriter(File.Open(path, append ? FileMode.Append : FileMode.Create)))
                         for (int i = 0; i < lines.Count; ++i)
-                            writer.WriteLine(lines[0]);
+                            writer.WriteLine(lines[i]);
                 });
             });
         }

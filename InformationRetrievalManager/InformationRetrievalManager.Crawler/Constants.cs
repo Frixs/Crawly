@@ -9,6 +9,6 @@ namespace InformationRetrievalManager.Crawler
         /// <summary>
         /// Place where crawled data are placed
         /// </summary>
-        public const string DataStorageDir = "/storage";
+        public const string DataStorageDir = "storage";
     }
 }

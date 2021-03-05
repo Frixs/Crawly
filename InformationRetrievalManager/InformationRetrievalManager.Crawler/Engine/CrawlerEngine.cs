@@ -103,6 +103,7 @@ namespace InformationRetrievalManager.Crawler
             if (IsCurrentlyCrawlingFlag)
                 return false;
             IsCurrentlyCrawlingFlag = true;
+            CrawlingProgressPct = 0;
 
             // Run the process of crawling...
             _taskManager.RunAndForget(ProcessAsync);
@@ -190,11 +191,12 @@ namespace InformationRetrievalManager.Crawler
         {
             HashSet<string> result = new HashSet<string>();
 
+            const short processPctValue = 30;
             const string hrefKeyword = "href";
             const string defaultArticleLink = "#";
 
             string compoundUrl = SiteAddress + SiteSuffix;
-            string urlsFilename = $"urls_{NameIdentifier}_{compoundUrl.GetHashCode()}_{StartPageNo}_{MaxPageNo}_{PageNoModifier}_{DateTime.Today.Year}_{DateTime.Today.Month}_{DateTime.Today.Day}.txt";
+            string urlsFilename = $"urls_{NameIdentifier}_{compoundUrl.GetHashCode()}_{StartPageNo}_{MaxPageNo}_{PageNoModifier}_{DateTime.Today.Year}_{DateTime.Today.Month}_{DateTime.Today.Day}_{DateTime.Today.Hour}.txt";
             string urlsFilePath = $"{Constants.DataStorageDir}/{urlsFilename}";
 
             // Check if we have already scanned urls...
@@ -202,6 +204,8 @@ namespace InformationRetrievalManager.Crawler
             {
                 foreach (var line in _fileManager.ReadLines(urlsFilePath))
                     result.Add(line);
+                // Log it
+                _logger.LogTraceSource($"Crawler '{NameIdentifier}' has loaded scanned URLs from the file storage.");
             }
             // Otherwise, scan the website...
             else
@@ -213,7 +217,10 @@ namespace InformationRetrievalManager.Crawler
                     if (_cancelationFlag)
                         break;
 
+                    // Load the document
                     HtmlDocument doc = web.Load(compoundUrl.Replace("{0}", i.ToString()));
+                    // Log it
+                    _logger.LogTraceSource($"Crawler '{NameIdentifier}' is currently scanning '{web.ResponseUri}'.");
 
                     // Go through the specific page...
                     foreach (var item in doc.DocumentNode.SelectNodes(SiteUrlArticlesXPath))
@@ -225,6 +232,11 @@ namespace InformationRetrievalManager.Crawler
                         if (item.HasAttributes)
                             result.Add(item.GetAttributeValue(hrefKeyword, defaultArticleLink));
                     }
+
+                    // Calculaate progress pct
+                    CrawlingProgressPct = Convert.ToInt16(
+                        (((i - StartPageNo) / PageNoModifier) + 1) / (double)((MaxPageNo - StartPageNo + PageNoModifier) / PageNoModifier) * processPctValue
+                        );
 
                     await Task.Delay(SearchInterval);
                 }
