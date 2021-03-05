@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace InformationRetrievalManager.Crawler
 {
@@ -33,7 +34,7 @@ namespace InformationRetrievalManager.Crawler
         #region Interface Properties
 
         /// <inheritdoc/>
-        public string Identifier { get; private set; } //; ctor
+        public string NameIdentifier { get; private set; } //; ctor
 
         /// <inheritdoc/>
         public bool IsCurrentlyCrawlingFlag { get; private set; } //; ctor
@@ -42,13 +43,34 @@ namespace InformationRetrievalManager.Crawler
         public short CrawlingProgressPct { get; private set; } //; ctor
 
         /// <inheritdoc/>
-        public int StartPageNo { get; set; } = 1;
+        public int StartPageNo { get; private set; } = 1;
 
         /// <inheritdoc/>
-        public int MaxPageNo { get; set; } = 1;
+        public int MaxPageNo { get; private set; } = 1;
 
         /// <inheritdoc/>
-        public int PageNoModifier { get; set; } = 1;
+        public int PageNoModifier { get; private set; } = 1;
+
+        /// <inheritdoc/>
+        public string SiteAddress { get; private set; } = null;
+
+        /// <inheritdoc/>
+        public string SiteSuffix { get; private set; } = null;
+
+        /// <inheritdoc/>
+        public string SiteUrlArticlesXPath { get; private set; } = "";
+
+        /// <inheritdoc/>
+        public int SearchInterval { get; private set; } = 1000;
+
+        #endregion
+
+        #region Public Properties
+
+        /// <summary>
+        /// Basic check/indication if the site is set / ready to use
+        /// </summary>
+        public bool IsSiteSet => !SiteAddress.IsNullOrEmpty() && !SiteSuffix.IsNullOrEmpty();
 
         #endregion
 
@@ -60,7 +82,7 @@ namespace InformationRetrievalManager.Crawler
         /// <param name="name">It makes an unique identifier among all crawlers in this system</param>
         public CrawlerEngine(string name)
         {
-            Identifier = name ?? throw new ArgumentNullException(nameof(name));
+            NameIdentifier = name ?? throw new ArgumentNullException(nameof(name));
             IsCurrentlyCrawlingFlag = false;
             CrawlingProgressPct = -1;
 
@@ -82,7 +104,7 @@ namespace InformationRetrievalManager.Crawler
             IsCurrentlyCrawlingFlag = true;
 
             // Run the process of crawling...
-            _taskManager.RunAndForget(Process);
+            _taskManager.RunAndForget(ProcessAsync);
 
             return true;
         }
@@ -94,6 +116,21 @@ namespace InformationRetrievalManager.Crawler
                 return false;
 
             _cancelationFlag = true;
+            return true;
+        }
+
+        /// <inheritdoc/>
+        public bool SetControls(string siteAddress, string siteSuffix, int startPageNo, int maxPageNo, int pageNoModifier, int searchInterval, string siteUrlArticlesXPath)
+        {
+            // TODO: validate data
+            SiteAddress = siteAddress;
+            SiteSuffix = siteSuffix;
+            StartPageNo = startPageNo;
+            MaxPageNo = maxPageNo;
+            PageNoModifier = pageNoModifier;
+            SearchInterval = searchInterval;
+            SiteUrlArticlesXPath = siteUrlArticlesXPath;
+
             return true;
         }
 
@@ -111,34 +148,59 @@ namespace InformationRetrievalManager.Crawler
             _cancelationFlag = false;
 
             // Log it
-            _logger.LogTraceSource($"Crawler '{Identifier}' has finished.");
+            _logger.LogInformationSource($"Crawler '{NameIdentifier}' has finished.");
         }
 
         /// <summary>
         /// Process method of crawling
         /// HACK: Might be a good idea to move this into a completely separate class of engine processing
         /// </summary>
-        private void Process()
+        private async Task ProcessAsync()
         {
+            // Log it
+            _logger.LogInformationSource($"Crawler '{NameIdentifier}' started processing.");
+
+            // Check the basis...
+            if (IsSiteSet)
+            {
+                HtmlWeb web = new HtmlWeb();
+
+                HashSet<string> urls = await GetUrlsAsync(web);
+
+                // TODO
+            }
+            // Otherwise, we are unable to start the process...
+            else
+            {
+                // Log it
+                _logger.LogInformationSource($"Crawler '{NameIdentifier}' was unable to proceed with the process.");
+            }
+
+            // Finish the processing
+            Finish();
+        }
+
+        /// <summary>
+        /// Get urls by crawling it or by loading it from already crawled data source
+        /// </summary>
+        /// <param name="web">Web HtmlAgility instance</param>
+        /// <returns>Set of the URLs</returns>
+        private async Task<HashSet<string>> GetUrlsAsync(HtmlWeb web)
+        {
+            HashSet<string> result = new HashSet<string>();
+
             const string hrefKeyword = "href";
             const string defaultArticleLink = "#";
-            // TODO - move it on better location
-            const string dataStorageSubfolder = "storage/";
 
-            // Log it
-            _logger.LogTraceSource($"Crawler '{Identifier}' started processing.");
-
-            string compoundUrl = "https://www.sea.playblackdesert.com/News/Notice?boardType=2&Page={0}";
-
-            HtmlWeb web = new HtmlWeb();
-            HashSet<string> urls = new HashSet<string>();
-            string urlsFilename = $"urls_{Identifier}_{compoundUrl.GetHashCode()}_{StartPageNo}_{MaxPageNo}_{PageNoModifier}.txt";
+            string compoundUrl = SiteAddress + SiteSuffix;
+            string urlsFilename = $"urls_{NameIdentifier}_{compoundUrl.GetHashCode()}_{StartPageNo}_{MaxPageNo}_{PageNoModifier}_{DateTime.Today.Year}_{DateTime.Today.Month}_{DateTime.Today.Day}.txt";
+            string urlsFilePath = $"{Constants.DataStorageDir}/{urlsFilename}";
 
             // Check if we have already scanned urls...
-            if (File.Exists(dataStorageSubfolder + urlsFilename))
+            if (File.Exists(urlsFilePath))
             {
-                foreach (var line in _fileManager.ReadLines(dataStorageSubfolder + urlsFilename))
-                    urls.Add(line);
+                foreach (var line in _fileManager.ReadLines(urlsFilePath))
+                    result.Add(line);
             }
             // Otherwise, scan the website...
             else
@@ -146,10 +208,14 @@ namespace InformationRetrievalManager.Crawler
                 // Go through the pages of articles...
                 for (int i = StartPageNo; i <= MaxPageNo; i += PageNoModifier)
                 {
+                    // Check for cancelation
+                    if (_cancelationFlag)
+                        break;
+
                     HtmlDocument doc = web.Load(compoundUrl.Replace("{0}", i.ToString()));
 
                     // Go through the specific page...
-                    foreach (var item in doc.DocumentNode.SelectNodes("//article[@class='content']//ul[@class='thumb_nail_list']//a"))
+                    foreach (var item in doc.DocumentNode.SelectNodes(SiteUrlArticlesXPath))
                     {
                         // Check for cancelation
                         if (_cancelationFlag)
@@ -164,14 +230,11 @@ namespace InformationRetrievalManager.Crawler
                         }
                     }
 
-                    // Check for cancelation
-                    if (_cancelationFlag)
-                        break;
+                    await Task.Delay(SearchInterval);
                 }
             }
 
-            // Finish the processing
-            Finish();
+            return result;
         }
 
         #endregion

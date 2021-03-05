@@ -136,7 +136,7 @@ namespace InformationRetrievalManager
         /// </summary>
         public void Exit()
         {
-            // TODO
+            // TODO: app exit process
             // Save user data before exiting application.
             //_ = CoreDI.LocalSettingsStorage.SaveAsync();
 

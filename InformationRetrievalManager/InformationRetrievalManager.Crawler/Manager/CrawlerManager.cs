@@ -49,8 +49,8 @@ namespace InformationRetrievalManager.Crawler
             // Lock the task
             return await AsyncLock.LockResultAsync(nameof(CrawlerManager), async () =>
             {
-                _crawlers.Add(crawler.Identifier, crawler);
-                _logger.LogTraceSource($"Crawler '{crawler.Identifier}' has been added to the crawler manager successfully.");
+                _crawlers.Add(crawler.NameIdentifier, crawler);
+                _logger.LogTraceSource($"Crawler '{crawler.NameIdentifier}' has been added to the crawler manager successfully.");
                 return true;
             });
         }

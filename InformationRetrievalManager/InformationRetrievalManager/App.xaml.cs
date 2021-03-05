@@ -86,9 +86,19 @@ namespace InformationRetrievalManager
                 .Build();
 
             // Add crawlers
-            await Framework.Service<ICrawlerManager>().AddCrawlerAsync(new CrawlerEngine("bdo-sea"));
+            var crawler = new CrawlerEngine("bdo-sea");
+            crawler.SetControls(
+                "https://www.sea.playblackdesert.com",
+                "/News/Notice?boardType=2&Page={0}",
+                1,
+                12,
+                1,
+                1000,
+                "//article[@class='content']//ul[@class='thumb_nail_list']//a"
+                );
+            await Framework.Service<ICrawlerManager>().AddCrawlerAsync(crawler);
 
-            // TODO
+            // TODO: app setup
             // Ensure the client data store
             //await CoreDI.ClientDataStore.EnsureDataStoreAsync();
 
