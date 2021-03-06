@@ -272,11 +272,10 @@ namespace InformationRetrievalManager.Crawler
         }
 
         /// <summary>
-        /// TODO
+        /// Process scanned URLs
         /// </summary>
-        /// <param name="web"></param>
-        /// <param name="urls"></param>
-        /// <returns></returns>
+        /// <param name="web">Web HtmlAgility instance</param>
+        /// <param name="urls">The URLs</param>
         private async Task ProcessUrlsAsync(HtmlWeb web, HashSet<string> urls)
         {
             const short processPctValue = 75;
