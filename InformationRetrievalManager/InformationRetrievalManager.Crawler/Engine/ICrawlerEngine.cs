@@ -10,7 +10,7 @@
         /// <summary>
         /// represents the crawler and makes it unique identifier for a certain crawler
         /// </summary>
-        /// <remarks>Should not be changeable.</remarks>
+        /// <remarks>Should not be changeable. Should be valid for file/dir names.</remarks>
         string NameIdentifier { get; }
 
         /// <summary>
@@ -42,6 +42,11 @@
         /// XPath to select URLs of articles
         /// </summary>
         string SiteUrlArticlesXPath { get; }
+
+        /// <summary>
+        /// XPath to content of an article
+        /// </summary>
+        string SiteArticleContentAreaXPath { get; }
 
         /// <summary>
         /// Start page number for crawling
@@ -95,6 +100,7 @@
         /// <param name="pageNoModifier">Modifier which is used to increment the page number</param>
         /// <param name="searchInterval">Search interval to do not load the web servers too much</param>
         /// <param name="siteUrlArticlesXPath">XPath for searching URL article links</param>
+        /// <param name="siteArticleContentAreaXPath">XPath for content of an article</param>
         /// <returns>
         ///     <see langword="true"/> on successful set.
         ///     <see langword="false"/> on failure.
@@ -102,7 +108,7 @@
         /// <remarks>
         ///     <paramref name="siteAddress"/> and <paramref name="siteSuffix"/> may contain wildchars '{0}' that defines the place to replace it with real page number
         /// </remarks>
-        bool SetControls(string siteAddress, string siteSuffix, int startPageNo, int maxPageNo, int pageNoModifier, int searchInterval, string siteUrlArticlesXPath);
+        bool SetControls(string siteAddress, string siteSuffix, int startPageNo, int maxPageNo, int pageNoModifier, int searchInterval, string siteUrlArticlesXPath, string siteArticleContentAreaXPath);
 
         #endregion
     }

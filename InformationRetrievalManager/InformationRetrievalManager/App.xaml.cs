@@ -94,7 +94,8 @@ namespace InformationRetrievalManager
                 12,
                 1,
                 1000,
-                "//article[@class='content']//ul[@class='thumb_nail_list']//a"
+                "//article[@class='content']//ul[@class='thumb_nail_list']//a",
+                "//div[@class='view_detail_area']"
                 );
             await Framework.Service<ICrawlerManager>().AddCrawlerAsync(crawler);
 
