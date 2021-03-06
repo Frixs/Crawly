@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using InformationRetrievalManager.Core;
+using InformationRetrievalManager.Crawler;
 
 namespace InformationRetrievalManager
 {
@@ -23,6 +24,10 @@ namespace InformationRetrievalManager
                 return new ApplicationViewModel(true);
             });
 
+            // Bind page view models
+            construction.Services.AddTransient<HomePageViewModel>();
+            construction.Services.AddTransient<HowToPageViewModel>();
+
             //// Bind settings view model
             //construction.Services.AddSingleton<SettingsViewModel>();
 
@@ -43,11 +48,14 @@ namespace InformationRetrievalManager
             // Rewrite the default logger from DNA Framework to our own
             construction.Services.AddTransient(provider => provider.GetService<ILoggerFactory>().CreateLogger(typeof(App).Namespace));
 
-            // Bind task manager.
+            // Bind a task manager
             construction.Services.AddTransient<ITaskManager, BaseTaskManager>();
 
-            // Bind a file manager.
+            // Bind a file manager
             construction.Services.AddTransient<IFileManager, BaseFileManager>();
+
+            // Bind a crawler manager
+            construction.Services.AddSingleton<ICrawlerManager, CrawlerManager>();
 
             // Return the construction for chaining
             return construction;

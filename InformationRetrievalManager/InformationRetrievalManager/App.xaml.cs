@@ -1,4 +1,5 @@
-﻿using Ixs.DNA;
+﻿using InformationRetrievalManager.Crawler;
+using Ixs.DNA;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -78,13 +79,27 @@ namespace InformationRetrievalManager
             Framework.Construct<DefaultFrameworkConstruction>()
                 .AddFileLogger(
                     logPath: Framework.Construction.Environment.IsDevelopment ? "logs/debug.log" : "logs/InformationRetrievalManager.log",
-                    logLevel: (LogLevel)Enum.Parse(typeof(LogLevel), "Information", true),
+                    logLevel: (LogLevel)Enum.Parse(typeof(LogLevel), Framework.Construction.Configuration.GetSection("Logging:LogLevel:Default")?.Value ?? LogLevel.Information.ToString(), true),
                     trimSize: 50000000) // 50MB limit
                 .AddTheViewModels()
                 .AddTheServices()
                 .Build();
 
-            // TODO
+            // Add crawlers
+            var crawler = new CrawlerEngine("bdo-sea");
+            crawler.SetControls(
+                "https://www.sea.playblackdesert.com",
+                "/News/Notice?boardType=2&Page={0}",
+                1,
+                12,
+                1,
+                1000,
+                "//article[@class='content']//ul[@class='thumb_nail_list']//a",
+                "//div[@class='view_detail_area']"
+                );
+            await Framework.Service<ICrawlerManager>().AddCrawlerAsync(crawler);
+
+            // TODO: app setup
             // Ensure the client data store
             //await CoreDI.ClientDataStore.EnsureDataStoreAsync();
 

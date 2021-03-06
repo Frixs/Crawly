@@ -16,7 +16,7 @@ namespace InformationRetrievalManager
         /// <summary>
         /// The View Model associated with this page.
         /// </summary>
-        private object mViewModel;
+        private object _viewModel;
 
         #endregion
 
@@ -61,18 +61,18 @@ namespace InformationRetrievalManager
         {
             get
             {
-                return mViewModel;
+                return _viewModel;
             }
             set
             {
                 // If nothing has changed, return.
-                if (mViewModel == value)
+                if (_viewModel == value)
                     return;
 
-                mViewModel = value;
+                _viewModel = value;
 
                 // Set the data context for this page.
-                DataContext = mViewModel;
+                DataContext = _viewModel;
             }
         }
 

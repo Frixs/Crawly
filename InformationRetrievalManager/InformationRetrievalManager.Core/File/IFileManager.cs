@@ -15,8 +15,15 @@ namespace InformationRetrievalManager.Core
         /// <param name="text">The text to write.</param>
         /// <param name="path">The path of the file to write to.</param>
         /// <param name="append">If true, writes the text to the end of the file, otherwise overrides any existing file.</param>
-        /// <returns></returns>
         Task WriteTextToFileAsync(string text, string path, bool append = false);
+
+        /// <summary>
+        /// Writes lines to the specified file.
+        /// </summary>
+        /// <param name="lines">The lines to write.</param>
+        /// <param name="path">The path of the file to write to.</param>
+        /// <param name="append">If true, writes the text to the end of the file, otherwise overrides any existing file.</param>
+        Task WriteLinesToFileAsync(List<string> lines, string path, bool append = false);
 
         /// <summary>
         /// Count lines in the specified file.

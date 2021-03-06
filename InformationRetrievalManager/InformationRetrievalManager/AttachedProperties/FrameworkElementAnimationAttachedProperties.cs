@@ -19,12 +19,12 @@ namespace InformationRetrievalManager
         /// True if this is the very first time the value has been updated
         /// Used to make sure we run the logic at least once during first load
         /// </summary>
-        protected Dictionary<WeakReference, bool> mAlreadyLoaded = new Dictionary<WeakReference, bool>();
+        protected Dictionary<WeakReference, bool> _alreadyLoaded = new Dictionary<WeakReference, bool>();
 
         /// <summary>
         /// The most recent value used if we get a value changed before we do the first load
         /// </summary>
-        protected Dictionary<WeakReference, bool> mFirstLoadValue = new Dictionary<WeakReference, bool>();
+        protected Dictionary<WeakReference, bool> _firstLoadValue = new Dictionary<WeakReference, bool>();
 
         #endregion
 
@@ -35,10 +35,10 @@ namespace InformationRetrievalManager
                 return;
 
             // Try and get the already loaded reference
-            var alreadyLoadedReference = mAlreadyLoaded.FirstOrDefault(f => f.Key.Target == sender);
+            var alreadyLoadedReference = _alreadyLoaded.FirstOrDefault(f => f.Key.Target == sender);
 
             // Try and get the first load reference
-            var firstLoadReference = mFirstLoadValue.FirstOrDefault(f => f.Key.Target == sender);
+            var firstLoadReference = _firstLoadValue.FirstOrDefault(f => f.Key.Target == sender);
 
             // Don't fire if the value doesn't change
             if ((bool)sender.GetValue(ValueProperty) == (bool)value && alreadyLoadedReference.Key != null)
@@ -51,7 +51,7 @@ namespace InformationRetrievalManager
                 var weakReference = new WeakReference(sender);
 
                 // Flag that we are in first load but have not finished it
-                mAlreadyLoaded[weakReference] = false;
+                _alreadyLoaded[weakReference] = false;
 
                 // Start off hidden before we decide how to animate
                 element.Visibility = Visibility.Hidden;
@@ -70,13 +70,13 @@ namespace InformationRetrievalManager
 
                     // Refresh the first load value in case it changed
                     // since the 5ms delay
-                    firstLoadReference = mFirstLoadValue.FirstOrDefault(f => f.Key.Target == sender);
+                    firstLoadReference = _firstLoadValue.FirstOrDefault(f => f.Key.Target == sender);
 
                     // Do desired animation
                     DoAnimation(element, firstLoadReference.Key != null ? firstLoadReference.Value : (bool)value, true);
 
                     // Flag that we have finished first load
-                    mAlreadyLoaded[weakReference] = true;
+                    _alreadyLoaded[weakReference] = true;
                 };
 
                 // Hook into the Loaded event of the element
@@ -84,7 +84,7 @@ namespace InformationRetrievalManager
             }
             // If we have started a first load but not fired the animation yet, update the property
             else if (alreadyLoadedReference.Value == false)
-                mFirstLoadValue[new WeakReference(sender)] = (bool)value;
+                _firstLoadValue[new WeakReference(sender)] = (bool)value;
             else
                 // Do desired animation
                 DoAnimation(element, (bool)value, false);

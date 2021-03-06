@@ -1,4 +1,6 @@
-﻿using Ixs.DNA;
+﻿using InformationRetrievalManager.Crawler;
+using Ixs.DNA;
+using System;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
@@ -9,6 +11,12 @@ namespace InformationRetrievalManager
     /// </summary>
     public class HomePageViewModel : BaseViewModel
     {
+        #region Private Members (Injects)
+
+        private readonly ICrawlerManager _crawlerManager;
+
+        #endregion
+
         #region Commands
 
         /// <summary>
@@ -35,6 +43,14 @@ namespace InformationRetrievalManager
             StartCrawlerCommand = new RelayCommand(async () => await StartCrawlerCommandRoutineAsync());
         }
 
+        /// <summary>
+        /// DI constructor
+        /// </summary>
+        public HomePageViewModel(ICrawlerManager crawlerManager) : this()
+        {
+            _crawlerManager = crawlerManager ?? throw new ArgumentNullException(nameof(crawlerManager));
+        }
+
         #endregion
 
         #region Command Methods
@@ -53,8 +69,11 @@ namespace InformationRetrievalManager
         /// <returns></returns>
         private async Task StartCrawlerCommandRoutineAsync()
         {
-            // TODO: start crawler here
-            System.Console.WriteLine("TODO: start crawler");
+            //await RunCommandAsync(() => StartStopAllFlag, async () => await StartStopAll(true));
+            // HACK: crawler starter
+            var crawler = await _crawlerManager.GetCrawlerAsync("bdo-sea");
+            crawler.Start();
+
             await Task.Delay(1);
         }
 
