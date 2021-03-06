@@ -160,7 +160,6 @@ namespace InformationRetrievalManager.Crawler
 
         /// <summary>
         /// Process method of crawling
-        /// HACK: Might be a good idea to move this into a completely separate class of engine processing
         /// </summary>
         private async Task ProcessAsync()
         {
@@ -306,7 +305,7 @@ namespace InformationRetrievalManager.Crawler
                     // Log it
                     _logger.LogTraceSource($"Crawler '{NameIdentifier}' is currently processing URL '{web.ResponseUri}'.");
 
-                    var content = doc.DocumentNode.SelectNodes("//div[@class='view_detail_area']").FirstOrDefault();
+                    var content = doc.DocumentNode.SelectNodes(SiteArticleContentAreaXPath).FirstOrDefault();
                     if (content != null)
                     {
                         string html = content.InnerHtml;
