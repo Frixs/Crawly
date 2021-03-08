@@ -1,4 +1,6 @@
-﻿namespace InformationRetrievalManager.Crawler
+﻿using System;
+
+namespace InformationRetrievalManager.Crawler
 {
     /// <summary>
     /// Interface for crawler engines
@@ -67,6 +69,34 @@
         /// Delay between search tasks (ms)
         /// </summary>
         int SearchInterval { get; }
+
+        #endregion
+
+        #region Events
+
+        /// <summary>
+        /// Event raised on process start
+        /// </summary>
+        /// <remarks>
+        ///     After each crawler processing, the event is meant to be set default
+        /// </remarks>
+        event EventHandler OnStartProcessEvent;
+
+        /// <summary>
+        /// Event raised on process finish
+        /// </summary>
+        /// <remarks>
+        ///     After each crawler processing, the event is meant to be set default
+        /// </remarks>
+        event EventHandler OnFinishProcessEvent;
+
+        /// <summary>
+        /// Event raised each time process progress moves
+        /// </summary>
+        /// <remarks>
+        ///     After each crawler processing, the event is meant to be set default
+        /// </remarks>
+        event EventHandler<CrawlerEngineEventArgs> OnProcessProgressEvent;
 
         #endregion
 

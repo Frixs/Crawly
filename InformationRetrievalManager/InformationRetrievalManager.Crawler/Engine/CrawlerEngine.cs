@@ -31,6 +31,11 @@ namespace InformationRetrievalManager.Crawler
         /// </summary>
         private bool _cancelationFlag = false;
 
+        /// <summary>
+        /// Private member for <see cref="CrawlingProgressPct"/>
+        /// </summary>
+        private short _crawlingProgressPct; //; ctor
+
         #endregion
 
         #region Interface Properties
@@ -42,7 +47,16 @@ namespace InformationRetrievalManager.Crawler
         public bool IsCurrentlyCrawlingFlag { get; private set; } //; ctor
 
         /// <inheritdoc/>
-        public short CrawlingProgressPct { get; private set; } //; ctor
+        public short CrawlingProgressPct
+        {
+            get => _crawlingProgressPct;
+            private set
+            {
+                _crawlingProgressPct = value;
+                if (value > 0)
+                    OnProcessProgressEvent?.Invoke(this, new CrawlerEngineEventArgs { CrawlingProgressPct = CrawlingProgressPct });
+            }
+        }
 
         /// <inheritdoc/>
         public int StartPageNo { get; private set; } = 1;
@@ -67,6 +81,19 @@ namespace InformationRetrievalManager.Crawler
 
         /// <inheritdoc/>
         public int SearchInterval { get; private set; } = 1000;
+
+        #endregion
+
+        #region Interface Events
+
+        /// <inheritdoc/>
+        public event EventHandler OnStartProcessEvent;
+
+        /// <inheritdoc/>
+        public event EventHandler OnFinishProcessEvent;
+
+        /// <inheritdoc/>
+        public event EventHandler<CrawlerEngineEventArgs> OnProcessProgressEvent;
 
         #endregion
 
@@ -104,10 +131,13 @@ namespace InformationRetrievalManager.Crawler
         /// <inheritdoc/>
         public bool Start()
         {
+            // First, make sure the process is not running in this crawler...
+            // ... the same check should be in process method due to separate process running and default value set in there
             if (IsCurrentlyCrawlingFlag)
                 return false;
-            IsCurrentlyCrawlingFlag = true;
-            CrawlingProgressPct = 0;
+
+            // Raise the start event
+            OnStartProcessEvent?.Invoke(null, EventArgs.Empty);
 
             // Run the process of crawling...
             _taskManager.RunAndForget(ProcessAsync);
@@ -146,13 +176,22 @@ namespace InformationRetrievalManager.Crawler
         #region Private Methods
 
         /// <summary>
-        /// Finish up crawler processing
+        /// Finish up crawler processing and put the crawler into a default state
         /// </summary>
         private void Finish()
         {
             // Turn off the flag once the crawling is finished
             IsCurrentlyCrawlingFlag = false;
+            CrawlingProgressPct = -1;
             _cancelationFlag = false;
+
+            // Raise the finish event
+            OnFinishProcessEvent?.Invoke(null, EventArgs.Empty);
+
+            // Clean the event handlers
+            OnStartProcessEvent = null;
+            OnFinishProcessEvent = null;
+            OnProcessProgressEvent = null;
 
             // Log it
             _logger.LogInformationSource($"Crawler '{NameIdentifier}' has finished.");
@@ -163,6 +202,17 @@ namespace InformationRetrievalManager.Crawler
         /// </summary>
         private async Task ProcessAsync()
         {
+            // Check if the process is not already running in this crawler...
+            if (IsCurrentlyCrawlingFlag)
+                return;
+            // Init/start the crawling process
+            /*
+             *  It would be more clean to have this in Start method instead, 
+             *  but this makes us sure, the crawler cannot throttle down due to separate process start failure.
+             */
+            IsCurrentlyCrawlingFlag = true;
+            CrawlingProgressPct = 0;
+
             // Log it
             _logger.LogInformationSource($"Crawler '{NameIdentifier}' started processing.");
 
@@ -184,7 +234,7 @@ namespace InformationRetrievalManager.Crawler
                 _logger.LogWarningSource($"Crawler '{NameIdentifier}' was unable to proceed with the process.");
             }
 
-            // Finish the processing
+            // Finish the processing (it is important to call it at the end here)
             Finish();
         }
 
@@ -197,7 +247,7 @@ namespace InformationRetrievalManager.Crawler
         {
             HashSet<string> result = new HashSet<string>();
 
-            const short processPctValue = 25;
+            const short processPctValue = 20;
 
             const string hrefKeyword = "href";
             const string defaultArticleLink = "#";
@@ -277,7 +327,7 @@ namespace InformationRetrievalManager.Crawler
         /// <param name="urls">The URLs</param>
         private async Task ProcessUrlsAsync(HtmlWeb web, HashSet<string> urls)
         {
-            const short processPctValue = 75;
+            const short processPctValue = 80;
 
             short currentPctProgress = 0;
             short previousPctProgress = 0;
@@ -325,7 +375,6 @@ namespace InformationRetrievalManager.Crawler
                         currentPctProgress = Convert.ToInt16(Math.Round(i / (double)(urls.Count / 100.0) * (processPctValue / 100.0)));
                         CrawlingProgressPct += (short)(currentPctProgress - previousPctProgress);
                         previousPctProgress = currentPctProgress;
-                        Console.WriteLine(CrawlingProgressPct);
                     }
 
                     await Task.Delay(SearchInterval);
