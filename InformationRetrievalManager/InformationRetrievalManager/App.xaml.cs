@@ -94,9 +94,9 @@ namespace InformationRetrievalManager
                 1, 12, 1,
                 1000,
                 "//article[@class='content']//ul[@class='thumb_nail_list']//a",
-                "//div[@class='view_detail_area']",
-                "//div[@class='view_detail_area']//strong[@class='title']",
-                "//div[@class='view_detail_area']//span[@class='date']",
+                "//div[@class='view_detail_area']//div[@class='contents_area']",
+                "//div[@class='view_detail_area']//div[@class='title_area']//strong[@class='title']",
+                "//div[@class='view_detail_area']//div[@class='title_area']//span[@class='date']",
                 new DatetimeParseData("yyyy-MM-dd HH:mm")
                 );
             await Framework.Service<ICrawlerManager>().AddCrawlerAsync(crawler);

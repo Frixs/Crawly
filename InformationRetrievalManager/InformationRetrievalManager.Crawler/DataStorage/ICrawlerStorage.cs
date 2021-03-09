@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 
 namespace InformationRetrievalManager.Crawler
 {
@@ -16,11 +17,11 @@ namespace InformationRetrievalManager.Crawler
         /// <param name="crawler">The crawler</param>
         /// <param name="url">Currently saved data's URL</param>
         /// <param name="title">Title</param>
-        /// <param name="datetime">Datetime of the saved article</param>
+        /// <param name="timestamp">Datetime of the saved article</param>
         /// <param name="contentHtml">HTML version of content</param>
         /// <param name="contentTextMin">Minimized version of content</param>
         /// <param name="contentText">Normal (tidy) version of content</param>
-        Task SaveAsync(ICrawlerEngine crawler, string url, string title, string datetime, string contentHtml, string contentTextMin, string contentText);
+        Task SaveAsync(ICrawlerEngine crawler, string url, string title, DateTime timestamp, string contentHtml, string contentTextMin, string contentText);
 
         #endregion
     }

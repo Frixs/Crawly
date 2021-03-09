@@ -391,15 +391,16 @@ namespace InformationRetrievalManager.Crawler
                     // Make sure we found all needed HTML...
                     if (title != null && datetime != null && content != null)
                     {
+                        DateTime timestamp;
                         // Check fi the datetime is parsable...
-                        if (DateTime.TryParseExact(datetime.InnerText, SiteArticleDateTimeParseData.Format, SiteArticleDateTimeParseData.CultureInfo, System.Globalization.DateTimeStyles.None, out _))
+                        if (DateTime.TryParseExact(datetime.InnerText.Trim(), SiteArticleDateTimeParseData.Format, SiteArticleDateTimeParseData.CultureInfo, System.Globalization.DateTimeStyles.None, out timestamp))
                         {
                             // Save data
                             await _crawlerStorage.SaveAsync(
                                 this,
                                 url,
-                                MinifyText(title.InnerText),
-                                datetime.InnerText,
+                                MinifyText(title.InnerText).Trim(),
+                                timestamp,
                                 TidyfyText(content.InnerHtml),
                                 MinifyText(content.InnerText),
                                 TidyfyText(content.InnerText)
