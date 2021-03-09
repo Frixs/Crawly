@@ -21,6 +21,7 @@ namespace InformationRetrievalManager.Crawler
         private readonly ILogger _logger;
         private readonly IFileManager _fileManager;
         private readonly ITaskManager _taskManager;
+        private readonly ICrawlerStorage _crawlerStorage;
 
         #endregion
 
@@ -30,6 +31,11 @@ namespace InformationRetrievalManager.Crawler
         /// It is used to cancel the crawler processing
         /// </summary>
         private bool _cancelationFlag = false;
+
+        /// <summary>
+        /// Private member for <see cref="CrawlingProgressPct"/>
+        /// </summary>
+        private short _crawlingProgressPct; //; ctor
 
         #endregion
 
@@ -42,7 +48,19 @@ namespace InformationRetrievalManager.Crawler
         public bool IsCurrentlyCrawlingFlag { get; private set; } //; ctor
 
         /// <inheritdoc/>
-        public short CrawlingProgressPct { get; private set; } //; ctor
+        public short CrawlingProgressPct
+        {
+            get => _crawlingProgressPct;
+            private set
+            {
+                _crawlingProgressPct = value;
+                if (value > 0)
+                    OnProcessProgressEvent?.Invoke(this, new CrawlerEngineEventArgs { CrawlingProgressPct = CrawlingProgressPct });
+            }
+        }
+
+        /// <inheritdoc/>
+        public DateTime CrawlingTimestamp { get; private set; }
 
         /// <inheritdoc/>
         public int StartPageNo { get; private set; } = 1;
@@ -54,10 +72,16 @@ namespace InformationRetrievalManager.Crawler
         public int PageNoModifier { get; private set; } = 1;
 
         /// <inheritdoc/>
-        public string SiteAddress { get; private set; } = null;
+        public string SiteAddress { get; private set; } = "";
 
         /// <inheritdoc/>
-        public string SiteSuffix { get; private set; } = null;
+        public string SiteSuffix { get; private set; } = "";
+
+        /// <inheritdoc/>
+        public string FullSiteAddress => IsSiteSet ? SiteAddress + SiteSuffix : string.Empty;
+
+        /// <inheritdoc/>
+        public string CurrentSiteDataIdentification => IsSiteSet ? $"{NameIdentifier}_{FullSiteAddress.GetHashCode()}" : string.Empty;
 
         /// <inheritdoc/>
         public string SiteUrlArticlesXPath { get; private set; } = "";
@@ -66,7 +90,32 @@ namespace InformationRetrievalManager.Crawler
         public string SiteArticleContentAreaXPath { get; private set; } = "";
 
         /// <inheritdoc/>
+        public string SiteArticleTitleXPath { get; private set; } = "";
+
+        /// <inheritdoc/>
+        public string SiteArticleDateTimeXPath { get; private set; } = "";
+
+        /// <inheritdoc/>
+        public DatetimeParseData SiteArticleDateTimeParseData { get; private set; } = new DatetimeParseData();
+
+        /// <inheritdoc/>
         public int SearchInterval { get; private set; } = 1000;
+
+        /// <inheritdoc/>
+        public bool InterruptOnError { get; set; } = false;
+
+        #endregion
+
+        #region Interface Events
+
+        /// <inheritdoc/>
+        public event EventHandler OnStartProcessEvent;
+
+        /// <inheritdoc/>
+        public event EventHandler OnFinishProcessEvent;
+
+        /// <inheritdoc/>
+        public event EventHandler<CrawlerEngineEventArgs> OnProcessProgressEvent;
 
         #endregion
 
@@ -95,6 +144,7 @@ namespace InformationRetrievalManager.Crawler
             _logger = FrameworkDI.Logger ?? throw new ArgumentNullException(nameof(_logger));
             _fileManager = CoreDI.File ?? throw new ArgumentNullException(nameof(_fileManager));
             _taskManager = CoreDI.Task ?? throw new ArgumentNullException(nameof(_taskManager));
+            _crawlerStorage = Framework.Service<ICrawlerStorage>() ?? throw new ArgumentNullException(nameof(_crawlerStorage));
         }
 
         #endregion
@@ -104,10 +154,13 @@ namespace InformationRetrievalManager.Crawler
         /// <inheritdoc/>
         public bool Start()
         {
+            // First, make sure the process is not running in this crawler...
+            // ... the same check should be in process method due to separate process running and default value set in there
             if (IsCurrentlyCrawlingFlag)
                 return false;
-            IsCurrentlyCrawlingFlag = true;
-            CrawlingProgressPct = 0;
+
+            // Raise the start event
+            OnStartProcessEvent?.Invoke(null, EventArgs.Empty);
 
             // Run the process of crawling...
             _taskManager.RunAndForget(ProcessAsync);
@@ -126,7 +179,15 @@ namespace InformationRetrievalManager.Crawler
         }
 
         /// <inheritdoc/>
-        public bool SetControls(string siteAddress, string siteSuffix, int startPageNo, int maxPageNo, int pageNoModifier, int searchInterval, string siteUrlArticlesXPath, string siteArticleContentAreaXPath)
+        public bool SetControls(
+            string siteAddress, string siteSuffix,
+            int startPageNo, int maxPageNo, int pageNoModifier,
+            int searchInterval,
+            string siteUrlArticlesXPath,
+            string siteArticleContentAreaXPath,
+            string siteArticleTitleXPath,
+            string siteArticleDateTimeXPath, DatetimeParseData siteArticleDateTimeParseData
+            )
         {
             // TODO: validate data
             SiteAddress = siteAddress;
@@ -137,6 +198,9 @@ namespace InformationRetrievalManager.Crawler
             SearchInterval = searchInterval;
             SiteUrlArticlesXPath = siteUrlArticlesXPath;
             SiteArticleContentAreaXPath = siteArticleContentAreaXPath;
+            SiteArticleTitleXPath = siteArticleTitleXPath;
+            SiteArticleDateTimeXPath = siteArticleDateTimeXPath;
+            SiteArticleDateTimeParseData = siteArticleDateTimeParseData;
 
             return true;
         }
@@ -146,13 +210,23 @@ namespace InformationRetrievalManager.Crawler
         #region Private Methods
 
         /// <summary>
-        /// Finish up crawler processing
+        /// Finish up crawler processing and put the crawler into a default state
         /// </summary>
         private void Finish()
         {
             // Turn off the flag once the crawling is finished
             IsCurrentlyCrawlingFlag = false;
+            CrawlingProgressPct = -1;
+            CrawlingTimestamp = default;
             _cancelationFlag = false;
+
+            // Raise the finish event
+            OnFinishProcessEvent?.Invoke(null, EventArgs.Empty);
+
+            // Clean the event handlers
+            OnStartProcessEvent = null;
+            OnFinishProcessEvent = null;
+            OnProcessProgressEvent = null;
 
             // Log it
             _logger.LogInformationSource($"Crawler '{NameIdentifier}' has finished.");
@@ -163,6 +237,18 @@ namespace InformationRetrievalManager.Crawler
         /// </summary>
         private async Task ProcessAsync()
         {
+            // Check if the process is not already running in this crawler...
+            if (IsCurrentlyCrawlingFlag)
+                return;
+            // Init/start the crawling process
+            /*
+             *  It would be more clean to have this in Start method instead, 
+             *  but this makes us sure, the crawler cannot throttle down due to separate process start failure.
+             */
+            IsCurrentlyCrawlingFlag = true;
+            CrawlingProgressPct = 0;
+            CrawlingTimestamp = DateTime.UtcNow;
+
             // Log it
             _logger.LogInformationSource($"Crawler '{NameIdentifier}' started processing.");
 
@@ -184,7 +270,7 @@ namespace InformationRetrievalManager.Crawler
                 _logger.LogWarningSource($"Crawler '{NameIdentifier}' was unable to proceed with the process.");
             }
 
-            // Finish the processing
+            // Finish the processing (it is important to call it at the end here)
             Finish();
         }
 
@@ -197,15 +283,14 @@ namespace InformationRetrievalManager.Crawler
         {
             HashSet<string> result = new HashSet<string>();
 
-            const short processPctValue = 25;
+            const short processPctValue = 20;
 
             const string hrefKeyword = "href";
             const string defaultArticleLink = "#";
 
             bool anyInvalidLinks = false;
-            string compoundUrl = SiteAddress + SiteSuffix;
-            string urlsFilename = $"urls_{NameIdentifier}_{compoundUrl.GetHashCode()}_{StartPageNo}_{MaxPageNo}_{PageNoModifier}_{DateTime.UtcNow.Year}_{DateTime.UtcNow.Month}_{DateTime.UtcNow.Day}_{DateTime.UtcNow.Hour}.txt";
-            string urlsFilePath = $"{Constants.DataStorageDir}/{urlsFilename}";
+            string urlsFilename = $"urls_{CurrentSiteDataIdentification}_{StartPageNo}_{MaxPageNo}_{PageNoModifier}_{DateTime.UtcNow.Year}_{DateTime.UtcNow.Month}_{DateTime.UtcNow.Day}_{DateTime.UtcNow.Hour}.txt";
+            string urlsFilePath = $"{Constants.CrawlerDataStorageDir}/{urlsFilename}";
 
             // Check if we have already scanned urls...
             if (File.Exists(urlsFilePath))
@@ -230,7 +315,7 @@ namespace InformationRetrievalManager.Crawler
                         break;
 
                     // Load the document
-                    HtmlDocument doc = web.Load(compoundUrl.Replace("{0}", i.ToString()));
+                    HtmlDocument doc = web.Load(FullSiteAddress.Replace("{0}", i.ToString()));
                     // Log it
                     _logger.LogTraceSource($"Crawler '{NameIdentifier}' is currently scanning '{web.ResponseUri}'.");
 
@@ -277,16 +362,10 @@ namespace InformationRetrievalManager.Crawler
         /// <param name="urls">The URLs</param>
         private async Task ProcessUrlsAsync(HtmlWeb web, HashSet<string> urls)
         {
-            const short processPctValue = 75;
+            const short processPctValue = 80;
 
             short currentPctProgress = 0;
             short previousPctProgress = 0;
-
-            string compoundUrl = SiteAddress + SiteSuffix;
-            string dirPath = $"{Constants.DataStorageDir}/{NameIdentifier}_{compoundUrl.GetHashCode()}";
-            string htmlFilename = $"html_{DateTime.UtcNow.Year}_{DateTime.UtcNow.Month}_{DateTime.UtcNow.Day}_{DateTime.UtcNow.Hour}_{DateTime.UtcNow.Minute}_{DateTime.UtcNow.Second}.txt";
-            string textFilename = $"text_{DateTime.UtcNow.Year}_{DateTime.UtcNow.Month}_{DateTime.UtcNow.Day}_{DateTime.UtcNow.Hour}_{DateTime.UtcNow.Minute}_{DateTime.UtcNow.Second}.txt";
-            string tidytextFilename = $"tidytext_{DateTime.UtcNow.Year}_{DateTime.UtcNow.Month}_{DateTime.UtcNow.Day}_{DateTime.UtcNow.Hour}_{DateTime.UtcNow.Minute}_{DateTime.UtcNow.Second}.txt";
 
             int i = 0;
             foreach (var item in urls)
@@ -303,32 +382,60 @@ namespace InformationRetrievalManager.Crawler
                     // Load the document
                     HtmlDocument doc = web.Load(url);
                     // Log it
-                    _logger.LogTraceSource($"Crawler '{NameIdentifier}' is currently processing URL '{web.ResponseUri}'.");
+                    _logger.LogDebugSource($"Crawler '{NameIdentifier}' is currently processing URL '{web.ResponseUri}'.");
 
+                    var title = doc.DocumentNode.SelectNodes(SiteArticleTitleXPath).FirstOrDefault();
+                    var datetime = doc.DocumentNode.SelectNodes(SiteArticleDateTimeXPath).FirstOrDefault();
                     var content = doc.DocumentNode.SelectNodes(SiteArticleContentAreaXPath).FirstOrDefault();
-                    if (content != null)
+
+                    // Make sure we found all needed HTML...
+                    if (title != null && datetime != null && content != null)
                     {
-                        string html = content.InnerHtml;
-                        string minifiedText = MinifyText(content.InnerText);
-                        string tidyText = TidyfyText(content.InnerText);
+                        DateTime timestamp;
+                        // Check fi the datetime is parsable...
+                        if (DateTime.TryParseExact(datetime.InnerText.Trim(), SiteArticleDateTimeParseData.Format, SiteArticleDateTimeParseData.CultureInfo, System.Globalization.DateTimeStyles.None, out timestamp))
+                        {
+                            // Save data
+                            await _crawlerStorage.SaveAsync(
+                                this,
+                                url,
+                                MinifyText(title.InnerText).Trim(),
+                                timestamp,
+                                TidyfyText(content.InnerHtml),
+                                MinifyText(content.InnerText),
+                                TidyfyText(content.InnerText)
+                                );
+                        }
+                        else
+                        {
+                            _logger.LogTraceSource($"Crawler '{NameIdentifier}' cannot parse the article's datetime according to attached formatting!");
 
-                        // Check if the dir exists...
-                        if (!Directory.Exists(dirPath))
-                            Directory.CreateDirectory(dirPath);
+                            if (InterruptOnError)
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        string invalidNodeNames = $"{(title == null ? $" {nameof(title)}" : "")}{(datetime == null ? $" {nameof(datetime)}" : "")}{(content == null ? $" {nameof(content)}" : "")}";
+                        _logger.LogTraceSource($"Crawler '{NameIdentifier}' cannot find html node(s):{invalidNodeNames}");
 
-                        // Save data into files
-                        await _fileManager.WriteTextToFileAsync(url + Environment.NewLine + html + Environment.NewLine, $"{dirPath}/{htmlFilename}", true);
-                        await _fileManager.WriteTextToFileAsync(url + Environment.NewLine + minifiedText + Environment.NewLine, $"{dirPath}/{textFilename}", true);
-                        await _fileManager.WriteTextToFileAsync(url + Environment.NewLine + tidyText + Environment.NewLine, $"{dirPath}/{tidytextFilename}", true);
-
-                        // Calculate progress pct
-                        currentPctProgress = Convert.ToInt16(Math.Round(i / (double)(urls.Count / 100.0) * (processPctValue / 100.0)));
-                        CrawlingProgressPct += (short)(currentPctProgress - previousPctProgress);
-                        previousPctProgress = currentPctProgress;
-                        Console.WriteLine(CrawlingProgressPct);
+                        if (InterruptOnError)
+                            break;
                     }
 
+                    // Calculate progress pct
+                    currentPctProgress = Convert.ToInt16(Math.Round(i / (double)(urls.Count / 100.0) * (processPctValue / 100.0)));
+                    CrawlingProgressPct += (short)(currentPctProgress - previousPctProgress);
+                    previousPctProgress = currentPctProgress;
+
                     await Task.Delay(SearchInterval);
+                }
+                else
+                {
+                    _logger.LogTraceSource($"Crawler '{NameIdentifier}' indicates a wrong URL! '{url}'");
+
+                    if (InterruptOnError)
+                        break;
                 }
 
                 ++i;

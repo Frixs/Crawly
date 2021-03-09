@@ -1,4 +1,7 @@
-﻿namespace InformationRetrievalManager.Crawler
+﻿using InformationRetrievalManager.Core;
+using System;
+
+namespace InformationRetrievalManager.Crawler
 {
     /// <summary>
     /// Interface for crawler engines
@@ -27,6 +30,12 @@
         short CrawlingProgressPct { get; }
 
         /// <summary>
+        /// Indicates the start of processing as a timestamp that could be useful to identify specific processing. 
+        /// If the processing is not running the value is set to <see cref="default"/>
+        /// </summary>
+        DateTime CrawlingTimestamp { get; }
+
+        /// <summary>
         /// The base size address
         /// </summary>
         /// <remarks>Can contain wildchars to be replaced with page no. - more in <see cref="SetControls"/></remarks>
@@ -39,14 +48,41 @@
         string SiteSuffix { get; }
 
         /// <summary>
+        /// Should return combination of <see cref="SiteAddress"/> and <see cref="SiteSuffix"/>. 
+        /// Returns empty string if the site is not set.
+        /// </summary>
+        string FullSiteAddress { get; }
+
+        /// <summary>
+        /// Dirname base that identifies the crawler's data
+        /// Returns empty string if the site is not set.
+        /// </summary>
+        string CurrentSiteDataIdentification { get; }
+
+        /// <summary>
         /// XPath to select URLs of articles
         /// </summary>
         string SiteUrlArticlesXPath { get; }
 
         /// <summary>
-        /// XPath to content of an article
+        /// XPath to content of the article
         /// </summary>
         string SiteArticleContentAreaXPath { get; }
+
+        /// <summary>
+        /// XPath to title of the article
+        /// </summary>
+        string SiteArticleTitleXPath { get; }
+
+        /// <summary>
+        /// XPath to date-time of the article
+        /// </summary>
+        string SiteArticleDateTimeXPath { get; }
+
+        /// <summary>
+        /// Date-time related parsing data (<see cref="SiteArticleDateTimeXPath"/>)
+        /// </summary>
+        DatetimeParseData SiteArticleDateTimeParseData { get; }
 
         /// <summary>
         /// Start page number for crawling
@@ -67,6 +103,39 @@
         /// Delay between search tasks (ms)
         /// </summary>
         int SearchInterval { get; }
+
+        /// <summary>
+        /// Indicates if the crawler should interrupt processing on any error (TRUE) (e.g. failed to parse html) or simple continue and ignore it (FALSE)
+        /// </summary>
+        bool InterruptOnError { get; set; }
+
+        #endregion
+
+        #region Events
+
+        /// <summary>
+        /// Event raised on process start
+        /// </summary>
+        /// <remarks>
+        ///     After each crawler processing, the event is meant to be set default
+        /// </remarks>
+        event EventHandler OnStartProcessEvent;
+
+        /// <summary>
+        /// Event raised on process finish
+        /// </summary>
+        /// <remarks>
+        ///     After each crawler processing, the event is meant to be set default
+        /// </remarks>
+        event EventHandler OnFinishProcessEvent;
+
+        /// <summary>
+        /// Event raised each time process progress moves
+        /// </summary>
+        /// <remarks>
+        ///     After each crawler processing, the event is meant to be set default
+        /// </remarks>
+        event EventHandler<CrawlerEngineEventArgs> OnProcessProgressEvent;
 
         #endregion
 
@@ -100,7 +169,10 @@
         /// <param name="pageNoModifier">Modifier which is used to increment the page number</param>
         /// <param name="searchInterval">Search interval to do not load the web servers too much</param>
         /// <param name="siteUrlArticlesXPath">XPath for searching URL article links</param>
-        /// <param name="siteArticleContentAreaXPath">XPath for content of an article</param>
+        /// <param name="siteArticleContentAreaXPath">XPath for content of the article</param>
+        /// <param name="siteArticleTitleXPath">XPath for title of the article</param>
+        /// <param name="siteArticleDateTimeXPath">XPath for date-time of creation of the article</param>
+        /// <param name="siteArticleDateTimeParseData">Parse data need for parsing the date-time</param>
         /// <returns>
         ///     <see langword="true"/> on successful set.
         ///     <see langword="false"/> on failure.
@@ -108,7 +180,15 @@
         /// <remarks>
         ///     <paramref name="siteAddress"/> and <paramref name="siteSuffix"/> may contain wildchars '{0}' that defines the place to replace it with real page number
         /// </remarks>
-        bool SetControls(string siteAddress, string siteSuffix, int startPageNo, int maxPageNo, int pageNoModifier, int searchInterval, string siteUrlArticlesXPath, string siteArticleContentAreaXPath);
+        bool SetControls(
+            string siteAddress, string siteSuffix, 
+            int startPageNo, int maxPageNo, int pageNoModifier, 
+            int searchInterval, 
+            string siteUrlArticlesXPath, 
+            string siteArticleContentAreaXPath, 
+            string siteArticleTitleXPath, 
+            string siteArticleDateTimeXPath, DatetimeParseData siteArticleDateTimeParseData
+            );
 
         #endregion
     }

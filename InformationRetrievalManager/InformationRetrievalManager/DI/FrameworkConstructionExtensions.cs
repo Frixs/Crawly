@@ -57,6 +57,9 @@ namespace InformationRetrievalManager
             // Bind a crawler manager
             construction.Services.AddSingleton<ICrawlerManager, CrawlerManager>();
 
+            // Bind a crawler storage
+            construction.Services.AddSingleton<ICrawlerStorage, CrawlerStorage>();
+
             // Return the construction for chaining
             return construction;
         }

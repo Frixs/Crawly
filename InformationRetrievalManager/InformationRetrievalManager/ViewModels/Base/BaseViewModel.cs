@@ -19,7 +19,7 @@ namespace InformationRetrievalManager
         /// <summary>
         /// Call this to fire a <see cref="PropertyChanged"/> event.
         /// </summary>
-        /// <param name="name"></param>
+        /// <param name="name">The name of a child property</param>
         public void OnPropertyChanged(string name)
         {
             PropertyChanged(this, new PropertyChangedEventArgs(name));
