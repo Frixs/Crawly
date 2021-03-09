@@ -1,4 +1,5 @@
-﻿using InformationRetrievalManager.Crawler;
+﻿using InformationRetrievalManager.Core;
+using InformationRetrievalManager.Crawler;
 using Ixs.DNA;
 using Microsoft.Extensions.Logging;
 using System;
@@ -90,12 +91,13 @@ namespace InformationRetrievalManager
             crawler.SetControls(
                 "https://www.sea.playblackdesert.com",
                 "/News/Notice?boardType=2&Page={0}",
-                1,
-                12,
-                1,
+                1, 12, 1,
                 1000,
                 "//article[@class='content']//ul[@class='thumb_nail_list']//a",
-                "//div[@class='view_detail_area']"
+                "//div[@class='view_detail_area']",
+                "//div[@class='view_detail_area']//strong[@class='title']",
+                "//div[@class='view_detail_area']//span[@class='date']",
+                new DatetimeParseData("yyyy-MM-dd HH:mm")
                 );
             await Framework.Service<ICrawlerManager>().AddCrawlerAsync(crawler);
 

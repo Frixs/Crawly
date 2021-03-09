@@ -21,6 +21,7 @@ namespace InformationRetrievalManager.Crawler
         private readonly ILogger _logger;
         private readonly IFileManager _fileManager;
         private readonly ITaskManager _taskManager;
+        private readonly ICrawlerStorage _crawlerStorage;
 
         #endregion
 
@@ -59,6 +60,9 @@ namespace InformationRetrievalManager.Crawler
         }
 
         /// <inheritdoc/>
+        public DateTime CrawlingTimestamp { get; private set; }
+
+        /// <inheritdoc/>
         public int StartPageNo { get; private set; } = 1;
 
         /// <inheritdoc/>
@@ -68,10 +72,16 @@ namespace InformationRetrievalManager.Crawler
         public int PageNoModifier { get; private set; } = 1;
 
         /// <inheritdoc/>
-        public string SiteAddress { get; private set; } = null;
+        public string SiteAddress { get; private set; } = "";
 
         /// <inheritdoc/>
-        public string SiteSuffix { get; private set; } = null;
+        public string SiteSuffix { get; private set; } = "";
+
+        /// <inheritdoc/>
+        public string FullSiteAddress => IsSiteSet ? SiteAddress + SiteSuffix : string.Empty;
+
+        /// <inheritdoc/>
+        public string CurrentSiteDataIdentification => IsSiteSet ? $"{NameIdentifier}_{FullSiteAddress.GetHashCode()}" : string.Empty;
 
         /// <inheritdoc/>
         public string SiteUrlArticlesXPath { get; private set; } = "";
@@ -80,7 +90,19 @@ namespace InformationRetrievalManager.Crawler
         public string SiteArticleContentAreaXPath { get; private set; } = "";
 
         /// <inheritdoc/>
+        public string SiteArticleTitleXPath { get; private set; } = "";
+
+        /// <inheritdoc/>
+        public string SiteArticleDateTimeXPath { get; private set; } = "";
+
+        /// <inheritdoc/>
+        public DatetimeParseData SiteArticleDateTimeParseData { get; private set; } = new DatetimeParseData();
+
+        /// <inheritdoc/>
         public int SearchInterval { get; private set; } = 1000;
+
+        /// <inheritdoc/>
+        public bool InterruptOnError { get; set; } = false;
 
         #endregion
 
@@ -122,6 +144,7 @@ namespace InformationRetrievalManager.Crawler
             _logger = FrameworkDI.Logger ?? throw new ArgumentNullException(nameof(_logger));
             _fileManager = CoreDI.File ?? throw new ArgumentNullException(nameof(_fileManager));
             _taskManager = CoreDI.Task ?? throw new ArgumentNullException(nameof(_taskManager));
+            _crawlerStorage = Framework.Service<ICrawlerStorage>() ?? throw new ArgumentNullException(nameof(_crawlerStorage));
         }
 
         #endregion
@@ -156,7 +179,15 @@ namespace InformationRetrievalManager.Crawler
         }
 
         /// <inheritdoc/>
-        public bool SetControls(string siteAddress, string siteSuffix, int startPageNo, int maxPageNo, int pageNoModifier, int searchInterval, string siteUrlArticlesXPath, string siteArticleContentAreaXPath)
+        public bool SetControls(
+            string siteAddress, string siteSuffix,
+            int startPageNo, int maxPageNo, int pageNoModifier,
+            int searchInterval,
+            string siteUrlArticlesXPath,
+            string siteArticleContentAreaXPath,
+            string siteArticleTitleXPath,
+            string siteArticleDateTimeXPath, DatetimeParseData siteArticleDateTimeParseData
+            )
         {
             // TODO: validate data
             SiteAddress = siteAddress;
@@ -167,6 +198,9 @@ namespace InformationRetrievalManager.Crawler
             SearchInterval = searchInterval;
             SiteUrlArticlesXPath = siteUrlArticlesXPath;
             SiteArticleContentAreaXPath = siteArticleContentAreaXPath;
+            SiteArticleTitleXPath = siteArticleTitleXPath;
+            SiteArticleDateTimeXPath = siteArticleDateTimeXPath;
+            SiteArticleDateTimeParseData = siteArticleDateTimeParseData;
 
             return true;
         }
@@ -183,6 +217,7 @@ namespace InformationRetrievalManager.Crawler
             // Turn off the flag once the crawling is finished
             IsCurrentlyCrawlingFlag = false;
             CrawlingProgressPct = -1;
+            CrawlingTimestamp = default;
             _cancelationFlag = false;
 
             // Raise the finish event
@@ -212,6 +247,7 @@ namespace InformationRetrievalManager.Crawler
              */
             IsCurrentlyCrawlingFlag = true;
             CrawlingProgressPct = 0;
+            CrawlingTimestamp = DateTime.UtcNow;
 
             // Log it
             _logger.LogInformationSource($"Crawler '{NameIdentifier}' started processing.");
@@ -253,9 +289,8 @@ namespace InformationRetrievalManager.Crawler
             const string defaultArticleLink = "#";
 
             bool anyInvalidLinks = false;
-            string compoundUrl = SiteAddress + SiteSuffix;
-            string urlsFilename = $"urls_{NameIdentifier}_{compoundUrl.GetHashCode()}_{StartPageNo}_{MaxPageNo}_{PageNoModifier}_{DateTime.UtcNow.Year}_{DateTime.UtcNow.Month}_{DateTime.UtcNow.Day}_{DateTime.UtcNow.Hour}.txt";
-            string urlsFilePath = $"{Constants.DataStorageDir}/{urlsFilename}";
+            string urlsFilename = $"urls_{CurrentSiteDataIdentification}_{StartPageNo}_{MaxPageNo}_{PageNoModifier}_{DateTime.UtcNow.Year}_{DateTime.UtcNow.Month}_{DateTime.UtcNow.Day}_{DateTime.UtcNow.Hour}.txt";
+            string urlsFilePath = $"{Constants.CrawlerDataStorageDir}/{urlsFilename}";
 
             // Check if we have already scanned urls...
             if (File.Exists(urlsFilePath))
@@ -280,7 +315,7 @@ namespace InformationRetrievalManager.Crawler
                         break;
 
                     // Load the document
-                    HtmlDocument doc = web.Load(compoundUrl.Replace("{0}", i.ToString()));
+                    HtmlDocument doc = web.Load(FullSiteAddress.Replace("{0}", i.ToString()));
                     // Log it
                     _logger.LogTraceSource($"Crawler '{NameIdentifier}' is currently scanning '{web.ResponseUri}'.");
 
@@ -332,12 +367,6 @@ namespace InformationRetrievalManager.Crawler
             short currentPctProgress = 0;
             short previousPctProgress = 0;
 
-            string compoundUrl = SiteAddress + SiteSuffix;
-            string dirPath = $"{Constants.DataStorageDir}/{NameIdentifier}_{compoundUrl.GetHashCode()}";
-            string htmlFilename = $"html_{DateTime.UtcNow.Year}_{DateTime.UtcNow.Month}_{DateTime.UtcNow.Day}_{DateTime.UtcNow.Hour}_{DateTime.UtcNow.Minute}_{DateTime.UtcNow.Second}.txt";
-            string textFilename = $"text_{DateTime.UtcNow.Year}_{DateTime.UtcNow.Month}_{DateTime.UtcNow.Day}_{DateTime.UtcNow.Hour}_{DateTime.UtcNow.Minute}_{DateTime.UtcNow.Second}.txt";
-            string tidytextFilename = $"tidytext_{DateTime.UtcNow.Year}_{DateTime.UtcNow.Month}_{DateTime.UtcNow.Day}_{DateTime.UtcNow.Hour}_{DateTime.UtcNow.Minute}_{DateTime.UtcNow.Second}.txt";
-
             int i = 0;
             foreach (var item in urls)
             {
@@ -353,31 +382,59 @@ namespace InformationRetrievalManager.Crawler
                     // Load the document
                     HtmlDocument doc = web.Load(url);
                     // Log it
-                    _logger.LogTraceSource($"Crawler '{NameIdentifier}' is currently processing URL '{web.ResponseUri}'.");
+                    _logger.LogDebugSource($"Crawler '{NameIdentifier}' is currently processing URL '{web.ResponseUri}'.");
 
+                    var title = doc.DocumentNode.SelectNodes(SiteArticleTitleXPath).FirstOrDefault();
+                    var datetime = doc.DocumentNode.SelectNodes(SiteArticleDateTimeXPath).FirstOrDefault();
                     var content = doc.DocumentNode.SelectNodes(SiteArticleContentAreaXPath).FirstOrDefault();
-                    if (content != null)
+
+                    // Make sure we found all needed HTML...
+                    if (title != null && datetime != null && content != null)
                     {
-                        string html = content.InnerHtml;
-                        string minifiedText = MinifyText(content.InnerText);
-                        string tidyText = TidyfyText(content.InnerText);
+                        // Check fi the datetime is parsable...
+                        if (DateTime.TryParseExact(datetime.InnerText, SiteArticleDateTimeParseData.Format, SiteArticleDateTimeParseData.CultureInfo, System.Globalization.DateTimeStyles.None, out _))
+                        {
+                            // Save data
+                            await _crawlerStorage.SaveAsync(
+                                this,
+                                url,
+                                MinifyText(title.InnerText),
+                                datetime.InnerText,
+                                TidyfyText(content.InnerHtml),
+                                MinifyText(content.InnerText),
+                                TidyfyText(content.InnerText)
+                                );
+                        }
+                        else
+                        {
+                            _logger.LogTraceSource($"Crawler '{NameIdentifier}' cannot parse the article's datetime according to attached formatting!");
 
-                        // Check if the dir exists...
-                        if (!Directory.Exists(dirPath))
-                            Directory.CreateDirectory(dirPath);
+                            if (InterruptOnError)
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        string invalidNodeNames = $"{(title == null ? $" {nameof(title)}" : "")}{(datetime == null ? $" {nameof(datetime)}" : "")}{(content == null ? $" {nameof(content)}" : "")}";
+                        _logger.LogTraceSource($"Crawler '{NameIdentifier}' cannot find html node(s):{invalidNodeNames}");
 
-                        // Save data into files
-                        await _fileManager.WriteTextToFileAsync(url + Environment.NewLine + html + Environment.NewLine, $"{dirPath}/{htmlFilename}", true);
-                        await _fileManager.WriteTextToFileAsync(url + Environment.NewLine + minifiedText + Environment.NewLine, $"{dirPath}/{textFilename}", true);
-                        await _fileManager.WriteTextToFileAsync(url + Environment.NewLine + tidyText + Environment.NewLine, $"{dirPath}/{tidytextFilename}", true);
-
-                        // Calculate progress pct
-                        currentPctProgress = Convert.ToInt16(Math.Round(i / (double)(urls.Count / 100.0) * (processPctValue / 100.0)));
-                        CrawlingProgressPct += (short)(currentPctProgress - previousPctProgress);
-                        previousPctProgress = currentPctProgress;
+                        if (InterruptOnError)
+                            break;
                     }
 
+                    // Calculate progress pct
+                    currentPctProgress = Convert.ToInt16(Math.Round(i / (double)(urls.Count / 100.0) * (processPctValue / 100.0)));
+                    CrawlingProgressPct += (short)(currentPctProgress - previousPctProgress);
+                    previousPctProgress = currentPctProgress;
+
                     await Task.Delay(SearchInterval);
+                }
+                else
+                {
+                    _logger.LogTraceSource($"Crawler '{NameIdentifier}' indicates a wrong URL! '{url}'");
+
+                    if (InterruptOnError)
+                        break;
                 }
 
                 ++i;
