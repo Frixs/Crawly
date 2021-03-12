@@ -45,7 +45,7 @@ namespace InformationRetrievalManager.Crawler
         public string NameIdentifier { get; private set; } //; ctor
 
         /// <inheritdoc/>
-        public bool IsCurrentlyCrawlingFlag { get; private set; } //; ctor
+        public bool IsCurrentlyCrawling { get; private set; } //; ctor
 
         /// <inheritdoc/>
         public short CrawlingProgressPct
@@ -137,7 +137,7 @@ namespace InformationRetrievalManager.Crawler
         public CrawlerEngine(string name)
         {
             NameIdentifier = name ?? throw new ArgumentNullException(nameof(name));
-            IsCurrentlyCrawlingFlag = false;
+            IsCurrentlyCrawling = false;
             CrawlingProgressPct = -1;
 
             // HACK: DI injections
@@ -156,7 +156,7 @@ namespace InformationRetrievalManager.Crawler
         {
             // First, make sure the process is not running in this crawler...
             // ... the same check should be in process method due to separate process running and default value set in there
-            if (IsCurrentlyCrawlingFlag)
+            if (IsCurrentlyCrawling)
                 return false;
 
             // Raise the start event
@@ -171,7 +171,7 @@ namespace InformationRetrievalManager.Crawler
         /// <inheritdoc/>
         public bool Cancel()
         {
-            if (!IsCurrentlyCrawlingFlag)
+            if (!IsCurrentlyCrawling)
                 return false;
 
             _cancelationFlag = true;
@@ -215,7 +215,7 @@ namespace InformationRetrievalManager.Crawler
         private void Finish()
         {
             // Turn off the flag once the crawling is finished
-            IsCurrentlyCrawlingFlag = false;
+            IsCurrentlyCrawling = false;
             CrawlingProgressPct = -1;
             CrawlingTimestamp = default;
             _cancelationFlag = false;
@@ -238,14 +238,14 @@ namespace InformationRetrievalManager.Crawler
         private async Task ProcessAsync()
         {
             // Check if the process is not already running in this crawler...
-            if (IsCurrentlyCrawlingFlag)
+            if (IsCurrentlyCrawling)
                 return;
             // Init/start the crawling process
             /*
              *  It would be more clean to have this in Start method instead, 
              *  but this makes us sure, the crawler cannot throttle down due to separate process start failure.
              */
-            IsCurrentlyCrawlingFlag = true;
+            IsCurrentlyCrawling = true;
             CrawlingProgressPct = 0;
             CrawlingTimestamp = DateTime.UtcNow;
 
@@ -371,6 +371,10 @@ namespace InformationRetrievalManager.Crawler
             foreach (var item in urls)
             {
                 string url = item;
+
+                // Check for cancelation
+                if (_cancelationFlag)
+                    break;
 
                 // If the link is actually only the absolute path...
                 if (!url.Contains(SiteAddress))

@@ -23,6 +23,14 @@ namespace InformationRetrievalManager.Crawler
         /// <param name="contentText">Normal (tidy) version of content</param>
         Task SaveAsync(ICrawlerEngine crawler, string url, string title, DateTime timestamp, string contentHtml, string contentTextMin, string contentText);
 
+        /// <summary>
+        /// Find all data files related to specific crawler. 
+        /// It is not possible to get the data if the crawler is currently processing.
+        /// </summary>
+        /// <param name="crawler">The crawler</param>
+        /// <returns>Array of all data files (file paths) - if the crawler is processing, it returns <see langword="null"/>.</returns>
+        string[] GetDataFiles(ICrawlerEngine crawler);
+
         #endregion
     }
 }

@@ -1,4 +1,6 @@
 ﻿
+using System;
+
 namespace InformationRetrievalManager.NLP
 {
     /// <summary>
@@ -20,15 +22,26 @@ namespace InformationRetrievalManager.NLP
 
         #endregion
 
+        #region Public Properties
+
+        /// <summary>
+        /// Indicates if this processing puts the document into the lower case
+        /// </summary>
+        public bool ToLowerCase { get; } //; ctor
+
+        #endregion
+
         #region Constructor
 
         /// <summary>
         /// Default constructor
         /// </summary>
-        public BasicProcessing(Tokenizer tokenizer, Stemmer stemmer)
+        public BasicProcessing(Tokenizer tokenizer, Stemmer stemmer, bool toLowerCase = false)
         {
-            _tokenizer = tokenizer;
-            _stemmer = stemmer;
+            _tokenizer = tokenizer ?? throw new ArgumentNullException(nameof(tokenizer));
+            _stemmer = stemmer ?? throw new ArgumentNullException(nameof(stemmer));
+
+            ToLowerCase = toLowerCase;
         }
 
         #endregion
@@ -41,7 +54,15 @@ namespace InformationRetrievalManager.NLP
         /// <param name="document">The document</param>
         public void Index(string document)
         {
+            if (ToLowerCase)
+                document = document.ToLower();
 
+            var tokens = _tokenizer.Tokenize(document);
+            for (int i = 0; i < tokens.Length; ++i)
+            {
+                Console.Write($"'{tokens[i]}', ");
+            }
+            Console.WriteLine();
         }
 
         #endregion

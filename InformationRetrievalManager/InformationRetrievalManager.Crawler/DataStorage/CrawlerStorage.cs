@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -61,7 +62,7 @@ namespace InformationRetrievalManager.Crawler
         /// <inheritdoc/>
         public async Task SaveAsync(ICrawlerEngine crawler, string url, string title, DateTime timestamp, string contentHtml, string contentTextMin, string contentText)
         {
-            if (!crawler.IsCurrentlyCrawlingFlag)
+            if (!crawler.IsCurrentlyCrawling)
                 return;
 
             string crawledDataDirPath = $"{Constants.CrawlerDataStorageDir}/{crawler.CurrentSiteDataIdentification}";
@@ -109,6 +110,31 @@ namespace InformationRetrievalManager.Crawler
                 fs.Write(System.Text.Encoding.UTF8.GetBytes("]"), 0, 1);
                 fs.SetLength(fs.Position); // Only needed if new content may be smaller than old
             }
+        }
+
+        /// <inheritdoc/>
+        public string[] GetDataFiles(ICrawlerEngine crawler)
+        {
+            if (crawler.IsCurrentlyCrawling)
+                return null;
+
+            var result = new List<string>();
+
+            if (Directory.Exists(Constants.CrawlerDataStorageDir))
+            {
+                // Get all crawler directories...
+                string[] dirs = Directory.GetDirectories(Constants.CrawlerDataStorageDir);
+                for (int i = 0; i < dirs.Length; ++i)
+                    // Find the one specific for the searched crawler...
+                    if (Path.GetFileName(dirs[i]).StartsWith(crawler.NameIdentifier))
+                    {
+                        result.AddRange(
+                            Directory.GetFiles(dirs[i])
+                            );
+                    }
+            }
+
+            return result.ToArray();
         }
 
         #endregion

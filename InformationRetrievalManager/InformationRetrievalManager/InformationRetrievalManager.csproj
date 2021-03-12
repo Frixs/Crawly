@@ -276,6 +276,10 @@
       <Project>{966f566c-6691-4e1a-a2a0-5567ea2e70cd}</Project>
       <Name>InformationRetrievalManager.Crawler</Name>
     </ProjectReference>
+    <ProjectReference Include="..\InformationRetrievalManager.NLP\InformationRetrievalManager.NLP.csproj">
+      <Project>{e428d812-186d-4f49-9022-9624cf952184}</Project>
+      <Name>InformationRetrievalManager.NLP</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.8">

@@ -19,7 +19,7 @@ namespace InformationRetrievalManager.Crawler
         /// <summary>
         /// Indicates if the engine is currently crawling data
         /// </summary>
-        bool IsCurrentlyCrawlingFlag { get; }
+        bool IsCurrentlyCrawling { get; }
 
         /// <summary>
         /// Percentage progress of current crawling
