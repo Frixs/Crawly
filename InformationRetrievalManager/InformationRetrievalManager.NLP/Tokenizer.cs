@@ -13,7 +13,7 @@ namespace InformationRetrievalManager.NLP
         /// <summary>
         /// Default regular expression used in this tokenizer (it is used if the custom one is not set)
         /// </summary>
-        public const string DefaultRegex = @"\s+";
+        public const string DefaultRegex = @"\W*\s+\W*|\s+|\W+";
 
         #endregion
 
