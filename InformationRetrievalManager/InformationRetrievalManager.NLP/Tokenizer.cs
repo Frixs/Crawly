@@ -8,7 +8,7 @@ namespace InformationRetrievalManager.NLP
     /// </summary>
     public class Tokenizer
     {
-        #region Static Constants
+        #region Constants
 
         /// <summary>
         /// Default regular expression used in this tokenizer (it is used if the custom one is not set)
