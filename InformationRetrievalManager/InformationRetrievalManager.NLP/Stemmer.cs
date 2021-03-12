@@ -3,7 +3,7 @@
 namespace InformationRetrievalManager.NLP
 {
     /// <summary>
-    /// UNDONE doc
+    /// Stemmer wrapper
     /// </summary>
     public class Stemmer
     {

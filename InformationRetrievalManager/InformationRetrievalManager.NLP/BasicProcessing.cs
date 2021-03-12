@@ -34,9 +34,19 @@ namespace InformationRetrievalManager.NLP
         /// </summary>
         private Stemmer _stemmer;
 
+        /// <summary>
+        /// Dictionary of everything indexed via this processing
+        /// </summary>
+        private Dictionary<string, int> _wordFrequencies = new Dictionary<string, int>();
+
         #endregion
 
         #region Public Properties
+
+        /// <summary>
+        /// Read-only reference to <see cref="_wordFrequencies"/>
+        /// </summary>
+        public IReadOnlyDictionary<string, int> WordFrequencies => _wordFrequencies;
 
         /// <summary>
         /// Indicates if this processing puts the document into the lower case
@@ -83,11 +93,8 @@ namespace InformationRetrievalManager.NLP
         /// Process the document by the processing settings and indexate it
         /// </summary>
         /// <param name="document">The document</param>
-        public Dictionary<string, int> Index(string document)
+        public void Index(string document)
         {
-            // Result counts the frequencies for the words
-            var result = new Dictionary<string, int>();
-
             // To lower
             if (ToLowerCase)
                 document = document.ToLower();
@@ -112,13 +119,11 @@ namespace InformationRetrievalManager.NLP
                     tokens[i] = RemoveAccents(tokens[i]);
 
                 // Count frequency
-                if (result.ContainsKey(tokens[i]))
-                    result[tokens[i]] += 1;
+                if (_wordFrequencies.ContainsKey(tokens[i]))
+                    _wordFrequencies[tokens[i]] += 1;
                 else
-                    result.Add(tokens[i], 0);
+                    _wordFrequencies.Add(tokens[i], 0);
             }
-
-            return result;
         }
 
         /// <summary>
