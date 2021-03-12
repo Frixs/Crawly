@@ -1,4 +1,5 @@
 ﻿using Iveonik.Stemmers;
+using System.Diagnostics;
 
 namespace InformationRetrievalManager.NLP
 {
@@ -21,9 +22,22 @@ namespace InformationRetrievalManager.NLP
         /// <summary>
         /// Default constructor
         /// </summary>
-        public Stemmer()
+        /// <param name="language">Language specification for this stemmer</param>
+        public Stemmer(StemmerLanguage language = StemmerLanguage.EN)
         {
-            _stemmer = new EnglishStemmer();
+            switch (language)
+            {
+                case StemmerLanguage.EN:
+                    _stemmer = new EnglishStemmer();
+                    break;
+                case StemmerLanguage.CZ:
+                    _stemmer = new CzechStemmer();
+                    break;
+                default:
+                    _stemmer = new EnglishStemmer();
+                    Debugger.Break();
+                    break;
+            }
         }
 
         #endregion
