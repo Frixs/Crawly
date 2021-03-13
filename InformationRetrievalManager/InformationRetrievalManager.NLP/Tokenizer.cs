@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace InformationRetrievalManager.NLP
@@ -13,7 +14,9 @@ namespace InformationRetrievalManager.NLP
         /// <summary>
         /// Default regular expression used in this tokenizer (it is used if the custom one is not set)
         /// </summary>
-        public const string DefaultRegex = @"\W*\s+\W*|\s+|\W+";
+        public const string DefaultRegex = @"((http|ftp|https)://)?(www)?([\w_-]+(?:(?:\.[A-Za-z_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?|\d+\.\d+\.(\d+)?|<\/?[A-Za-z0-9]+>|[0-9A-Za-zÀ-úěščřžýáíé]+[0-9A-Za-zÀ-úěščřžýáíé_\-:*]+[0-9A-Za-zÀ-úěščřžýáíé]+|[0-9A-Za-zÀ-úěščřžýáíé]+(?=\s*)";
+        // Intended for Regex.Split - finds separators
+        //public const string DefaultRegex = @"(?<=\D+)([.,]+)(?=[^0-9A-Za-zÀ-úěščřžýáíé]+)\s*|(?<!(<\/?[0-9A-Za-zÀ-úěščřžýáíé]+))>\s*|\s*<\/?(?!(\/?[0-9A-Za-zÀ-úěščřžýáíé]+>))|((?<=([A-Za-zÀ-úěščřžýáíé](?!>))|([0-9](?!\.){1}))[^0-9A-Za-zÀ-úěščřžýáíé]*)*(^|\s+)[^0-9A-Za-zÀ-úěščřžýáíé]*(?=((?<!<\/?)[0-9A-Za-zÀ-úěščřžýáíé]))|(?<=([A-Za-zÀ-úěščřžýáíé](?!>)))[^0-9A-Za-zÀ-úěščřžýáíé]*($|\s+)([^0-9A-Za-zÀ-úěščřžýáíé]*(?=((?<!<\/?)[0-9A-Za-zÀ-úěščřžýáíé])))*|\s+|[^0-9A-Za-zÀ-úěščřžýáíé]{2,}(?!\s+)\s+|\s+(?<!\s+)[^0-9A-Za-zÀ-úěščřžýáíé]{2,}";
 
         #endregion
 
@@ -60,7 +63,13 @@ namespace InformationRetrievalManager.NLP
             if (text == null)
                 return Array.Empty<string>();
 
-            return Regex.Split(text, UsingRegex);
+            var matches = Regex.Matches(text, UsingRegex);
+            
+            var tokens = new string[matches.Count];
+            for (int i = 0; i < matches.Count; ++i)
+                tokens[i] = matches[i].Value;
+            
+            return tokens;
         }
 
         #endregion

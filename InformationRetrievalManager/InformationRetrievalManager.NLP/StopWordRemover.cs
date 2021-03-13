@@ -1,6 +1,7 @@
 ﻿
 using Microsoft.ML;
 using Microsoft.ML.Transforms.Text;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -59,6 +60,9 @@ namespace InformationRetrievalManager.NLP
         /// <returns>New words with removed stop words</returns>
         public virtual string[] Process(string[] words)
         {
+            if (words == null || words.Length == 0)
+                return Array.Empty<string>();
+
             // Create the context
             var mlContext = new MLContext();
 
@@ -76,7 +80,7 @@ namespace InformationRetrievalManager.NLP
             var engine = mlContext.Model.CreatePredictionEngine<TextData, TransformedTextData>(stopWordsModel);
 
             // Process the words
-            return engine.Predict(new TextData { Words = words }).WordsWithoutStopWords;
+            return engine.Predict(new TextData { Words = words }).WordsWithoutStopWords ?? Array.Empty<string>();
         }
 
         #endregion

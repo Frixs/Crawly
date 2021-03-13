@@ -134,7 +134,7 @@ namespace InformationRetrievalManager.NLP
                 if (_wordFrequencies.ContainsKey(tokens[i]))
                     _wordFrequencies[tokens[i]] += 1;
                 else
-                    _wordFrequencies.Add(tokens[i], 0);
+                    _wordFrequencies.Add(tokens[i], 1);
             }
         }
 

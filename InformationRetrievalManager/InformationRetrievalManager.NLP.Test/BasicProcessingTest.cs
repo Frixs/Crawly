@@ -27,7 +27,7 @@ namespace InformationRetrievalManager.NLP.Test
         {
             _testOutputHelper = testOutputHelper;
 
-            _processing = new BasicProcessing(new Tokenizer(), new Stemmer(), null, false, true, true);
+            //_processing = new BasicProcessing(new Tokenizer(), new Stemmer(), null, false, true, true);
         }
 
         #endregion
@@ -53,6 +53,8 @@ namespace InformationRetrievalManager.NLP.Test
         public void Index_ContainsKey()
         {
             #region Arrange
+
+            _processing = new BasicProcessing(new Tokenizer(), new Stemmer(ProcessingLanguage.CZ), null, false, true, true);
 
             string text = "Æauík";
 
@@ -81,6 +83,8 @@ namespace InformationRetrievalManager.NLP.Test
         {
             #region Arrange
 
+            _processing = new BasicProcessing(new Tokenizer(), new Stemmer(), null, false, true, true);
+
             string text = "<li>";
 
             #endregion
@@ -107,6 +111,8 @@ namespace InformationRetrievalManager.NLP.Test
         public void Index_CheckLink()
         {
             #region Arrange
+
+            _processing = new BasicProcessing(new Tokenizer(), new Stemmer(), null, false, true, true);
 
             string text = "http://www.csfd.cz/film/261379-deadpool/komentare/?comment=10355101 link";
 
@@ -135,6 +141,8 @@ namespace InformationRetrievalManager.NLP.Test
         public void Index_CheckTokenization()
         {
             #region Arrange
+
+            _processing = new BasicProcessing(new Tokenizer(), new Stemmer(), null, false, false, false);
 
             string text1 = "(pìstí).";
             string text2 = "1280x800";
@@ -169,6 +177,8 @@ namespace InformationRetrievalManager.NLP.Test
         {
             #region Arrange
 
+            _processing = new BasicProcessing(new Tokenizer(), new Stemmer(ProcessingLanguage.CZ), new StopWordRemover(ProcessingLanguage.CZ), true, false, false);
+
             string text1 = "Tímto textem britský The Guardian Jana Èulíka nepotìšil";
             string text2 = "Jestliže nepøijde, mìl by se omluvit.";
             string text3 = "Šedesát procent naší elektøiny vyrábíme z dováženého plynu, pøièemž prùmìr EU je okolo 40 %.";
@@ -193,7 +203,7 @@ namespace InformationRetrievalManager.NLP.Test
 
             #region Assert
 
-            Assert.True(wordFrequencies.ContainsKey(_processing.ProcessWord("tímto")));
+            Assert.True(wordFrequencies.ContainsKey(_processing.ProcessWord("tímtéž"))); // tímto = stopword - expl. for IR ex.
             Assert.True(wordFrequencies.ContainsKey(_processing.ProcessWord("aèkoli")));
             Assert.True(wordFrequencies.ContainsKey(_processing.ProcessWord("jestliže")));
             Assert.True(wordFrequencies.ContainsKey(_processing.ProcessWord("pøièemž")));
@@ -208,6 +218,8 @@ namespace InformationRetrievalManager.NLP.Test
         public void Index_CheckDate()
         {
             #region Arrange
+
+            _processing = new BasicProcessing(new Tokenizer(), new Stemmer(), new StopWordRemover(), false, false, false);
 
             string text1 = "11.2. 2015";
             string text2 = "15.5.2010";
@@ -238,6 +250,8 @@ namespace InformationRetrievalManager.NLP.Test
         public void Index_CheckDiacritics()
         {
             #region Arrange
+
+            _processing = new BasicProcessing(new Tokenizer(), new Stemmer(ProcessingLanguage.CZ), null, false, true, false);
 
             string text1 = "æau";
             string text2 = "cau";
@@ -278,6 +292,8 @@ namespace InformationRetrievalManager.NLP.Test
         {
             #region Arrange
 
+            _processing = new BasicProcessing(new Tokenizer(), new Stemmer(ProcessingLanguage.CZ), null, true, false, false);
+
             string text1 = "BOMB";
             string text2 = "Bomba";
             string text3 = "bomba";
@@ -314,6 +330,8 @@ namespace InformationRetrievalManager.NLP.Test
         public void Index_CheckStemming()
         {
             #region Arrange
+
+            _processing = new BasicProcessing(new Tokenizer(), new Stemmer(ProcessingLanguage.CZ), null, false, false, false);
 
             string text1 = "smìjí";
             string text2 = "smìju";
@@ -368,6 +386,8 @@ namespace InformationRetrievalManager.NLP.Test
         {
             #region Arrange
 
+            _processing = new BasicProcessing(new Tokenizer(), new Stemmer(ProcessingLanguage.CZ), null, true, false, false);
+
             string text1 = "BOMB";
             string text2 = "Bomba";
             string text3 = "bomba";
@@ -404,6 +424,8 @@ namespace InformationRetrievalManager.NLP.Test
         public void Index_CheckLongText()
         {
             #region Arrange
+
+            _processing = new BasicProcessing(new Tokenizer(), new Stemmer(ProcessingLanguage.CZ), null, true, false, false);
 
             string text = "èáú jak se máš?" +
                 "<li> o co jsti se snažil a jak,</li>\n" +
@@ -475,7 +497,7 @@ namespace InformationRetrievalManager.NLP.Test
         private void PrintWordFrequencies(IReadOnlyDictionary<string, int> wordFrequencies)
         {
             foreach (KeyValuePair<string, int> entry in wordFrequencies)
-                _testOutputHelper.WriteLine(entry.Key + ": " + entry.Value);
+                _testOutputHelper.WriteLine(entry.Key + ":\t" + entry.Value);
             PrintSortedDictionary(wordFrequencies);
         }
 
@@ -487,7 +509,7 @@ namespace InformationRetrievalManager.NLP.Test
         {
             string[] words = wordFrequencies.Keys.ToArray();
             Array.Sort(words);
-            _testOutputHelper.WriteLine(words.ToString());
+            _testOutputHelper.WriteLine(string.Join(", ", words));
         }
 
         #endregion
