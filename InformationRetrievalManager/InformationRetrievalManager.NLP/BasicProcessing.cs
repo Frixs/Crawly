@@ -13,12 +13,12 @@ namespace InformationRetrievalManager.NLP
         /// <summary>
         /// Alphabet with diacritics
         /// </summary>
-        private const string _withDiacritics = "áÁčČďĎéÉěĚíÍňŇóÓřŘšŠťŤúÚůŮýÝžŽ";
+        private const string _withDiacritics = "áÁäÄčČćĆďĎéÉěĚíÍňŇńŃóÓöÖřŘŕŔšŠśŚťŤúÚůŮüÜýÝžŽźŹ";
 
         /// <summary>
         /// Alphabet without diacritics
         /// </summary>
-        private const string _withoutDiacritics = "aAcCdDeEeEiInNoOrRsStTuUuUyYzZ";
+        private const string _withoutDiacritics = "aAaAcCcCdDeEeEiInNnNoOoOrRrRsSsStTuUuUuUyYzZzZ";
 
         #endregion
 
