@@ -133,7 +133,7 @@ namespace InformationRetrievalManager
                     var dataFilePath = filePaths.FirstOrDefault(o => o.Contains(".json"));
                     if (dataFilePath != null)
                     {
-                        // deserialize JSON directly from a file
+                        // Deserialize JSON directly from a file
                         using (StreamReader file = File.OpenText(dataFilePath))
                         {
                             JsonSerializer serializer = new JsonSerializer();
@@ -141,7 +141,7 @@ namespace InformationRetrievalManager
                             if (data.Length > 0)
                             {
                                 // HACK - start processing
-                                var processing = new BasicProcessing(new Tokenizer(), new Stemmer());
+                                var processing = new BasicProcessing(new Tokenizer(), new Stemmer(), new StopWordRemover());
                                 processing.Index(data[0].Content);
                             }
                         }

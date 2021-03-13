@@ -2,9 +2,9 @@
 namespace InformationRetrievalManager.NLP
 {
     /// <summary>
-    /// Supported languages by implemented stemmer <see cref="Stemmer"/>
+    /// Supported languages for NLP processing
     /// </summary>
-    public enum StemmerLanguage
+    public enum ProcessingLanguage
     {
         // English
         EN = 0,

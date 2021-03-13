@@ -55,7 +55,7 @@ namespace InformationRetrievalManager.NLP
         /// </summary>
         /// <param name="text">The text</param>
         /// <returns>Array of tokens made from the text</returns>
-        public string[] Tokenize(string text)
+        public virtual string[] Tokenize(string text)
         {
             if (text == null)
                 return Array.Empty<string>();

@@ -17,20 +17,31 @@ namespace InformationRetrievalManager.NLP
 
         #endregion
 
+        #region Public Properties
+
+        /// <summary>
+        /// Language used by this Stemmer
+        /// </summary>
+        public ProcessingLanguage Language { get; } //; ctor
+
+        #endregion
+
         #region Constructor
 
         /// <summary>
         /// Default constructor
         /// </summary>
         /// <param name="language">Language specification for this stemmer</param>
-        public Stemmer(StemmerLanguage language = StemmerLanguage.EN)
+        public Stemmer(ProcessingLanguage language = ProcessingLanguage.EN)
         {
+            Language = language;
+
             switch (language)
             {
-                case StemmerLanguage.EN:
+                case ProcessingLanguage.EN:
                     _stemmer = new EnglishStemmer();
                     break;
-                case StemmerLanguage.CZ:
+                case ProcessingLanguage.CZ:
                     _stemmer = new CzechStemmer();
                     break;
                 default:
@@ -49,7 +60,7 @@ namespace InformationRetrievalManager.NLP
         /// </summary>
         /// <param name="word">The word</param>
         /// <returns>Stemmed word</returns>
-        public string Stem(string word) => _stemmer.Stem(word);
+        public virtual string Stem(string word) => _stemmer.Stem(word);
 
         #endregion
     }

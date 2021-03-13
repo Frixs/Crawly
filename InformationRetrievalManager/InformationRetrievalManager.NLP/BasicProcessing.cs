@@ -35,6 +35,11 @@ namespace InformationRetrievalManager.NLP
         private Stemmer _stemmer;
 
         /// <summary>
+        /// StopWord remover of this processing
+        /// </summary>
+        private StopWordRemover _stopWordRemover;
+
+        /// <summary>
         /// Dictionary of everything indexed via this processing
         /// </summary>
         private Dictionary<string, int> _wordFrequencies = new Dictionary<string, int>();
@@ -72,13 +77,15 @@ namespace InformationRetrievalManager.NLP
         /// </summary>
         /// <param name="tokenizer">The tokenizer for this processing</param>
         /// <param name="stemmer">The stemmer for this processing</param>
+        /// <param name="stopWordRemover">The stopword remover for this processing (leave <see langword="null"/> to ignore removing stopwords)</param>
         /// <param name="toLowerCase">Should the toknes be lowercased?</param>
         /// <param name="removeAccentsBeforeStemming">Should we remove accents from tokens before stemming?</param>
         /// <param name="removeAccentsAfterStemming">Should we remove accents from tokens after stemming?</param>
-        public BasicProcessing(Tokenizer tokenizer, Stemmer stemmer, bool toLowerCase = false, bool removeAccentsBeforeStemming = false, bool removeAccentsAfterStemming = false)
+        public BasicProcessing(Tokenizer tokenizer, Stemmer stemmer, StopWordRemover stopWordRemover = null, bool toLowerCase = false, bool removeAccentsBeforeStemming = false, bool removeAccentsAfterStemming = false)
         {
             _tokenizer = tokenizer ?? throw new ArgumentNullException(nameof(tokenizer));
             _stemmer = stemmer ?? throw new ArgumentNullException(nameof(stemmer));
+            _stopWordRemover = stopWordRemover;
 
             ToLowerCase = toLowerCase;
             RemoveAccentsBeforeStemming = removeAccentsBeforeStemming;
@@ -108,6 +115,11 @@ namespace InformationRetrievalManager.NLP
 
             // Tokenize
             var tokens = _tokenizer.Tokenize(document);
+
+            // Remove stopwords
+            if (_stopWordRemover != null)
+                tokens = _stopWordRemover.Process(tokens);
+
             // Go through all tokens
             for (int i = 0; i < tokens.Length; ++i)
             {
@@ -127,27 +139,27 @@ namespace InformationRetrievalManager.NLP
         }
 
         /// <summary>
-        /// Process the text by the processing settings
+        /// Process the word by the processing settings
         /// </summary>
-        /// <returns>Processed text</returns>
-        public string GetProcessedForm(string text)
+        /// <returns>Processed word</returns>
+        public string ProcessWord(string word)
         {
             // To lower
             if (ToLowerCase)
-                text = text.ToLower();
+                word = word.ToLower();
 
             // Remove accents before stemming
             if (RemoveAccentsBeforeStemming)
-                text = RemoveAccents(text);
+                word = RemoveAccents(word);
 
             // Stemming
-            text = _stemmer.Stem(text);
+            word = _stemmer.Stem(word);
 
             // Remove accents after stemming
             if (RemoveAccentsAfterStemming)
-                text = RemoveAccents(text);
+                word = RemoveAccents(word);
 
-            return text;
+            return word;
         }
 
         #endregion

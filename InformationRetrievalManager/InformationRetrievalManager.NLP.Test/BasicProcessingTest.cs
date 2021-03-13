@@ -27,7 +27,7 @@ namespace InformationRetrievalManager.NLP.Test
         {
             _testOutputHelper = testOutputHelper;
 
-            _processing = new BasicProcessing(new Tokenizer(), new Stemmer(), false, true, true);
+            _processing = new BasicProcessing(new Tokenizer(), new Stemmer(), null, false, true, true);
         }
 
         #endregion
@@ -154,9 +154,9 @@ namespace InformationRetrievalManager.NLP.Test
 
             #region Assert
 
-            Assert.True(wordFrequencies.ContainsKey(_processing.GetProcessedForm("pìstí")));
-            Assert.True(wordFrequencies.ContainsKey(_processing.GetProcessedForm("1280x800")));
-            Assert.True(wordFrequencies.ContainsKey(_processing.GetProcessedForm("pr*sata")));
+            Assert.True(wordFrequencies.ContainsKey(_processing.ProcessWord("pìstí")));
+            Assert.True(wordFrequencies.ContainsKey(_processing.ProcessWord("1280x800")));
+            Assert.True(wordFrequencies.ContainsKey(_processing.ProcessWord("pr*sata")));
 
             #endregion
         }
@@ -193,10 +193,10 @@ namespace InformationRetrievalManager.NLP.Test
 
             #region Assert
 
-            Assert.True(wordFrequencies.ContainsKey(_processing.GetProcessedForm("tímto")));
-            Assert.True(wordFrequencies.ContainsKey(_processing.GetProcessedForm("aèkoli")));
-            Assert.True(wordFrequencies.ContainsKey(_processing.GetProcessedForm("jestliže")));
-            Assert.True(wordFrequencies.ContainsKey(_processing.GetProcessedForm("pøièemž")));
+            Assert.True(wordFrequencies.ContainsKey(_processing.ProcessWord("tímto")));
+            Assert.True(wordFrequencies.ContainsKey(_processing.ProcessWord("aèkoli")));
+            Assert.True(wordFrequencies.ContainsKey(_processing.ProcessWord("jestliže")));
+            Assert.True(wordFrequencies.ContainsKey(_processing.ProcessWord("pøièemž")));
 
             #endregion
         }
@@ -261,7 +261,7 @@ namespace InformationRetrievalManager.NLP.Test
 
             #region Assert
 
-            var pText = _processing.GetProcessedForm("èau");
+            var pText = _processing.ProcessWord("èau");
             if (wordFrequencies.ContainsKey(pText))
                 Assert.Equal(5, wordFrequencies[pText]);
             else
@@ -298,7 +298,7 @@ namespace InformationRetrievalManager.NLP.Test
 
             #region Assert
 
-            var pText = _processing.GetProcessedForm("bomb");
+            var pText = _processing.ProcessWord("bomb");
             if (wordFrequencies.ContainsKey(pText))
                 Assert.Equal(4, wordFrequencies[pText]);
             else
@@ -339,19 +339,19 @@ namespace InformationRetrievalManager.NLP.Test
 
             #region Assert
 
-            var pText1 = _processing.GetProcessedForm("smìjí");
+            var pText1 = _processing.ProcessWord("smìjí");
             if (wordFrequencies.ContainsKey(pText1))
                 Assert.Equal(4, wordFrequencies[pText1]);
             else
                 Assert.True(false);
 
-            var pText2 = _processing.GetProcessedForm("smìješ");
+            var pText2 = _processing.ProcessWord("smìješ");
             if (wordFrequencies.ContainsKey(pText2))
                 Assert.Equal(1, wordFrequencies[pText2]);
             else
                 Assert.True(false);
 
-            var pText3 = _processing.GetProcessedForm("smìjeme");
+            var pText3 = _processing.ProcessWord("smìjeme");
             if (wordFrequencies.ContainsKey(pText3))
                 Assert.Equal(1, wordFrequencies[pText3]);
             else
@@ -388,7 +388,7 @@ namespace InformationRetrievalManager.NLP.Test
 
             #region Assert
 
-            var pText = _processing.GetProcessedForm("bomb");
+            var pText = _processing.ProcessWord("bomb");
             if (wordFrequencies.ContainsKey(pText))
                 Assert.Equal(4, wordFrequencies[pText]);
             else
@@ -437,25 +437,25 @@ namespace InformationRetrievalManager.NLP.Test
 
             #region Assert
 
-            var pText1 = _processing.GetProcessedForm("bomb");
+            var pText1 = _processing.ProcessWord("bomb");
             if (wordFrequencies.ContainsKey(pText1))
                 Assert.Equal(2, wordFrequencies[pText1]);
             else
                 Assert.True(false);
 
-            var pText2 = _processing.GetProcessedForm("tržby");
+            var pText2 = _processing.ProcessWord("tržby");
             if (wordFrequencies.ContainsKey(pText2))
                 Assert.Equal(2, wordFrequencies[pText2]);
             else
                 Assert.True(false);
 
-            var pText3 = _processing.GetProcessedForm("z3735f");
+            var pText3 = _processing.ProcessWord("z3735f");
             if (wordFrequencies.ContainsKey(pText3))
                 Assert.Equal(1, wordFrequencies[pText3]);
             else
                 Assert.True(false);
 
-            var pText4 = _processing.GetProcessedForm("</li>");
+            var pText4 = _processing.ProcessWord("</li>");
             if (wordFrequencies.ContainsKey(pText4))
                 Assert.Equal(4, wordFrequencies[pText4]);
             else
