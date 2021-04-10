@@ -60,7 +60,7 @@ namespace InformationRetrievalManager.Crawler
         #region Interface Methods
 
         /// <inheritdoc/>
-        public async Task SaveAsync(ICrawlerEngine crawler, string url, string title, DateTime timestamp, string contentHtml, string contentTextMin, string contentText)
+        public async Task SaveAsync(ICrawlerEngine crawler, string url, string title, string category, DateTime timestamp, string contentHtml, string contentTextMin, string contentText)
         {
             if (!crawler.IsCurrentlyCrawling)
                 return;
@@ -92,6 +92,7 @@ namespace InformationRetrievalManager.Crawler
             var model = new CrawlerDataModel
             {
                 Title = title,
+                Category = category,
                 Timestamp = timestamp,
                 Content = contentText
             };

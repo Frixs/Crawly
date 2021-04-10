@@ -13,6 +13,7 @@ namespace InformationRetrievalManager.Crawler
 {
     /// <summary>
     /// Crawler engineú scrapes the web data and parse them into files
+    /// TODO: Make category and timestamp optional
     /// </summary>
     public class CrawlerEngine : ICrawlerEngine
     {
@@ -91,6 +92,9 @@ namespace InformationRetrievalManager.Crawler
 
         /// <inheritdoc/>
         public string SiteArticleTitleXPath { get; private set; } = "";
+
+        /// <inheritdoc/>
+        public string SiteArticleCategoryXPath { get; private set; } = "";
 
         /// <inheritdoc/>
         public string SiteArticleDateTimeXPath { get; private set; } = "";
@@ -186,6 +190,7 @@ namespace InformationRetrievalManager.Crawler
             string siteUrlArticlesXPath,
             string siteArticleContentAreaXPath,
             string siteArticleTitleXPath,
+            string siteArticleCategoryXPath,
             string siteArticleDateTimeXPath, DatetimeParseData siteArticleDateTimeParseData
             )
         {
@@ -199,6 +204,7 @@ namespace InformationRetrievalManager.Crawler
             SiteUrlArticlesXPath = siteUrlArticlesXPath;
             SiteArticleContentAreaXPath = siteArticleContentAreaXPath;
             SiteArticleTitleXPath = siteArticleTitleXPath;
+            SiteArticleCategoryXPath = siteArticleCategoryXPath;
             SiteArticleDateTimeXPath = siteArticleDateTimeXPath;
             SiteArticleDateTimeParseData = siteArticleDateTimeParseData;
 
@@ -389,11 +395,12 @@ namespace InformationRetrievalManager.Crawler
                     _logger.LogDebugSource($"Crawler '{NameIdentifier}' is currently processing URL '{web.ResponseUri}'.");
 
                     var title = doc.DocumentNode.SelectNodes(SiteArticleTitleXPath).FirstOrDefault();
+                    var category = doc.DocumentNode.SelectNodes(SiteArticleCategoryXPath).FirstOrDefault();
                     var datetime = doc.DocumentNode.SelectNodes(SiteArticleDateTimeXPath).FirstOrDefault();
                     var content = doc.DocumentNode.SelectNodes(SiteArticleContentAreaXPath).FirstOrDefault();
 
                     // Make sure we found all needed HTML...
-                    if (title != null && datetime != null && content != null)
+                    if (title != null && category != null && datetime != null && content != null)
                     {
                         DateTime timestamp;
                         // Check fi the datetime is parsable...
@@ -404,6 +411,7 @@ namespace InformationRetrievalManager.Crawler
                                 this,
                                 url,
                                 MinifyText(title.InnerText).Trim(),
+                                MinifyText(category.InnerText).Trim(),
                                 timestamp,
                                 TidyfyText(content.InnerHtml),
                                 MinifyText(content.InnerText),
@@ -418,9 +426,10 @@ namespace InformationRetrievalManager.Crawler
                                 break;
                         }
                     }
+                    // Otherwise, catch the issue...
                     else
                     {
-                        string invalidNodeNames = $"{(title == null ? $" {nameof(title)}" : "")}{(datetime == null ? $" {nameof(datetime)}" : "")}{(content == null ? $" {nameof(content)}" : "")}";
+                        string invalidNodeNames = $"{(title == null ? $" {nameof(title)}" : "")}{(category == null ? $" {nameof(category)}" : "")}{(datetime == null ? $" {nameof(datetime)}" : "")}{(content == null ? $" {nameof(content)}" : "")}";
                         _logger.LogTraceSource($"Crawler '{NameIdentifier}' cannot find html node(s):{invalidNodeNames}");
 
                         if (InterruptOnError)

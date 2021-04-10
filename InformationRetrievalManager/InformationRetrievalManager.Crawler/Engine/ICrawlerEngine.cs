@@ -75,6 +75,11 @@ namespace InformationRetrievalManager.Crawler
         string SiteArticleTitleXPath { get; }
 
         /// <summary>
+        /// XPath to category of the article
+        /// </summary>
+        string SiteArticleCategoryXPath { get; }
+
+        /// <summary>
         /// XPath to date-time of the article
         /// </summary>
         string SiteArticleDateTimeXPath { get; }
@@ -171,6 +176,7 @@ namespace InformationRetrievalManager.Crawler
         /// <param name="siteUrlArticlesXPath">XPath for searching URL article links</param>
         /// <param name="siteArticleContentAreaXPath">XPath for content of the article</param>
         /// <param name="siteArticleTitleXPath">XPath for title of the article</param>
+        /// <param name="siteArticleCategoryXPath">XPath for category of the article</param>
         /// <param name="siteArticleDateTimeXPath">XPath for date-time of creation of the article</param>
         /// <param name="siteArticleDateTimeParseData">Parse data need for parsing the date-time</param>
         /// <returns>
@@ -186,7 +192,8 @@ namespace InformationRetrievalManager.Crawler
             int searchInterval, 
             string siteUrlArticlesXPath, 
             string siteArticleContentAreaXPath, 
-            string siteArticleTitleXPath, 
+            string siteArticleTitleXPath,
+            string siteArticleCategoryXPath, 
             string siteArticleDateTimeXPath, DatetimeParseData siteArticleDateTimeParseData
             );
 

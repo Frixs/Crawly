@@ -159,7 +159,7 @@ namespace InformationRetrievalManager
         /// </summary>
         private async Task LoadAsync()
         {
-            _crawler = await _crawlerManager.GetCrawlerAsync("bdo-sea");
+            _crawler = await _crawlerManager.GetCrawlerAsync("bdo-naeu");
             // Set the events
             //     - Raise the property changed in the UI thread (crawler is running in a different assembly on a separate thread)
             _crawler.OnStartProcessEvent += (s, e) =>

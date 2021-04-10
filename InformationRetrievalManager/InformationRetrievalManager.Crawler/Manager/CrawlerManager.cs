@@ -47,7 +47,7 @@ namespace InformationRetrievalManager.Crawler
                 return false;
 
             // Lock the task
-            return await AsyncLock.LockResultAsync(nameof(CrawlerManager), async () =>
+            return await AsyncLock.LockResultAsync(nameof(CrawlerManager), () =>
             {
                 _crawlers.Add(crawler.NameIdentifier, crawler);
                 _logger.LogTraceSource($"Crawler '{crawler.NameIdentifier}' has been added to the crawler manager successfully.");
@@ -62,7 +62,7 @@ namespace InformationRetrievalManager.Crawler
                 return null;
 
             // Lock the task
-            return await AsyncLock.LockResultAsync(nameof(CrawlerManager), async () =>
+            return await AsyncLock.LockResultAsync(nameof(CrawlerManager), () =>
             {
                 if (_crawlers.ContainsKey(cid))
                     return _crawlers[cid];
@@ -77,7 +77,7 @@ namespace InformationRetrievalManager.Crawler
                 return false;
 
             // Lock the task
-            return await AsyncLock.LockResultAsync(nameof(CrawlerManager), async () =>
+            return await AsyncLock.LockResultAsync(nameof(CrawlerManager), () =>
             {
                 bool result = _crawlers.Remove(cid);
 
