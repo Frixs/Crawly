@@ -40,23 +40,18 @@ namespace InformationRetrievalManager.NLP
         private StopWordRemover _stopWordRemover;
 
         /// <summary>
-        /// TODO
+        /// Inverted indexation
         /// </summary>
         private IInvertedIndex _invertedIndex;
-
-        /// <summary>
-        /// Dictionary of everything indexed via this processing
-        /// </summary>
-        private Dictionary<string, int> _wordFrequencies = new Dictionary<string, int>();
 
         #endregion
 
         #region Public Properties
 
         /// <summary>
-        /// Read-only reference to <see cref="_wordFrequencies"/>
+        /// Read-only reference to <see cref="_invertedIndex"/>
         /// </summary>
-        public IReadOnlyDictionary<string, int> WordFrequencies => _wordFrequencies;
+        public IReadOnlyInvertedIndex InvertedIndex => _invertedIndex;
 
         /// <summary>
         /// Indicates if this processing puts the document into the lower case
@@ -103,24 +98,45 @@ namespace InformationRetrievalManager.NLP
         #region Public Methods
 
         /// <summary>
+        /// Process the documents by the processing settings and indexate it
+        /// </summary>
+        /// <param name="documents">Array of the documents</param>
+        /// <exception cref="ArgumentNullException">If the array is null</exception>
+        public void IndexDocuments(IndexDocumentDataModel[] documents)
+        {
+            if (documents == null)
+                throw new ArgumentNullException("Array of documents not specified!");
+
+            for (int i = 0; i < documents.Length; ++i)
+                IndexDocument(documents[i]);
+        }
+
+        /// <summary>
         /// Process the document by the processing settings and indexate it
         /// </summary>
         /// <param name="document">The document</param>
-        public void IndexDocument(string document)
+        /// <exception cref="ArgumentNullException">If the document is null</exception>
+        public void IndexDocument(IndexDocumentDataModel document)
         {
+            if (document == null)
+                throw new ArgumentNullException("Document not specified!");
+
+            // TODO
+            string docContent = document.Content;
+
             // To lower
             if (ToLowerCase)
-                document = document.ToLower();
+                docContent = docContent.ToLower();
 
             // Remove newlines from the document to prepare the doc for tokenization
-            document = document.Replace(Environment.NewLine, " ");
+            docContent = docContent.Replace(Environment.NewLine, " ");
 
             // Remove accents before stemming
             if (RemoveAccentsBeforeStemming)
-                document = RemoveAccents(document);
+                docContent = RemoveAccents(docContent);
 
             // Tokenize
-            var terms = _tokenizer.Tokenize(document);
+            var terms = _tokenizer.Tokenize(docContent);
 
             // Remove stopwords
             if (_stopWordRemover != null)
@@ -136,16 +152,13 @@ namespace InformationRetrievalManager.NLP
                 if (RemoveAccentsAfterStemming)
                     terms[i] = RemoveAccents(terms[i]);
 
-                // Count frequency
-                if (_wordFrequencies.ContainsKey(terms[i]))
-                    _wordFrequencies[terms[i]] += 1;
-                else
-                    _wordFrequencies.Add(terms[i], 1);
+                // Indexate it
+                _invertedIndex.Put(terms[i], document.Id);
             }
         }
 
         /// <summary>
-        /// Process the word by the processing settings
+        /// Process the word (no sentence is expected - just a word) by the processing settings
         /// </summary>
         /// <returns>Processed word</returns>
         public string ProcessWord(string word)

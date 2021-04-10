@@ -343,7 +343,7 @@ namespace InformationRetrievalManager.Crawler
                     CrawlingProgressPct = Convert.ToInt16(
                         (((i - StartPageNo) / PageNoModifier) + 1) / (double)((MaxPageNo - StartPageNo + PageNoModifier) / PageNoModifier) * processPctValue
                         );
-                    
+
                     await Task.Delay(SearchInterval);
                 }
 
@@ -394,13 +394,17 @@ namespace InformationRetrievalManager.Crawler
                     // Log it
                     _logger.LogDebugSource($"Crawler '{NameIdentifier}' is currently processing URL '{web.ResponseUri}'.");
 
-                    var title = doc.DocumentNode.SelectNodes(SiteArticleTitleXPath).FirstOrDefault();
-                    var category = doc.DocumentNode.SelectNodes(SiteArticleCategoryXPath).FirstOrDefault();
-                    var datetime = doc.DocumentNode.SelectNodes(SiteArticleDateTimeXPath).FirstOrDefault();
-                    var content = doc.DocumentNode.SelectNodes(SiteArticleContentAreaXPath).FirstOrDefault();
+                    HtmlNode title = null, category = null, datetime = null, content = null;
+                    if (string.IsNullOrEmpty(SiteArticleTitleXPath)) title = doc.DocumentNode.SelectNodes(SiteArticleTitleXPath).FirstOrDefault();
+                    if (string.IsNullOrEmpty(SiteArticleCategoryXPath)) category = doc.DocumentNode.SelectNodes(SiteArticleCategoryXPath).FirstOrDefault();
+                    if (string.IsNullOrEmpty(SiteArticleDateTimeXPath)) datetime = doc.DocumentNode.SelectNodes(SiteArticleDateTimeXPath).FirstOrDefault();
+                    if (string.IsNullOrEmpty(SiteArticleContentAreaXPath)) content = doc.DocumentNode.SelectNodes(SiteArticleContentAreaXPath).FirstOrDefault();
 
                     // Make sure we found all needed HTML...
-                    if (title != null && category != null && datetime != null && content != null)
+                    if (title != null
+                        && category != null
+                        && datetime != null
+                        && content != null)
                     {
                         DateTime timestamp;
                         // Check fi the datetime is parsable...
@@ -408,14 +412,14 @@ namespace InformationRetrievalManager.Crawler
                         {
                             // Save data
                             await _crawlerStorage.SaveAsync(
-                                this,
-                                url,
-                                MinifyText(title.InnerText).Trim(),
-                                MinifyText(category.InnerText).Trim(),
-                                timestamp,
-                                TidyfyText(content.InnerHtml),
-                                MinifyText(content.InnerText),
-                                TidyfyText(content.InnerText)
+                                crawler: this,
+                                url: url,
+                                title: MinifyText(title.InnerText).Trim(),
+                                category: MinifyText(category.InnerText).Trim(),
+                                timestamp: timestamp,
+                                contentHtml: TidyfyText(content.InnerHtml),
+                                contentTextMin: MinifyText(content.InnerText),
+                                contentText: TidyfyText(content.InnerText)
                                 );
                         }
                         else

@@ -385,6 +385,7 @@
     <Compile Include="DataTypes\ApplicationPage.cs" />
     <Compile Include="DI\DI.cs" />
     <Compile Include="DI\FrameworkConstructionExtensions.cs" />
+    <Compile Include="Extensions\CrawlerExtensions.cs" />
     <Compile Include="Pages\Base\BasePage.cs" />
     <Compile Include="Pages\HomePage.xaml.cs">
       <DependentUpon>HomePage.xaml</DependentUpon>

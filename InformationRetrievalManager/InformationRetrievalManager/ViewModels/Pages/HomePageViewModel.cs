@@ -142,7 +142,7 @@ namespace InformationRetrievalManager
                             {
                                 // HACK - start processing
                                 var processing = new IndexProcessing(new Tokenizer(), new Stemmer(), new StopWordRemover());
-                                processing.IndexDocument(data[0].Content);
+                                processing.IndexDocument(new IndexDocumentDataModel(0, data[0].Title, data[0].Category, data[0].Timestamp, data[0].Content));
                             }
                         }
                     }

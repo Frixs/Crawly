@@ -45,7 +45,7 @@ namespace InformationRetrievalManager.NLP
         public void Put(string term, int documentId)
         {
             if (string.IsNullOrEmpty(term) || documentId < 0)
-                throw new ArgumentNullException();
+                throw new ArgumentNullException("Invalid parameters for indexing!");
 
             // Check if the term already exists...
             if (_vocabulary.ContainsKey(term))
@@ -58,10 +58,7 @@ namespace InformationRetrievalManager.NLP
                 // Otherwise, create a new record for the document...
                 else
                 {
-                    _vocabulary[term].Add(documentId, new TermInfo
-                    {
-                        Frequency = 1
-                    });
+                    _vocabulary[term].Add(documentId, new TermInfo(frequency: 1));
                 }
             }
             // Otherwise, create a new record...
@@ -69,10 +66,7 @@ namespace InformationRetrievalManager.NLP
             {
                 _vocabulary.Add(term, new Dictionary<int, TermInfo>()
                 {
-                    {documentId, new TermInfo
-                    {
-                        Frequency = 1
-                    }}
+                    { documentId, new TermInfo(frequency: 1) }
                 });
             }
         }

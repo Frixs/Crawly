@@ -56,21 +56,21 @@ namespace InformationRetrievalManager.NLP.Test
 
             _processing = new IndexProcessing(new Tokenizer(), new Stemmer(ProcessingLanguage.CZ), null, false, true, true);
 
-            string text = "Æauík";
+            var text = new IndexDocumentDataModel(0, string.Empty, string.Empty, default, "Æauík");
 
             #endregion
 
             #region Act
 
             _processing.IndexDocument(text);
-            var wordFrequencies = _processing.WordFrequencies;
-            PrintWordFrequencies(wordFrequencies);
+            var vocabulary = _processing.InvertedIndex.GetReadOnlyVocabulary();
+            PrintWordFrequencies(vocabulary);
 
             #endregion
 
             #region Assert
 
-            Assert.True(wordFrequencies.ContainsKey("cau"));
+            Assert.True(vocabulary.ContainsKey("cau"));
 
             #endregion
         }
@@ -85,21 +85,21 @@ namespace InformationRetrievalManager.NLP.Test
 
             _processing = new IndexProcessing(new Tokenizer(), new Stemmer(), null, false, true, true);
 
-            string text = "<li>";
+            var text = new IndexDocumentDataModel(0, string.Empty, string.Empty, default, "<li>");
 
             #endregion
 
             #region Act
 
             _processing.IndexDocument(text);
-            var wordFrequencies = _processing.WordFrequencies;
-            PrintWordFrequencies(wordFrequencies);
+            var vocabulary = _processing.InvertedIndex.GetReadOnlyVocabulary();
+            PrintWordFrequencies(vocabulary);
 
             #endregion
 
             #region Assert
 
-            Assert.True(wordFrequencies.ContainsKey(text));
+            Assert.True(vocabulary.ContainsKey("<li>"));
 
             #endregion
         }
@@ -114,22 +114,22 @@ namespace InformationRetrievalManager.NLP.Test
 
             _processing = new IndexProcessing(new Tokenizer(), new Stemmer(), null, false, true, true);
 
-            string text = "http://www.csfd.cz/film/261379-deadpool/komentare/?comment=10355101 link";
+            var text = new IndexDocumentDataModel(0, string.Empty, string.Empty, default, "http://www.csfd.cz/film/261379-deadpool/komentare/?comment=10355101 link");
 
             #endregion
 
             #region Act
 
             _processing.IndexDocument(text);
-            var wordFrequencies = _processing.WordFrequencies;
-            PrintWordFrequencies(wordFrequencies);
+            var vocabulary = _processing.InvertedIndex.GetReadOnlyVocabulary();
+            PrintWordFrequencies(vocabulary);
 
             #endregion
 
             #region Assert
 
-            Assert.False(wordFrequencies.ContainsKey("http"));
-            Assert.True(wordFrequencies.ContainsKey("http://www.csfd.cz/film/261379-deadpool/komentare/?comment=10355101"));
+            Assert.False(vocabulary.ContainsKey("http"));
+            Assert.True(vocabulary.ContainsKey("http://www.csfd.cz/film/261379-deadpool/komentare/?comment=10355101"));
 
             #endregion
         }
@@ -144,9 +144,9 @@ namespace InformationRetrievalManager.NLP.Test
 
             _processing = new IndexProcessing(new Tokenizer(), new Stemmer(), null, false, false, false);
 
-            string text1 = "(pìstí).";
-            string text2 = "1280x800";
-            string text3 = "pr*sata";
+            var text1 = new IndexDocumentDataModel(0, string.Empty, string.Empty, default, "(pìstí).");
+            var text2 = new IndexDocumentDataModel(1, string.Empty, string.Empty, default, "1280x800");
+            var text3 = new IndexDocumentDataModel(2, string.Empty, string.Empty, default, "pr*sata");
 
             #endregion
 
@@ -155,16 +155,16 @@ namespace InformationRetrievalManager.NLP.Test
             _processing.IndexDocument(text1);
             _processing.IndexDocument(text2);
             _processing.IndexDocument(text3);
-            var wordFrequencies = _processing.WordFrequencies;
-            PrintWordFrequencies(wordFrequencies);
+            var vocabulary = _processing.InvertedIndex.GetReadOnlyVocabulary();
+            PrintWordFrequencies(vocabulary);
 
             #endregion
 
             #region Assert
 
-            Assert.True(wordFrequencies.ContainsKey(_processing.ProcessWord("pìstí")));
-            Assert.True(wordFrequencies.ContainsKey(_processing.ProcessWord("1280x800")));
-            Assert.True(wordFrequencies.ContainsKey(_processing.ProcessWord("pr*sata")));
+            Assert.True(vocabulary.ContainsKey(_processing.ProcessWord("pìstí")));
+            Assert.True(vocabulary.ContainsKey(_processing.ProcessWord("1280x800")));
+            Assert.True(vocabulary.ContainsKey(_processing.ProcessWord("pr*sata")));
 
             #endregion
         }
@@ -179,12 +179,12 @@ namespace InformationRetrievalManager.NLP.Test
 
             _processing = new IndexProcessing(new Tokenizer(), new Stemmer(ProcessingLanguage.CZ), new StopWordRemover(ProcessingLanguage.CZ), true, false, false);
 
-            string text1 = "Tímto textem britský The Guardian Jana Èulíka nepotìšil";
-            string text2 = "Jestliže nepøijde, mìl by se omluvit.";
-            string text3 = "Šedesát procent naší elektøiny vyrábíme z dováženého plynu, pøièemž prùmìr EU je okolo 40 %.";
-            string text4 = "Tento seznam mùže být revidován po dvou letech, pøièemž samotné programy mohou být pøedloženy jednou za rok.";
-            string text5 = "Tímto poznáním pøekroèuje ženské hnutí hranice feminismu a stává se hnutím pokrokovým, demokratickým. Doznávám, že jsem byl znaènì pøekvapen tímto novým dùkazem praktické stránky soudruhových theorií. Èechové byli stíženi tímtéž osudem po staletích hrdinského odboje proti nìmeckému útlaku. Tímto zpùsobem také, když opìt chcete zaèít pracovat, aktivní spoøiè obrazovky ukonèujete. Tím jste urèili, že program vyhledá všechny soubory, jejichž název tímto slovem zaèíná. Patnáct procent s tímto názorem nesouhlasilo a pìtina mužù nevìdìla, jak odpovìdìt. Celou tu pohádku o tøech Garridebech si patrnì vymyslel právì za tímto úèelem. Vložíte znaménko rovná se každý vzorec musí tímto znaménkem zaèínat. Zpøedu kráèel Stivín, za nim jel rytíø mladý a za tímto klusal starec. Pøed tímto gentlemanem mùžete øíci vše, co byste hodlal svìøit mnì. Všeobecnì dlužno uznati, že tímto nejvýhodnìším místem je škola. Chtìl bych Vás proto tímto dopisem poprosit o odpovìï na tyto otázky. Vím to a ráda bych, abyste i vy zaèal svou práci s tímto vìdomím. Tehdejší prezident Charles King musí pod tímto tlakem odstoupit. Pocítila jsem ostré bodnutí žárlivosti nad tímto cizincem. Páže, pohledem tímto pøekvapen, po celém tìle se tøásl. Tímto emailem bych se chtìla informovat o pøíznacích AIDS. Hlava mi témìø vybuchla snahou uvažovat tímto zpùsobem. Nechala jsem tímto temným zjištìním naplnit své oèi. Ètvrtina respondentù naopak s tímto názorem souhlasila. Rance zdál se býti ponìkud pozloben tímto odboèením. Tímto strašlivým zpùsobem jsem nabyl svoje dìdictví. Vìèná škoda, že tímto umìním plýtvala na Dolpha. Nepøipouštìl jsem si tímto smìrem jedinou myšlenku. Dodavatel tímto informuje odbìratele v souladu s zák. Víš, že mi nikdo neposlal kvìtiny tímto zpùsobem. Ne, rozhodnì se nesnese s tímto morbidním panákem. Tímto veèerem se poèalo podivínství kapitána J. Mohla být rána zasazena tímto pøedmìtem? Mohla. Jasnovidec byl zøejmì polichocen tímto uznáním. ";
-            string text6 = "Aèkoli se celý rok uèil, známky na vysvìdèení má podprùmìrné.";
+            var text1 = new IndexDocumentDataModel(0, string.Empty, string.Empty, default, "Tímto textem britský The Guardian Jana Èulíka nepotìšil");
+            var text2 = new IndexDocumentDataModel(1, string.Empty, string.Empty, default, "Jestliže nepøijde, mìl by se omluvit.");
+            var text3 = new IndexDocumentDataModel(2, string.Empty, string.Empty, default, "Šedesát procent naší elektøiny vyrábíme z dováženého plynu, pøièemž prùmìr EU je okolo 40 %.");
+            var text4 = new IndexDocumentDataModel(3, string.Empty, string.Empty, default, "Tento seznam mùže být revidován po dvou letech, pøièemž samotné programy mohou být pøedloženy jednou za rok.");
+            var text5 = new IndexDocumentDataModel(4, string.Empty, string.Empty, default, "Tímto poznáním pøekroèuje ženské hnutí hranice feminismu a stává se hnutím pokrokovým, demokratickým. Doznávám, že jsem byl znaènì pøekvapen tímto novým dùkazem praktické stránky soudruhových theorií. Èechové byli stíženi tímtéž osudem po staletích hrdinského odboje proti nìmeckému útlaku. Tímto zpùsobem také, když opìt chcete zaèít pracovat, aktivní spoøiè obrazovky ukonèujete. Tím jste urèili, že program vyhledá všechny soubory, jejichž název tímto slovem zaèíná. Patnáct procent s tímto názorem nesouhlasilo a pìtina mužù nevìdìla, jak odpovìdìt. Celou tu pohádku o tøech Garridebech si patrnì vymyslel právì za tímto úèelem. Vložíte znaménko rovná se každý vzorec musí tímto znaménkem zaèínat. Zpøedu kráèel Stivín, za nim jel rytíø mladý a za tímto klusal starec. Pøed tímto gentlemanem mùžete øíci vše, co byste hodlal svìøit mnì. Všeobecnì dlužno uznati, že tímto nejvýhodnìším místem je škola. Chtìl bych Vás proto tímto dopisem poprosit o odpovìï na tyto otázky. Vím to a ráda bych, abyste i vy zaèal svou práci s tímto vìdomím. Tehdejší prezident Charles King musí pod tímto tlakem odstoupit. Pocítila jsem ostré bodnutí žárlivosti nad tímto cizincem. Páže, pohledem tímto pøekvapen, po celém tìle se tøásl. Tímto emailem bych se chtìla informovat o pøíznacích AIDS. Hlava mi témìø vybuchla snahou uvažovat tímto zpùsobem. Nechala jsem tímto temným zjištìním naplnit své oèi. Ètvrtina respondentù naopak s tímto názorem souhlasila. Rance zdál se býti ponìkud pozloben tímto odboèením. Tímto strašlivým zpùsobem jsem nabyl svoje dìdictví. Vìèná škoda, že tímto umìním plýtvala na Dolpha. Nepøipouštìl jsem si tímto smìrem jedinou myšlenku. Dodavatel tímto informuje odbìratele v souladu s zák. Víš, že mi nikdo neposlal kvìtiny tímto zpùsobem. Ne, rozhodnì se nesnese s tímto morbidním panákem. Tímto veèerem se poèalo podivínství kapitána J. Mohla být rána zasazena tímto pøedmìtem? Mohla. Jasnovidec byl zøejmì polichocen tímto uznáním. ");
+            var text6 = new IndexDocumentDataModel(5, string.Empty, string.Empty, default, "Aèkoli se celý rok uèil, známky na vysvìdèení má podprùmìrné.");
 
             #endregion
 
@@ -196,17 +196,17 @@ namespace InformationRetrievalManager.NLP.Test
             _processing.IndexDocument(text4);
             _processing.IndexDocument(text5);
             _processing.IndexDocument(text6);
-            var wordFrequencies = _processing.WordFrequencies;
-            PrintWordFrequencies(wordFrequencies);
+            var vocabulary = _processing.InvertedIndex.GetReadOnlyVocabulary();
+            PrintWordFrequencies(vocabulary);
 
             #endregion
 
             #region Assert
 
-            Assert.True(wordFrequencies.ContainsKey(_processing.ProcessWord("tímtéž"))); // tímto = stopword - expl. for IR ex.
-            Assert.True(wordFrequencies.ContainsKey(_processing.ProcessWord("aèkoli")));
-            Assert.True(wordFrequencies.ContainsKey(_processing.ProcessWord("jestliže")));
-            Assert.True(wordFrequencies.ContainsKey(_processing.ProcessWord("pøièemž")));
+            Assert.True(vocabulary.ContainsKey(_processing.ProcessWord("tímtéž"))); // tímto = stopword - expl. for IR ex.
+            Assert.True(vocabulary.ContainsKey(_processing.ProcessWord("aèkoli")));
+            Assert.True(vocabulary.ContainsKey(_processing.ProcessWord("jestliže")));
+            Assert.True(vocabulary.ContainsKey(_processing.ProcessWord("pøièemž")));
 
             #endregion
         }
@@ -221,8 +221,8 @@ namespace InformationRetrievalManager.NLP.Test
 
             _processing = new IndexProcessing(new Tokenizer(), new Stemmer(), new StopWordRemover(), false, false, false);
 
-            string text1 = "11.2. 2015";
-            string text2 = "15.5.2010";
+            var text1 = new IndexDocumentDataModel(0, string.Empty, string.Empty, default, "11.2. 2015");
+            var text2 = new IndexDocumentDataModel(1, string.Empty, string.Empty, default, "15.5.2010");
 
             #endregion
 
@@ -230,15 +230,15 @@ namespace InformationRetrievalManager.NLP.Test
 
             _processing.IndexDocument(text1);
             _processing.IndexDocument(text2);
-            var wordFrequencies = _processing.WordFrequencies;
-            PrintWordFrequencies(wordFrequencies);
+            var vocabulary = _processing.InvertedIndex.GetReadOnlyVocabulary();
+            PrintWordFrequencies(vocabulary);
 
             #endregion
 
             #region Assert
 
-            Assert.True(wordFrequencies.ContainsKey("11.2."));
-            Assert.True(wordFrequencies.ContainsKey("15.5.2010"));
+            Assert.True(vocabulary.ContainsKey("11.2."));
+            Assert.True(vocabulary.ContainsKey("15.5.2010"));
 
             #endregion
         }
@@ -253,11 +253,11 @@ namespace InformationRetrievalManager.NLP.Test
 
             _processing = new IndexProcessing(new Tokenizer(), new Stemmer(ProcessingLanguage.CZ), null, false, true, false);
 
-            string text1 = "æau";
-            string text2 = "cau";
-            string text3 = "caú";
-            string text4 = "cáu";
-            string text5 = "èau";
+            var text1 = new IndexDocumentDataModel(0, string.Empty, string.Empty, default, "æau");
+            var text2 = new IndexDocumentDataModel(1, string.Empty, string.Empty, default, "cau");
+            var text3 = new IndexDocumentDataModel(2, string.Empty, string.Empty, default, "caú");
+            var text4 = new IndexDocumentDataModel(3, string.Empty, string.Empty, default, "cáu");
+            var text5 = new IndexDocumentDataModel(4, string.Empty, string.Empty, default, "èau");
 
             #endregion
 
@@ -268,16 +268,16 @@ namespace InformationRetrievalManager.NLP.Test
             _processing.IndexDocument(text3);
             _processing.IndexDocument(text4);
             _processing.IndexDocument(text5);
-            var wordFrequencies = _processing.WordFrequencies;
-            PrintWordFrequencies(wordFrequencies);
+            var vocabulary = _processing.InvertedIndex.GetReadOnlyVocabulary();
+            PrintWordFrequencies(vocabulary);
 
             #endregion
 
             #region Assert
 
             var pText = _processing.ProcessWord("èau");
-            if (wordFrequencies.ContainsKey(pText))
-                Assert.Equal(5, wordFrequencies[pText]);
+            if (vocabulary.ContainsKey(pText))
+                Assert.Equal(5, vocabulary[pText].Sum(o => o.Value.Frequency));
             else
                 Assert.True(false);
 
@@ -294,10 +294,10 @@ namespace InformationRetrievalManager.NLP.Test
 
             _processing = new IndexProcessing(new Tokenizer(), new Stemmer(ProcessingLanguage.CZ), null, true, false, false);
 
-            string text1 = "BOMB";
-            string text2 = "Bomba";
-            string text3 = "bomba";
-            string text4 = "BOMBY";
+            var text1 = new IndexDocumentDataModel(0, string.Empty, string.Empty, default, "BOMB");
+            var text2 = new IndexDocumentDataModel(1, string.Empty, string.Empty, default, "Bomba");
+            var text3 = new IndexDocumentDataModel(2, string.Empty, string.Empty, default, "bomba");
+            var text4 = new IndexDocumentDataModel(3, string.Empty, string.Empty, default, "BOMBY");
 
             #endregion
 
@@ -307,16 +307,16 @@ namespace InformationRetrievalManager.NLP.Test
             _processing.IndexDocument(text2);
             _processing.IndexDocument(text3);
             _processing.IndexDocument(text4);
-            var wordFrequencies = _processing.WordFrequencies;
-            PrintWordFrequencies(wordFrequencies);
+            var vocabulary = _processing.InvertedIndex.GetReadOnlyVocabulary();
+            PrintWordFrequencies(vocabulary);
 
             #endregion
 
             #region Assert
 
             var pText = _processing.ProcessWord("bomb");
-            if (wordFrequencies.ContainsKey(pText))
-                Assert.Equal(4, wordFrequencies[pText]);
+            if (vocabulary.ContainsKey(pText))
+                Assert.Equal(4, vocabulary[pText].Sum(o => o.Value.Frequency));
             else
                 Assert.True(false);
 
@@ -333,12 +333,12 @@ namespace InformationRetrievalManager.NLP.Test
 
             _processing = new IndexProcessing(new Tokenizer(), new Stemmer(ProcessingLanguage.CZ), null, false, false, false);
 
-            string text1 = "smìjí";
-            string text2 = "smìju";
-            string text3 = "smìješ";
-            string text4 = "smìjeme";
-            string text5 = "smìjí";
-            string text6 = "smìjou";
+            var text1 = new IndexDocumentDataModel(0, string.Empty, string.Empty, default, "smìjí");
+            var text2 = new IndexDocumentDataModel(1, string.Empty, string.Empty, default, "smìju");
+            var text3 = new IndexDocumentDataModel(2, string.Empty, string.Empty, default, "smìješ");
+            var text4 = new IndexDocumentDataModel(3, string.Empty, string.Empty, default, "smìjeme");
+            var text5 = new IndexDocumentDataModel(4, string.Empty, string.Empty, default, "smìjí");
+            var text6 = new IndexDocumentDataModel(5, string.Empty, string.Empty, default, "smìjou");
 
             #endregion
 
@@ -350,28 +350,28 @@ namespace InformationRetrievalManager.NLP.Test
             _processing.IndexDocument(text4);
             _processing.IndexDocument(text5);
             _processing.IndexDocument(text6);
-            var wordFrequencies = _processing.WordFrequencies;
-            PrintWordFrequencies(wordFrequencies);
+            var vocabulary = _processing.InvertedIndex.GetReadOnlyVocabulary();
+            PrintWordFrequencies(vocabulary);
 
             #endregion
 
             #region Assert
 
             var pText1 = _processing.ProcessWord("smìjí");
-            if (wordFrequencies.ContainsKey(pText1))
-                Assert.Equal(4, wordFrequencies[pText1]);
+            if (vocabulary.ContainsKey(pText1))
+                Assert.Equal(4, vocabulary[pText1].Sum(o => o.Value.Frequency));
             else
                 Assert.True(false);
 
             var pText2 = _processing.ProcessWord("smìješ");
-            if (wordFrequencies.ContainsKey(pText2))
-                Assert.Equal(1, wordFrequencies[pText2]);
+            if (vocabulary.ContainsKey(pText2))
+                Assert.Equal(1, vocabulary[pText2].Sum(o => o.Value.Frequency));
             else
                 Assert.True(false);
 
             var pText3 = _processing.ProcessWord("smìjeme");
-            if (wordFrequencies.ContainsKey(pText3))
-                Assert.Equal(1, wordFrequencies[pText3]);
+            if (vocabulary.ContainsKey(pText3))
+                Assert.Equal(1, vocabulary[pText3].Sum(o => o.Value.Frequency));
             else
                 Assert.True(false);
 
@@ -388,10 +388,10 @@ namespace InformationRetrievalManager.NLP.Test
 
             _processing = new IndexProcessing(new Tokenizer(), new Stemmer(ProcessingLanguage.CZ), null, true, false, false);
 
-            string text1 = "BOMB";
-            string text2 = "Bomba";
-            string text3 = "bomba";
-            string text4 = "bomby";
+            var text1 = new IndexDocumentDataModel(0, string.Empty, string.Empty, default, "BOMB");
+            var text2 = new IndexDocumentDataModel(1, string.Empty, string.Empty, default, "Bomba");
+            var text3 = new IndexDocumentDataModel(2, string.Empty, string.Empty, default, "bomba");
+            var text4 = new IndexDocumentDataModel(3, string.Empty, string.Empty, default, "bomby");
 
             #endregion
 
@@ -401,16 +401,16 @@ namespace InformationRetrievalManager.NLP.Test
             _processing.IndexDocument(text2);
             _processing.IndexDocument(text3);
             _processing.IndexDocument(text4);
-            var wordFrequencies = _processing.WordFrequencies;
-            PrintWordFrequencies(wordFrequencies);
+            var vocabulary = _processing.InvertedIndex.GetReadOnlyVocabulary();
+            PrintWordFrequencies(vocabulary);
 
             #endregion
 
             #region Assert
 
             var pText = _processing.ProcessWord("bomb");
-            if (wordFrequencies.ContainsKey(pText))
-                Assert.Equal(4, wordFrequencies[pText]);
+            if (vocabulary.ContainsKey(pText))
+                Assert.Equal(4, vocabulary[pText].Sum(o => o.Value.Frequency));
             else
                 Assert.True(false);
 
@@ -427,7 +427,7 @@ namespace InformationRetrievalManager.NLP.Test
 
             _processing = new IndexProcessing(new Tokenizer(), new Stemmer(ProcessingLanguage.CZ), null, true, false, false);
 
-            string text = "èáú jak se máš?" +
+            var text = new IndexDocumentDataModel(0, string.Empty, string.Empty, default, "èáú jak se máš?" +
                 "<li> o co jsti se snažil a jak,</li>\n" +
                 "<li> jakým výsledkem skonèila vaše akce,</li>\n" +
                 "<li> v kolik hodin jste akci provádìli,</li>\n" +
@@ -445,41 +445,41 @@ namespace InformationRetrievalManager.NLP.Test
                 "to je BOMBA ****\n" +
                 "Po prvním shlédnutí traileru jsem Deadpoolovi moc nevìøil, ale nakonec musím øíct, že je to fakticky bomba. Nicménì zdejší hodnocení mì vyslovenì vytáhlo do kina, abych se nakonec sám pøesvìdèil. Výsledek je takovej, že Deadpool pøesnì splnil, pro co byl urèenej. První chvíle sice byly dost rozpaèitý. Po pùl hodinì jsem nic moc nevìdìl, co si o filmu myslet, ale jakmile Deadpool rozjel trojboj v hláškované, nemìl konkurenci a sypal to ze sebe jak bábovièky písek. V tu chvíli jsem si užíval naprosto boží narážky na všechny možný a nemožný postavy superhrdinského univerza a pøemýšlel nad tím, jestli takovej film nìkdo za dvacet, tøicet let ocení. Ve výsledku je to stejnì ale jedno, protože tržby se tvoøí teï a tady a ty v tuhle chvíli mluví za vše." +
                 "<li> jméno, pøíjmení, orion login, studentské èíslo.</li>" +
-                "Tablet PC - Intel Atom Quad Core Z3735F, kapacitní multidotykový IPS 10.1\" LED 1280x800, Intel HD Graphics, RAM 2GB, 64GB eMMC, WiFi, Bluetooth 4.0, webkamera 2 Mpx + 5 Mpx, 2èlánková baterie, Windows 10 Home 32bit + MS Office Mobile";
+                "Tablet PC - Intel Atom Quad Core Z3735F, kapacitní multidotykový IPS 10.1\" LED 1280x800, Intel HD Graphics, RAM 2GB, 64GB eMMC, WiFi, Bluetooth 4.0, webkamera 2 Mpx + 5 Mpx, 2èlánková baterie, Windows 10 Home 32bit + MS Office Mobile");
 
             #endregion
 
             #region Act
 
             _processing.IndexDocument(text);
-            var wordFrequencies = _processing.WordFrequencies;
-            PrintWordFrequencies(wordFrequencies);
+            var vocabulary = _processing.InvertedIndex.GetReadOnlyVocabulary();
+            PrintWordFrequencies(vocabulary);
 
             #endregion
 
             #region Assert
 
             var pText1 = _processing.ProcessWord("bomb");
-            if (wordFrequencies.ContainsKey(pText1))
-                Assert.Equal(2, wordFrequencies[pText1]);
+            if (vocabulary.ContainsKey(pText1))
+                Assert.Equal(2, vocabulary[pText1].Sum(o => o.Value.Frequency));
             else
                 Assert.True(false);
 
             var pText2 = _processing.ProcessWord("tržby");
-            if (wordFrequencies.ContainsKey(pText2))
-                Assert.Equal(2, wordFrequencies[pText2]);
+            if (vocabulary.ContainsKey(pText2))
+                Assert.Equal(2, vocabulary[pText2].Sum(o => o.Value.Frequency));
             else
                 Assert.True(false);
 
             var pText3 = _processing.ProcessWord("z3735f");
-            if (wordFrequencies.ContainsKey(pText3))
-                Assert.Equal(1, wordFrequencies[pText3]);
+            if (vocabulary.ContainsKey(pText3))
+                Assert.Equal(1, vocabulary[pText3].Sum(o => o.Value.Frequency));
             else
                 Assert.True(false);
 
             var pText4 = _processing.ProcessWord("</li>");
-            if (wordFrequencies.ContainsKey(pText4))
-                Assert.Equal(4, wordFrequencies[pText4]);
+            if (vocabulary.ContainsKey(pText4))
+                Assert.Equal(4, vocabulary[pText4].Sum(o => o.Value.Frequency));
             else
                 Assert.True(false);
 
@@ -493,21 +493,21 @@ namespace InformationRetrievalManager.NLP.Test
         /// <summary>
         /// Print word frequencies
         /// </summary>
-        /// <param name="wordFrequencies">The word frequencies</param>
-        private void PrintWordFrequencies(IReadOnlyDictionary<string, int> wordFrequencies)
+        /// <param name="vocabulary">The vocabulary</param>
+        private void PrintWordFrequencies(IReadOnlyDictionary<string, IReadOnlyDictionary<int, IReadOnlyTermInfo>> vocabulary)
         {
-            foreach (KeyValuePair<string, int> entry in wordFrequencies)
-                _testOutputHelper.WriteLine(entry.Key + ":\t" + entry.Value);
-            PrintSortedDictionary(wordFrequencies);
+            foreach (KeyValuePair<string, IReadOnlyDictionary<int, IReadOnlyTermInfo>> entry in vocabulary)
+                _testOutputHelper.WriteLine(entry.Key + ":\t" + entry.Value.Sum(o => o.Value.Frequency));
+            PrintSortedDictionary(vocabulary);
         }
 
         /// <summary>
         /// Print sorted words from the lsit of frequencies
         /// </summary>
-        /// <param name="wordFrequencies">The list of frequencies</param>
-        private void PrintSortedDictionary(IReadOnlyDictionary<string, int> wordFrequencies)
+        /// <param name="vocabulary">The vocabulary</param>
+        private void PrintSortedDictionary(IReadOnlyDictionary<string, IReadOnlyDictionary<int, IReadOnlyTermInfo>> vocabulary)
         {
-            string[] words = wordFrequencies.Keys.ToArray();
+            string[] words = vocabulary.Keys.ToArray();
             Array.Sort(words);
             _testOutputHelper.WriteLine(string.Join(", ", words));
         }

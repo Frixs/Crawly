@@ -9,10 +9,10 @@ namespace InformationRetrievalManager.NLP
     {
         /// <summary>
         /// Put a term into a inverted index vocabulary.
-        /// Throws <see cref="ArgumentNullException"/> if term is null or empty or document ID is not positive number.
         /// </summary>
         /// <param name="term">The term</param>
         /// <param name="documentId">Document ID</param>
+        /// <exception cref="ArgumentNullException">If term is null or empty or document ID is not positive number.</exception>
         void Put(string term, int documentId);
     }
 }
