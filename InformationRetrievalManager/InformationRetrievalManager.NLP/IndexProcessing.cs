@@ -4,8 +4,7 @@ using System.Collections.Generic;
 namespace InformationRetrievalManager.NLP
 {
     /// <summary>
-    /// Basic processing (NLP)
-    /// TODO: rename to index processing
+    /// Basic index processing
     /// </summary>
     public sealed class IndexProcessing
     {

@@ -356,7 +356,7 @@ namespace InformationRetrievalManager.Crawler
         }
 
         /// <summary>
-        /// Process scanned URLs
+        /// Process scanned URLs and save them
         /// </summary>
         /// <param name="web">Web HtmlAgility instance</param>
         /// <param name="urls">The URLs</param>

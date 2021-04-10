@@ -4,7 +4,7 @@ using System;
 namespace InformationRetrievalManager.Crawler
 {
     /// <summary>
-    /// Defines the strcture for the storaged crawler data in organized foramt (e.g. JSON)
+    /// Defines the structure for storaged crawler data in organized foramt (e.g. JSON)
     /// </summary>
     public class CrawlerDataModel
     {
