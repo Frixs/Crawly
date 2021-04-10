@@ -7,14 +7,14 @@ using Xunit.Abstractions;
 namespace InformationRetrievalManager.NLP.Test
 {
     /// <summary>
-    /// Test <see cref="BasicProcessing"/>
+    /// Test <see cref="IndexProcessing"/>
     /// </summary>
-    public class BasicProcessingTest : IDisposable
+    public class IndexProcessingTest : IDisposable
     {
         #region Private Members
 
         private readonly ITestOutputHelper _testOutputHelper;
-        private BasicProcessing _processing;
+        private IndexProcessing _processing;
 
         #endregion
 
@@ -23,7 +23,7 @@ namespace InformationRetrievalManager.NLP.Test
         /// <summary>
         /// Do "global" initialization here; Called before every test method.
         /// </summary>
-        public BasicProcessingTest(ITestOutputHelper testOutputHelper)
+        public IndexProcessingTest(ITestOutputHelper testOutputHelper)
         {
             _testOutputHelper = testOutputHelper;
 
@@ -54,7 +54,7 @@ namespace InformationRetrievalManager.NLP.Test
         {
             #region Arrange
 
-            _processing = new BasicProcessing(new Tokenizer(), new Stemmer(ProcessingLanguage.CZ), null, false, true, true);
+            _processing = new IndexProcessing(new Tokenizer(), new Stemmer(ProcessingLanguage.CZ), null, false, true, true);
 
             string text = "Æauík";
 
@@ -62,7 +62,7 @@ namespace InformationRetrievalManager.NLP.Test
 
             #region Act
 
-            _processing.Index(text);
+            _processing.IndexDocument(text);
             var wordFrequencies = _processing.WordFrequencies;
             PrintWordFrequencies(wordFrequencies);
 
@@ -83,7 +83,7 @@ namespace InformationRetrievalManager.NLP.Test
         {
             #region Arrange
 
-            _processing = new BasicProcessing(new Tokenizer(), new Stemmer(), null, false, true, true);
+            _processing = new IndexProcessing(new Tokenizer(), new Stemmer(), null, false, true, true);
 
             string text = "<li>";
 
@@ -91,7 +91,7 @@ namespace InformationRetrievalManager.NLP.Test
 
             #region Act
 
-            _processing.Index(text);
+            _processing.IndexDocument(text);
             var wordFrequencies = _processing.WordFrequencies;
             PrintWordFrequencies(wordFrequencies);
 
@@ -112,7 +112,7 @@ namespace InformationRetrievalManager.NLP.Test
         {
             #region Arrange
 
-            _processing = new BasicProcessing(new Tokenizer(), new Stemmer(), null, false, true, true);
+            _processing = new IndexProcessing(new Tokenizer(), new Stemmer(), null, false, true, true);
 
             string text = "http://www.csfd.cz/film/261379-deadpool/komentare/?comment=10355101 link";
 
@@ -120,7 +120,7 @@ namespace InformationRetrievalManager.NLP.Test
 
             #region Act
 
-            _processing.Index(text);
+            _processing.IndexDocument(text);
             var wordFrequencies = _processing.WordFrequencies;
             PrintWordFrequencies(wordFrequencies);
 
@@ -142,7 +142,7 @@ namespace InformationRetrievalManager.NLP.Test
         {
             #region Arrange
 
-            _processing = new BasicProcessing(new Tokenizer(), new Stemmer(), null, false, false, false);
+            _processing = new IndexProcessing(new Tokenizer(), new Stemmer(), null, false, false, false);
 
             string text1 = "(pìstí).";
             string text2 = "1280x800";
@@ -152,9 +152,9 @@ namespace InformationRetrievalManager.NLP.Test
 
             #region Act
 
-            _processing.Index(text1);
-            _processing.Index(text2);
-            _processing.Index(text3);
+            _processing.IndexDocument(text1);
+            _processing.IndexDocument(text2);
+            _processing.IndexDocument(text3);
             var wordFrequencies = _processing.WordFrequencies;
             PrintWordFrequencies(wordFrequencies);
 
@@ -177,7 +177,7 @@ namespace InformationRetrievalManager.NLP.Test
         {
             #region Arrange
 
-            _processing = new BasicProcessing(new Tokenizer(), new Stemmer(ProcessingLanguage.CZ), new StopWordRemover(ProcessingLanguage.CZ), true, false, false);
+            _processing = new IndexProcessing(new Tokenizer(), new Stemmer(ProcessingLanguage.CZ), new StopWordRemover(ProcessingLanguage.CZ), true, false, false);
 
             string text1 = "Tímto textem britský The Guardian Jana Èulíka nepotìšil";
             string text2 = "Jestliže nepøijde, mìl by se omluvit.";
@@ -190,12 +190,12 @@ namespace InformationRetrievalManager.NLP.Test
 
             #region Act
 
-            _processing.Index(text1);
-            _processing.Index(text2);
-            _processing.Index(text3);
-            _processing.Index(text4);
-            _processing.Index(text5);
-            _processing.Index(text6);
+            _processing.IndexDocument(text1);
+            _processing.IndexDocument(text2);
+            _processing.IndexDocument(text3);
+            _processing.IndexDocument(text4);
+            _processing.IndexDocument(text5);
+            _processing.IndexDocument(text6);
             var wordFrequencies = _processing.WordFrequencies;
             PrintWordFrequencies(wordFrequencies);
 
@@ -219,7 +219,7 @@ namespace InformationRetrievalManager.NLP.Test
         {
             #region Arrange
 
-            _processing = new BasicProcessing(new Tokenizer(), new Stemmer(), new StopWordRemover(), false, false, false);
+            _processing = new IndexProcessing(new Tokenizer(), new Stemmer(), new StopWordRemover(), false, false, false);
 
             string text1 = "11.2. 2015";
             string text2 = "15.5.2010";
@@ -228,8 +228,8 @@ namespace InformationRetrievalManager.NLP.Test
 
             #region Act
 
-            _processing.Index(text1);
-            _processing.Index(text2);
+            _processing.IndexDocument(text1);
+            _processing.IndexDocument(text2);
             var wordFrequencies = _processing.WordFrequencies;
             PrintWordFrequencies(wordFrequencies);
 
@@ -251,7 +251,7 @@ namespace InformationRetrievalManager.NLP.Test
         {
             #region Arrange
 
-            _processing = new BasicProcessing(new Tokenizer(), new Stemmer(ProcessingLanguage.CZ), null, false, true, false);
+            _processing = new IndexProcessing(new Tokenizer(), new Stemmer(ProcessingLanguage.CZ), null, false, true, false);
 
             string text1 = "æau";
             string text2 = "cau";
@@ -263,11 +263,11 @@ namespace InformationRetrievalManager.NLP.Test
 
             #region Act
 
-            _processing.Index(text1);
-            _processing.Index(text2);
-            _processing.Index(text3);
-            _processing.Index(text4);
-            _processing.Index(text5);
+            _processing.IndexDocument(text1);
+            _processing.IndexDocument(text2);
+            _processing.IndexDocument(text3);
+            _processing.IndexDocument(text4);
+            _processing.IndexDocument(text5);
             var wordFrequencies = _processing.WordFrequencies;
             PrintWordFrequencies(wordFrequencies);
 
@@ -292,7 +292,7 @@ namespace InformationRetrievalManager.NLP.Test
         {
             #region Arrange
 
-            _processing = new BasicProcessing(new Tokenizer(), new Stemmer(ProcessingLanguage.CZ), null, true, false, false);
+            _processing = new IndexProcessing(new Tokenizer(), new Stemmer(ProcessingLanguage.CZ), null, true, false, false);
 
             string text1 = "BOMB";
             string text2 = "Bomba";
@@ -303,10 +303,10 @@ namespace InformationRetrievalManager.NLP.Test
 
             #region Act
 
-            _processing.Index(text1);
-            _processing.Index(text2);
-            _processing.Index(text3);
-            _processing.Index(text4);
+            _processing.IndexDocument(text1);
+            _processing.IndexDocument(text2);
+            _processing.IndexDocument(text3);
+            _processing.IndexDocument(text4);
             var wordFrequencies = _processing.WordFrequencies;
             PrintWordFrequencies(wordFrequencies);
 
@@ -331,7 +331,7 @@ namespace InformationRetrievalManager.NLP.Test
         {
             #region Arrange
 
-            _processing = new BasicProcessing(new Tokenizer(), new Stemmer(ProcessingLanguage.CZ), null, false, false, false);
+            _processing = new IndexProcessing(new Tokenizer(), new Stemmer(ProcessingLanguage.CZ), null, false, false, false);
 
             string text1 = "smìjí";
             string text2 = "smìju";
@@ -344,12 +344,12 @@ namespace InformationRetrievalManager.NLP.Test
 
             #region Act
 
-            _processing.Index(text1);
-            _processing.Index(text2);
-            _processing.Index(text3);
-            _processing.Index(text4);
-            _processing.Index(text5);
-            _processing.Index(text6);
+            _processing.IndexDocument(text1);
+            _processing.IndexDocument(text2);
+            _processing.IndexDocument(text3);
+            _processing.IndexDocument(text4);
+            _processing.IndexDocument(text5);
+            _processing.IndexDocument(text6);
             var wordFrequencies = _processing.WordFrequencies;
             PrintWordFrequencies(wordFrequencies);
 
@@ -386,7 +386,7 @@ namespace InformationRetrievalManager.NLP.Test
         {
             #region Arrange
 
-            _processing = new BasicProcessing(new Tokenizer(), new Stemmer(ProcessingLanguage.CZ), null, true, false, false);
+            _processing = new IndexProcessing(new Tokenizer(), new Stemmer(ProcessingLanguage.CZ), null, true, false, false);
 
             string text1 = "BOMB";
             string text2 = "Bomba";
@@ -397,10 +397,10 @@ namespace InformationRetrievalManager.NLP.Test
 
             #region Act
 
-            _processing.Index(text1);
-            _processing.Index(text2);
-            _processing.Index(text3);
-            _processing.Index(text4);
+            _processing.IndexDocument(text1);
+            _processing.IndexDocument(text2);
+            _processing.IndexDocument(text3);
+            _processing.IndexDocument(text4);
             var wordFrequencies = _processing.WordFrequencies;
             PrintWordFrequencies(wordFrequencies);
 
@@ -425,7 +425,7 @@ namespace InformationRetrievalManager.NLP.Test
         {
             #region Arrange
 
-            _processing = new BasicProcessing(new Tokenizer(), new Stemmer(ProcessingLanguage.CZ), null, true, false, false);
+            _processing = new IndexProcessing(new Tokenizer(), new Stemmer(ProcessingLanguage.CZ), null, true, false, false);
 
             string text = "èáú jak se máš?" +
                 "<li> o co jsti se snažil a jak,</li>\n" +
@@ -451,7 +451,7 @@ namespace InformationRetrievalManager.NLP.Test
 
             #region Act
 
-            _processing.Index(text);
+            _processing.IndexDocument(text);
             var wordFrequencies = _processing.WordFrequencies;
             PrintWordFrequencies(wordFrequencies);
 

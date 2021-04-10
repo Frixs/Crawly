@@ -141,8 +141,8 @@ namespace InformationRetrievalManager
                             if (data.Length > 0)
                             {
                                 // HACK - start processing
-                                var processing = new BasicProcessing(new Tokenizer(), new Stemmer(), new StopWordRemover());
-                                processing.Index(data[0].Content);
+                                var processing = new IndexProcessing(new Tokenizer(), new Stemmer(), new StopWordRemover());
+                                processing.IndexDocument(data[0].Content);
                             }
                         }
                     }

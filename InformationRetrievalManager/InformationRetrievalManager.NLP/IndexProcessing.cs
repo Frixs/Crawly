@@ -5,8 +5,9 @@ namespace InformationRetrievalManager.NLP
 {
     /// <summary>
     /// Basic processing (NLP)
+    /// TODO: rename to index processing
     /// </summary>
-    public class BasicProcessing
+    public sealed class IndexProcessing
     {
         #region Constants
 
@@ -38,6 +39,11 @@ namespace InformationRetrievalManager.NLP
         /// StopWord remover of this processing
         /// </summary>
         private StopWordRemover _stopWordRemover;
+
+        /// <summary>
+        /// TODO
+        /// </summary>
+        private IInvertedIndex _invertedIndex;
 
         /// <summary>
         /// Dictionary of everything indexed via this processing
@@ -81,11 +87,12 @@ namespace InformationRetrievalManager.NLP
         /// <param name="toLowerCase">Should the toknes be lowercased?</param>
         /// <param name="removeAccentsBeforeStemming">Should we remove accents from tokens before stemming?</param>
         /// <param name="removeAccentsAfterStemming">Should we remove accents from tokens after stemming?</param>
-        public BasicProcessing(Tokenizer tokenizer, Stemmer stemmer, StopWordRemover stopWordRemover = null, bool toLowerCase = false, bool removeAccentsBeforeStemming = false, bool removeAccentsAfterStemming = false)
+        public IndexProcessing(Tokenizer tokenizer, Stemmer stemmer, StopWordRemover stopWordRemover = null, bool toLowerCase = false, bool removeAccentsBeforeStemming = false, bool removeAccentsAfterStemming = false)
         {
             _tokenizer = tokenizer ?? throw new ArgumentNullException(nameof(tokenizer));
             _stemmer = stemmer ?? throw new ArgumentNullException(nameof(stemmer));
             _stopWordRemover = stopWordRemover;
+            _invertedIndex = new InvertedIndex();
 
             ToLowerCase = toLowerCase;
             RemoveAccentsBeforeStemming = removeAccentsBeforeStemming;
@@ -100,7 +107,7 @@ namespace InformationRetrievalManager.NLP
         /// Process the document by the processing settings and indexate it
         /// </summary>
         /// <param name="document">The document</param>
-        public void Index(string document)
+        public void IndexDocument(string document)
         {
             // To lower
             if (ToLowerCase)
@@ -114,27 +121,27 @@ namespace InformationRetrievalManager.NLP
                 document = RemoveAccents(document);
 
             // Tokenize
-            var tokens = _tokenizer.Tokenize(document);
+            var terms = _tokenizer.Tokenize(document);
 
             // Remove stopwords
             if (_stopWordRemover != null)
-                tokens = _stopWordRemover.Process(tokens);
+                terms = _stopWordRemover.Process(terms);
 
-            // Go through all tokens
-            for (int i = 0; i < tokens.Length; ++i)
+            // Go through all terms
+            for (int i = 0; i < terms.Length; ++i)
             {
                 // Stemming
-                tokens[i] = _stemmer.Stem(tokens[i]);
+                terms[i] = _stemmer.Stem(terms[i]);
 
                 // Remove accents after stemming
                 if (RemoveAccentsAfterStemming)
-                    tokens[i] = RemoveAccents(tokens[i]);
+                    terms[i] = RemoveAccents(terms[i]);
 
                 // Count frequency
-                if (_wordFrequencies.ContainsKey(tokens[i]))
-                    _wordFrequencies[tokens[i]] += 1;
+                if (_wordFrequencies.ContainsKey(terms[i]))
+                    _wordFrequencies[terms[i]] += 1;
                 else
-                    _wordFrequencies.Add(tokens[i], 1);
+                    _wordFrequencies.Add(terms[i], 1);
             }
         }
 
