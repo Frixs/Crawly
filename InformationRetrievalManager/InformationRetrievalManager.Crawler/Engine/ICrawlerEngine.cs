@@ -13,7 +13,7 @@ namespace InformationRetrievalManager.Crawler
         /// <summary>
         /// represents the crawler and makes it unique identifier for a certain crawler
         /// </summary>
-        /// <remarks>Should not be changeable. Should be valid for file/dir names.</remarks>
+        /// <remarks>Cannot be <see cref="null"/>. Should not be changeable. Should be valid for file/dir names.</remarks>
         string NameIdentifier { get; }
 
         /// <summary>
@@ -38,26 +38,24 @@ namespace InformationRetrievalManager.Crawler
         /// <summary>
         /// The base size address
         /// </summary>
-        /// <remarks>Can contain wildchars to be replaced with page no. - more in <see cref="SetControls"/></remarks>
+        /// <remarks>Cannot be <see cref="null"/>. Can contain wildchars to be replaced with page no. - more in <see cref="SetControls"/></remarks>
         string SiteAddress { get; }
 
         /// <summary>
-        /// The suffix of the site address for more specific selection of page articles
+        /// The suffix of <see cref="SiteAddress"/> address for more specific selection of page articles
         /// </summary>
-        /// <remarks>Can contain wildchars to be replaced with page no. - more in <see cref="SetControls"/></remarks>
+        /// <remarks>Cannot be <see cref="null"/>. Can contain wildchars to be replaced with page no. - more in <see cref="SetControls"/></remarks>
         string SiteSuffix { get; }
 
         /// <summary>
-        /// Should return combination of <see cref="SiteAddress"/> and <see cref="SiteSuffix"/>. 
-        /// Returns empty string if the site is not set.
+        /// Return combination of <see cref="SiteAddress"/> and <see cref="SiteSuffix"/>.
         /// </summary>
         string FullSiteAddress { get; }
 
         /// <summary>
-        /// Dirname base that identifies the crawler's data
-        /// Returns empty string if the site is not set.
+        /// Basic check/indication if the <see cref="FullSiteAddress"/> is set / ready to use
         /// </summary>
-        string CurrentSiteDataIdentification { get; }
+        bool IsSiteSet { get; }
 
         /// <summary>
         /// XPath to select URLs of articles
@@ -145,6 +143,15 @@ namespace InformationRetrievalManager.Crawler
         #endregion
 
         #region Methods
+
+        /// <summary>
+        /// Generates string identifier based on <see cref="NameIdentifier"/> and <see cref="FullSiteAddress"/>
+        /// </summary>
+        /// <returns>Return string identifier token.</returns>
+        /// <remarks>
+        ///     Dirname base that identifies the crawler's data. 
+        /// </remarks>
+        string GenerateCrawlerSiteIdentificationToken();
 
         /// <summary>
         /// Start the crawling process

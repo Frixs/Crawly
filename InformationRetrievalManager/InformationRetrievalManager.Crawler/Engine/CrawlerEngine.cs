@@ -79,10 +79,10 @@ namespace InformationRetrievalManager.Crawler
         public string SiteSuffix { get; private set; } = "";
 
         /// <inheritdoc/>
-        public string FullSiteAddress => IsSiteSet ? SiteAddress + SiteSuffix : string.Empty;
+        public string FullSiteAddress => SiteAddress + SiteSuffix;
 
         /// <inheritdoc/>
-        public string CurrentSiteDataIdentification => IsSiteSet ? $"{NameIdentifier}_{FullSiteAddress.GetHashCode()}" : string.Empty;
+        public bool IsSiteSet => !FullSiteAddress.IsNullOrEmpty();
 
         /// <inheritdoc/>
         public string SiteUrlArticlesXPath { get; private set; } = "";
@@ -123,15 +123,6 @@ namespace InformationRetrievalManager.Crawler
 
         #endregion
 
-        #region Public Properties
-
-        /// <summary>
-        /// Basic check/indication if the site is set / ready to use
-        /// </summary>
-        public bool IsSiteSet => !SiteAddress.IsNullOrEmpty() && !SiteSuffix.IsNullOrEmpty();
-
-        #endregion
-
         #region Constructor
 
         /// <summary>
@@ -154,6 +145,13 @@ namespace InformationRetrievalManager.Crawler
         #endregion
 
         #region Interface Methods
+
+        /// <inheritdoc/>
+        public string GenerateCrawlerSiteIdentificationToken()
+        {
+            int hc = FullSiteAddress.GetHashCode();
+            return $"{NameIdentifier}_{(hc < 0 ? "1" : "0-")}{hc}";
+        }
 
         /// <inheritdoc/>
         public bool Start()
@@ -295,7 +293,7 @@ namespace InformationRetrievalManager.Crawler
             const string defaultArticleLink = "#";
 
             bool anyInvalidLinks = false;
-            string urlsFilename = $"urls_{CurrentSiteDataIdentification}_{StartPageNo}_{MaxPageNo}_{PageNoModifier}_{DateTime.UtcNow.Year}_{DateTime.UtcNow.Month}_{DateTime.UtcNow.Day}_{DateTime.UtcNow.Hour}.txt";
+            string urlsFilename = $"urls_{GenerateCrawlerSiteIdentificationToken()}_{StartPageNo}_{MaxPageNo}_{PageNoModifier}_{DateTime.UtcNow.Year}_{DateTime.UtcNow.Month}_{DateTime.UtcNow.Day}_{DateTime.UtcNow.Hour}.txt";
             string urlsFilePath = $"{Constants.CrawlerDataStorageDir}/{urlsFilename}";
 
             // Check if we have already scanned urls...

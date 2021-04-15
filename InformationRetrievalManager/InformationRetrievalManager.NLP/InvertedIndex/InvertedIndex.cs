@@ -36,6 +36,7 @@ namespace InformationRetrievalManager.NLP
         #region Interface Methods
 
         /// <inheritdoc/>
+        /// <remarks>O(n^2)</remarks>
         public IReadOnlyDictionary<string, IReadOnlyDictionary<int, IReadOnlyTermInfo>> GetReadOnlyVocabulary()
         {
             return _vocabulary.ToDictionary(o => o.Key, o => (IReadOnlyDictionary<int, IReadOnlyTermInfo>)o.Value.ToDictionary(x => x.Key, x => (IReadOnlyTermInfo)x.Value));

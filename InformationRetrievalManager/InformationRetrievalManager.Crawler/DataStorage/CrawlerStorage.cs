@@ -62,10 +62,13 @@ namespace InformationRetrievalManager.Crawler
         /// <inheritdoc/>
         public async Task SaveAsync(ICrawlerEngine crawler, string url, string title, string category, DateTime timestamp, string contentHtml, string contentTextMin, string contentText)
         {
-            if (!crawler.IsCurrentlyCrawling)
+            if (crawler == null)
+                throw new ArgumentNullException("Crawler is not defined!");
+
+            if (!crawler.IsCurrentlyCrawling || !crawler.IsSiteSet)
                 return;
 
-            string crawledDataDirPath = $"{Constants.CrawlerDataStorageDir}/{crawler.CurrentSiteDataIdentification}";
+            string crawledDataDirPath = $"{Constants.CrawlerDataStorageDir}/{crawler.GenerateCrawlerSiteIdentificationToken()}";
 
             // Check if the dir exists...
             if (!Directory.Exists(crawledDataDirPath))
@@ -116,6 +119,9 @@ namespace InformationRetrievalManager.Crawler
         /// <inheritdoc/>
         public string[] GetDataFiles(ICrawlerEngine crawler)
         {
+            if (crawler == null)
+                throw new ArgumentNullException("Crawler is not defined!");
+
             if (crawler.IsCurrentlyCrawling)
                 return null;
 
