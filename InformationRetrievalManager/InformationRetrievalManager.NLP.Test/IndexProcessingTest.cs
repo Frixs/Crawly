@@ -14,6 +14,7 @@ namespace InformationRetrievalManager.NLP.Test
         #region Private Members
 
         private readonly ITestOutputHelper _testOutputHelper;
+        private readonly string _processingName = "utest_index";
         private IndexProcessing _processing;
 
         #endregion
@@ -54,7 +55,7 @@ namespace InformationRetrievalManager.NLP.Test
         {
             #region Arrange
 
-            _processing = new IndexProcessing(new Tokenizer(), new Stemmer(ProcessingLanguage.CZ), null, false, true, true);
+            _processing = new IndexProcessing(_processingName, new Tokenizer(), new Stemmer(ProcessingLanguage.CZ), null, null, null, false, true, true);
 
             var text = new IndexDocumentDataModel(0, string.Empty, string.Empty, default, "Æauík");
 
@@ -83,7 +84,7 @@ namespace InformationRetrievalManager.NLP.Test
         {
             #region Arrange
 
-            _processing = new IndexProcessing(new Tokenizer(), new Stemmer(), null, false, true, true);
+            _processing = new IndexProcessing(_processingName, new Tokenizer(), new Stemmer(), null, null, null, false, true, true);
 
             var text = new IndexDocumentDataModel(0, string.Empty, string.Empty, default, "<li>");
 
@@ -112,7 +113,7 @@ namespace InformationRetrievalManager.NLP.Test
         {
             #region Arrange
 
-            _processing = new IndexProcessing(new Tokenizer(), new Stemmer(), null, false, true, true);
+            _processing = new IndexProcessing(_processingName, new Tokenizer(), new Stemmer(), null, null, null, false, true, true);
 
             var text = new IndexDocumentDataModel(0, string.Empty, string.Empty, default, "http://www.csfd.cz/film/261379-deadpool/komentare/?comment=10355101 link");
 
@@ -142,7 +143,7 @@ namespace InformationRetrievalManager.NLP.Test
         {
             #region Arrange
 
-            _processing = new IndexProcessing(new Tokenizer(), new Stemmer(), null, false, false, false);
+            _processing = new IndexProcessing(_processingName, new Tokenizer(), new Stemmer(), null, null, null, false, false, false);
 
             var text1 = new IndexDocumentDataModel(0, string.Empty, string.Empty, default, "(pìstí).");
             var text2 = new IndexDocumentDataModel(1, string.Empty, string.Empty, default, "1280x800");
@@ -177,7 +178,7 @@ namespace InformationRetrievalManager.NLP.Test
         {
             #region Arrange
 
-            _processing = new IndexProcessing(new Tokenizer(), new Stemmer(ProcessingLanguage.CZ), new StopWordRemover(ProcessingLanguage.CZ), true, false, false);
+            _processing = new IndexProcessing(_processingName, new Tokenizer(), new Stemmer(ProcessingLanguage.CZ), new StopWordRemover(ProcessingLanguage.CZ), null, null, true, false, false);
 
             var text1 = new IndexDocumentDataModel(0, string.Empty, string.Empty, default, "Tímto textem britský The Guardian Jana Èulíka nepotìšil");
             var text2 = new IndexDocumentDataModel(1, string.Empty, string.Empty, default, "Jestliže nepøijde, mìl by se omluvit.");
@@ -219,7 +220,7 @@ namespace InformationRetrievalManager.NLP.Test
         {
             #region Arrange
 
-            _processing = new IndexProcessing(new Tokenizer(), new Stemmer(), new StopWordRemover(), false, false, false);
+            _processing = new IndexProcessing(_processingName, new Tokenizer(), new Stemmer(), new StopWordRemover(), null, null, false, false, false);
 
             var text1 = new IndexDocumentDataModel(0, string.Empty, string.Empty, default, "11.2. 2015");
             var text2 = new IndexDocumentDataModel(1, string.Empty, string.Empty, default, "15.5.2010");
@@ -251,7 +252,7 @@ namespace InformationRetrievalManager.NLP.Test
         {
             #region Arrange
 
-            _processing = new IndexProcessing(new Tokenizer(), new Stemmer(ProcessingLanguage.CZ), null, false, true, false);
+            _processing = new IndexProcessing(_processingName, new Tokenizer(), new Stemmer(ProcessingLanguage.CZ), null, null, null, false, true, false);
 
             var text1 = new IndexDocumentDataModel(0, string.Empty, string.Empty, default, "æau");
             var text2 = new IndexDocumentDataModel(1, string.Empty, string.Empty, default, "cau");
@@ -292,7 +293,7 @@ namespace InformationRetrievalManager.NLP.Test
         {
             #region Arrange
 
-            _processing = new IndexProcessing(new Tokenizer(), new Stemmer(ProcessingLanguage.CZ), null, true, false, false);
+            _processing = new IndexProcessing(_processingName, new Tokenizer(), new Stemmer(ProcessingLanguage.CZ), null, null, null, true, false, false);
 
             var text1 = new IndexDocumentDataModel(0, string.Empty, string.Empty, default, "BOMB");
             var text2 = new IndexDocumentDataModel(1, string.Empty, string.Empty, default, "Bomba");
@@ -331,7 +332,7 @@ namespace InformationRetrievalManager.NLP.Test
         {
             #region Arrange
 
-            _processing = new IndexProcessing(new Tokenizer(), new Stemmer(ProcessingLanguage.CZ), null, false, false, false);
+            _processing = new IndexProcessing(_processingName, new Tokenizer(), new Stemmer(ProcessingLanguage.CZ), null, null, null, false, false, false);
 
             var text1 = new IndexDocumentDataModel(0, string.Empty, string.Empty, default, "smìjí");
             var text2 = new IndexDocumentDataModel(1, string.Empty, string.Empty, default, "smìju");
@@ -386,7 +387,7 @@ namespace InformationRetrievalManager.NLP.Test
         {
             #region Arrange
 
-            _processing = new IndexProcessing(new Tokenizer(), new Stemmer(ProcessingLanguage.CZ), null, true, false, false);
+            _processing = new IndexProcessing(_processingName, new Tokenizer(), new Stemmer(ProcessingLanguage.CZ), null, null, null, true, false, false);
 
             var text1 = new IndexDocumentDataModel(0, string.Empty, string.Empty, default, "BOMB");
             var text2 = new IndexDocumentDataModel(1, string.Empty, string.Empty, default, "Bomba");
@@ -425,7 +426,7 @@ namespace InformationRetrievalManager.NLP.Test
         {
             #region Arrange
 
-            _processing = new IndexProcessing(new Tokenizer(), new Stemmer(ProcessingLanguage.CZ), null, true, false, false);
+            _processing = new IndexProcessing(_processingName, new Tokenizer(), new Stemmer(ProcessingLanguage.CZ), null, null, null, true, false, false);
 
             var text = new IndexDocumentDataModel(0, string.Empty, string.Empty, default, "èáú jak se máš?" +
                 "<li> o co jsti se snažil a jak,</li>\n" +

@@ -1,8 +1,11 @@
 ﻿using InformationRetrievalManager.Core;
 using InformationRetrievalManager.Crawler;
 using InformationRetrievalManager.NLP;
+using Ixs.DNA;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -18,8 +21,10 @@ namespace InformationRetrievalManager
     {
         #region Private Members (Injects)
 
+        private readonly ILogger _logger;
         private readonly ICrawlerManager _crawlerManager;
         private readonly ITaskManager _taskManager;
+        private readonly IFileManager _fileManager;
         private readonly ICrawlerStorage _crawlerStorage;
 
         #endregion
@@ -76,10 +81,12 @@ namespace InformationRetrievalManager
         /// <summary>
         /// DI constructor
         /// </summary>
-        public HomePageViewModel(ICrawlerManager crawlerManager, ITaskManager taskManager, ICrawlerStorage crawlerStorage) : this()
+        public HomePageViewModel(ILogger logger, ICrawlerManager crawlerManager, ITaskManager taskManager, IFileManager fileManager, ICrawlerStorage crawlerStorage) : this()
         {
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _crawlerManager = crawlerManager ?? throw new ArgumentNullException(nameof(crawlerManager));
             _taskManager = taskManager ?? throw new ArgumentNullException(nameof(taskManager));
+            _fileManager = fileManager ?? throw new ArgumentNullException(nameof(fileManager));
             _crawlerStorage = crawlerStorage ?? throw new ArgumentNullException(nameof(crawlerStorage));
 
             // HACK: crawler starter
@@ -138,12 +145,15 @@ namespace InformationRetrievalManager
                         {
                             JsonSerializer serializer = new JsonSerializer();
                             CrawlerDataModel[] data = (CrawlerDataModel[])serializer.Deserialize(file, typeof(CrawlerDataModel[]));
-                            if (data.Length > 0)
-                            {
-                                // HACK - start processing
-                                var processing = new IndexProcessing(new Tokenizer(), new Stemmer(), new StopWordRemover());
-                                processing.IndexDocument(new IndexDocumentDataModel(0, data[0].Title, data[0].Category, data[0].Timestamp, data[0].Content));
-                            }
+
+                            List<IndexDocumentDataModel> docs = new List<IndexDocumentDataModel>();
+                            for (int i = 0; i < data.Length; ++i)
+                                docs.Add(new IndexDocumentDataModel(i, data[i].Title, data[i].Category, data[i].Timestamp, data[i].Content));
+
+                            // HACK - start processing
+                            var processing = new IndexProcessing("my_index", new Tokenizer(), new Stemmer(), new StopWordRemover(), _fileManager);
+                            processing.IndexDocuments(docs.ToArray());
+                            _logger.LogDebugSource("Index processing done!");
                         }
                     }
                 }

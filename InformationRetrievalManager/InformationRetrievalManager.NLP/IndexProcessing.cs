@@ -1,5 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using InformationRetrievalManager.Core;
+using Microsoft.Extensions.Logging;
+using System;
 
 namespace InformationRetrievalManager.NLP
 {
@@ -19,6 +20,12 @@ namespace InformationRetrievalManager.NLP
         /// Alphabet without diacritics
         /// </summary>
         private const string _withoutDiacritics = "aAaAcCcCdDeEeEiInNnNoOoOrRrRsSsStTuUuUuUyYzZzZ";
+
+        #endregion
+
+        #region Private Members (Injects)
+
+        private readonly ILogger _logger;
 
         #endregion
 
@@ -49,6 +56,14 @@ namespace InformationRetrievalManager.NLP
         #region Public Properties
 
         /// <summary>
+        /// Name that identifies the index processing instance
+        /// </summary>
+        /// <remarks>
+        ///     Should not be <see cref="null"/>.
+        /// </remarks>
+        private string Name { get; }
+
+        /// <summary>
         /// Read-only reference to <see cref="_invertedIndex"/>
         /// </summary>
         public IReadOnlyInvertedIndex InvertedIndex => _invertedIndex;
@@ -75,18 +90,26 @@ namespace InformationRetrievalManager.NLP
         /// <summary>
         /// Default constructor
         /// </summary>
+        /// <param name="name">Name of the processing</param>
         /// <param name="tokenizer">The tokenizer for this processing</param>
         /// <param name="stemmer">The stemmer for this processing</param>
         /// <param name="stopWordRemover">The stopword remover for this processing (leave <see langword="null"/> to ignore removing stopwords)</param>
+        /// <param name="fileManager">File manager used used for storing the processed index (the index will be stored in-memory only if the manager is not set)</param>
+        /// <param name="logger">Connect logger from the rest of the system (if not set, the logger will not log anything)</param>
         /// <param name="toLowerCase">Should the toknes be lowercased?</param>
         /// <param name="removeAccentsBeforeStemming">Should we remove accents from tokens before stemming?</param>
         /// <param name="removeAccentsAfterStemming">Should we remove accents from tokens after stemming?</param>
-        public IndexProcessing(Tokenizer tokenizer, Stemmer stemmer, StopWordRemover stopWordRemover = null, bool toLowerCase = false, bool removeAccentsBeforeStemming = false, bool removeAccentsAfterStemming = false)
+        public IndexProcessing(string name, Tokenizer tokenizer, Stemmer stemmer, StopWordRemover stopWordRemover = null, IFileManager fileManager = null, ILogger logger = null, bool toLowerCase = false, bool removeAccentsBeforeStemming = false, bool removeAccentsAfterStemming = false)
         {
+            // TODO: check name allowed characters
+            Name = name;
+
             _tokenizer = tokenizer ?? throw new ArgumentNullException(nameof(tokenizer));
             _stemmer = stemmer ?? throw new ArgumentNullException(nameof(stemmer));
             _stopWordRemover = stopWordRemover;
-            _invertedIndex = new InvertedIndex();
+            _invertedIndex = new InvertedIndex(name, fileManager, logger);
+
+            _logger = logger;
 
             ToLowerCase = toLowerCase;
             RemoveAccentsBeforeStemming = removeAccentsBeforeStemming;
@@ -98,7 +121,8 @@ namespace InformationRetrievalManager.NLP
         #region Public Methods
 
         /// <summary>
-        /// Process the documents by the processing settings and indexate it
+        /// Process the documents by the processing settings and indexate it. 
+        /// Additionally, the method calls for inverted index to save data (if file manager was defined in constructor for this instance).
         /// </summary>
         /// <param name="documents">Array of the documents</param>
         /// <exception cref="ArgumentNullException">If the array is null</exception>
@@ -109,6 +133,9 @@ namespace InformationRetrievalManager.NLP
 
             for (int i = 0; i < documents.Length; ++i)
                 IndexDocument(documents[i]);
+
+            // Save indexed data
+            _invertedIndex.Save();
         }
 
         /// <summary>
@@ -121,7 +148,7 @@ namespace InformationRetrievalManager.NLP
             if (document == null)
                 throw new ArgumentNullException("Document not specified!");
 
-            // TODO
+            // TODO: add to process title and other fields
             string docContent = document.Content;
 
             // To lower

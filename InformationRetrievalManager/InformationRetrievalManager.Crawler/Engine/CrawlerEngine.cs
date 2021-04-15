@@ -393,10 +393,10 @@ namespace InformationRetrievalManager.Crawler
                     _logger.LogDebugSource($"Crawler '{NameIdentifier}' is currently processing URL '{web.ResponseUri}'.");
 
                     HtmlNode title = null, category = null, datetime = null, content = null;
-                    if (string.IsNullOrEmpty(SiteArticleTitleXPath)) title = doc.DocumentNode.SelectNodes(SiteArticleTitleXPath).FirstOrDefault();
-                    if (string.IsNullOrEmpty(SiteArticleCategoryXPath)) category = doc.DocumentNode.SelectNodes(SiteArticleCategoryXPath).FirstOrDefault();
-                    if (string.IsNullOrEmpty(SiteArticleDateTimeXPath)) datetime = doc.DocumentNode.SelectNodes(SiteArticleDateTimeXPath).FirstOrDefault();
-                    if (string.IsNullOrEmpty(SiteArticleContentAreaXPath)) content = doc.DocumentNode.SelectNodes(SiteArticleContentAreaXPath).FirstOrDefault();
+                    if (!string.IsNullOrEmpty(SiteArticleTitleXPath)) title = doc.DocumentNode.SelectNodes(SiteArticleTitleXPath).FirstOrDefault();
+                    if (!string.IsNullOrEmpty(SiteArticleCategoryXPath)) category = doc.DocumentNode.SelectNodes(SiteArticleCategoryXPath).FirstOrDefault();
+                    if (!string.IsNullOrEmpty(SiteArticleDateTimeXPath)) datetime = doc.DocumentNode.SelectNodes(SiteArticleDateTimeXPath).FirstOrDefault();
+                    if (!string.IsNullOrEmpty(SiteArticleContentAreaXPath)) content = doc.DocumentNode.SelectNodes(SiteArticleContentAreaXPath).FirstOrDefault();
 
                     // Make sure we found all needed HTML...
                     if (title != null

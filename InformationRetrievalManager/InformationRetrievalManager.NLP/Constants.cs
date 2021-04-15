@@ -1,5 +1,4 @@
-﻿
-namespace InformationRetrievalManager.Crawler
+﻿namespace InformationRetrievalManager.NLP
 {
     /// <summary>
     /// Keeps all necessary constants used widely through this project
@@ -7,8 +6,8 @@ namespace InformationRetrievalManager.Crawler
     static class Constants
     {
         /// <summary>
-        /// Place where crawled data are placed
+        /// Place where indexated data are placed
         /// </summary>
-        public const string CrawlerDataStorageDir = "crawler-storage";
+        public const string IndexDataStorageDir = "index-storage";
     }
 }

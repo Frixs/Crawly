@@ -1,6 +1,13 @@
-﻿using System;
+﻿using InformationRetrievalManager.Core;
+using Ixs.DNA;
+using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace InformationRetrievalManager.NLP
 {
@@ -9,6 +16,13 @@ namespace InformationRetrievalManager.NLP
     /// </summary>
     public sealed class InvertedIndex : IInvertedIndex
     {
+        #region Private Members (Injects)
+
+        private readonly ILogger _logger;
+        private readonly IFileManager _fileManager;
+
+        #endregion
+
         #region Private Members
 
         /// <summary>
@@ -22,13 +36,25 @@ namespace InformationRetrievalManager.NLP
 
         #endregion
 
+        #region Interface Properties
+
+        /// <inheritdoc/>
+        public string Name { get; }
+
+        #endregion
+
         #region Constructor
 
         /// <summary>
         /// Default constructor
         /// </summary>
-        public InvertedIndex()
+        public InvertedIndex(string name, IFileManager fileManager = null, ILogger logger = null)
         {
+            // TODO: check name allowed characters
+            Name = name;
+
+            _fileManager = fileManager;
+            _logger = logger;
         }
 
         #endregion
@@ -70,6 +96,78 @@ namespace InformationRetrievalManager.NLP
                     { documentId, new TermInfo(frequency: 1) }
                 });
             }
+        }
+
+        /// <inheritdoc/>
+        /// <remarks>
+        ///     <see cref="_fileManager"/> must exists, otherwise <see langword="true"/> on return.
+        /// </remarks>
+        public bool Load()
+        {
+            if (_fileManager == null)
+                return true;
+
+            bool ok = false;
+
+            // Deserialize
+            var result = _fileManager.DeserializeObjectFromBinFileAsync($"{Constants.IndexDataStorageDir}/{Name}.idx").Result;
+            short status = result.Item1;
+            object obj = result.Item2;
+
+            // Check deserialization result
+            if (status == 2)
+                _logger?.LogWarningSource($"Failed to load index '{Name}'. Corrupted data.");
+            else
+                _logger?.LogWarningSource($"Failed to load index '{Name}'. The index does not exist.");
+
+            if (status == 0 && obj != null)
+            {
+                // Try to load vocabulary
+                var newVocabulary = obj as SortedDictionary<string, Dictionary<int, TermInfo>>;
+                if (newVocabulary != null)
+                {
+                    ok = true;
+
+                    _vocabulary.Clear();
+                    foreach (var item in newVocabulary)
+                        _vocabulary.Add(item.Key, item.Value);
+                }
+                else
+                    _logger?.LogWarningSource($"Failed to load index '{Name}'. Inconsistent data.");
+            }
+            else
+                _logger?.LogWarningSource($"Failed to load index '{Name}'. Data does not exist.");
+
+            return ok;
+        }
+
+        /// <inheritdoc/>
+        /// <remarks>
+        ///     <see cref="_fileManager"/> must exists, otherwise <see langword="true"/> on return.
+        /// </remarks>
+        public bool Save()
+        {
+            if (_fileManager == null)
+                return true;
+
+            bool ok = false;
+
+            // Serialize
+            short status = _fileManager.SerializeObjectToBinFileAsync(_vocabulary, $"{Constants.IndexDataStorageDir}/{Name}.idx").Result;
+
+            // Check serialization result
+            if (status == 0)
+                ok = true;
+            else if (status == 2)
+                _logger?.LogWarningSource($"Failed to save index '{Name}'. Invalid data.");
+            else
+                _logger?.LogWarningSource($"Failed to save index '{Name}'. The index failed to write data in a file.");
+
+            // Clear vocabulary from memory if it is saved successfully
+            if (ok)
+                _vocabulary.Clear();
+
+            return ok;
         }
 
         #endregion

@@ -8,6 +8,14 @@ namespace InformationRetrievalManager.NLP
     public interface IReadOnlyInvertedIndex
     {
         /// <summary>
+        /// Name that identifies the inverted index instance
+        /// </summary>
+        /// <remarks>
+        ///     Should not be <see cref="null"/>.
+        /// </remarks>
+        string Name { get; }
+
+        /// <summary>
         /// Tranforms the index vocabulary to publicly manipulatable object.
         /// </summary>
         /// <returns>Index vocabulary</returns>

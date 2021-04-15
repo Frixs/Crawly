@@ -3,6 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading.Tasks;
 
 namespace InformationRetrievalManager.Core
@@ -12,6 +14,91 @@ namespace InformationRetrievalManager.Core
     /// </summary>
     public class BaseFileManager : IFileManager
     {
+        /// <inheritdoc/>
+        public async Task<(short, object)> DeserializeObjectFromBinFileAsync(string path)
+        {
+            // Normalize path.
+            path = NormalizedPath(path);
+
+            // Resolve to absolute path.
+            path = ResolvePath(path);
+
+            // Lock the task.
+            return await AsyncLock.LockResultAsync(path, async () =>
+            {
+                // Run the synchronous file access as a new task.
+                return await CoreDI.Task.Run(() =>
+                {
+                    short resultStatus = 0;
+                    object resultObj = null;
+
+                    try
+                    {
+                        using (Stream stream = File.Open(path, FileMode.Open))
+                        {
+                            BinaryFormatter bin = new BinaryFormatter();
+                            resultObj = bin.Deserialize(stream);
+                        }
+                    }
+                    catch (IOException)
+                    {
+                        resultStatus = 1;
+                    }
+                    catch (SerializationException)
+                    {
+                        resultStatus = 2;
+                    }
+
+                    return (resultStatus, resultObj);
+                });
+            });
+        }
+
+        /// <inheritdoc/>
+        public async Task<short> SerializeObjectToBinFileAsync(object obj, string path)
+        {
+            if (obj == null)
+                throw new ArgumentNullException(nameof(obj));
+
+            // Normalize path.
+            path = NormalizedPath(path);
+
+            // Resolve to absolute path.
+            path = ResolvePath(path);
+
+            // Lock the task.
+            return await AsyncLock.LockResultAsync(path, async () =>
+            {
+                // Run the synchronous file access as a new task.
+                return await CoreDI.Task.Run(() =>
+                {
+                    short result = 0;
+
+                    // Check if the file exists...
+                    TryCreatePath(path);
+
+                    try
+                    {
+                        using (Stream stream = File.Open(path, FileMode.Create))
+                        {
+                            BinaryFormatter bf = new BinaryFormatter();
+                            bf.Serialize(stream, obj);
+                        }
+                    }
+                    catch (IOException)
+                    {
+                        result = 1;
+                    }
+                    catch (SerializationException)
+                    {
+                        result = 2;
+                    }
+
+                    return result;
+                });
+            });
+        }
+
         /// <inheritdoc/>
         public async Task WriteTextToFileAsync(string text, string path, bool append = false)
         {
@@ -25,19 +112,13 @@ namespace InformationRetrievalManager.Core
             path = ResolvePath(path);
 
             // Lock the task.
-            await AsyncLock.LockAsync(nameof(WriteTextToFileAsync) + path, async () =>
+            await AsyncLock.LockAsync(path, async () =>
             {
                 // Run the synchronous file access as a new task.
                 await CoreDI.Task.Run(() =>
                 {
                     // Check if the file exists...
-                    if (!File.Exists(path))
-                    {
-                        // Create it
-                        Directory.CreateDirectory(Path.GetDirectoryName(path));
-                        var f = File.Create(path);
-                        f.Close();
-                    }
+                    TryCreatePath(path);
 
                     // Write the log message to file.
                     using (var writer = (TextWriter)new StreamWriter(File.Open(path, append ? FileMode.Append : FileMode.Create)))
@@ -59,19 +140,13 @@ namespace InformationRetrievalManager.Core
             path = ResolvePath(path);
 
             // Lock the task.
-            await AsyncLock.LockAsync(nameof(WriteTextToFileAsync) + path, async () =>
+            await AsyncLock.LockAsync(path, async () =>
             {
                 // Run the synchronous file access as a new task.
                 await CoreDI.Task.Run(() =>
                 {
                     // Check if the file exists...
-                    if (!File.Exists(path))
-                    {
-                        // Create it
-                        Directory.CreateDirectory(Path.GetDirectoryName(path));
-                        var f = File.Create(path);
-                        f.Close();
-                    }
+                    TryCreatePath(path);
 
                     // Write the log message to file.
                     using (var writer = (TextWriter)new StreamWriter(File.Open(path, append ? FileMode.Append : FileMode.Create)))
@@ -172,5 +247,25 @@ namespace InformationRetrievalManager.Core
             // Resolve the path to absolute.
             return Path.GetFullPath(path);
         }
+
+        #region Private Helpers
+
+        /// <summary>
+        /// Creates directories (including file - if any) if does not exist
+        /// </summary>
+        /// <param name="path">The path</param>
+        private void TryCreatePath(string path)
+        {
+            // Check if the file exists...
+            if (!File.Exists(path))
+            {
+                // Create it
+                Directory.CreateDirectory(Path.GetDirectoryName(path));
+                var f = File.Create(path);
+                f.Close();
+            }
+        }
+
+        #endregion
     }
 }
