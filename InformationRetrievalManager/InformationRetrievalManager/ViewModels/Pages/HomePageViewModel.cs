@@ -152,7 +152,7 @@ namespace InformationRetrievalManager
 
                             // HACK - start processing
                             var processing = new IndexProcessing("my_index", new Tokenizer(), new Stemmer(), new StopWordRemover(), _fileManager);
-                            processing.IndexDocuments(docs.ToArray());
+                            processing.IndexDocuments(docs.ToArray(), true);
                             _logger.LogDebugSource("Index processing done!");
                         }
                     }
