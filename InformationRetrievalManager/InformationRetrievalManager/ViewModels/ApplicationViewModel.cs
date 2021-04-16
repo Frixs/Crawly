@@ -1,4 +1,6 @@
 ﻿using InformationRetrievalManager.Core;
+using InformationRetrievalManager.Relational;
+using Ixs.DNA;
 using PropertyChanged;
 using System.Windows;
 
@@ -136,12 +138,8 @@ namespace InformationRetrievalManager
         /// </summary>
         public void Exit()
         {
-            // TODO: app exit process
-            // Save user data before exiting application.
-            //_ = CoreDI.LocalSettingsStorage.SaveAsync();
-
-            // Save user state app data
-            //_ = BaseDI.ViewModelApplication.StateData.SaveUpdateAsync();
+            // Save application state before closure
+            SaveStateData();
 
             // Shutdown.
             Application.Current.Shutdown();
@@ -170,6 +168,25 @@ namespace InformationRetrievalManager
 
             // Fire off a CurrentPage chaned event.
             OnPropertyChanged(nameof(CurrentPage));
+        }
+
+        /// <summary>
+        /// Saves the state data
+        /// </summary>
+        private void SaveStateData()
+        {
+            var uof = Framework.Service<IUnitOfWork>();
+
+            // Get main window size
+            var mainWindowSize = Framework.Service<IUIManager>().GetMainWindowSize();
+
+            // Save
+            uof.ApplicationState.Insert(new ApplicationStateDataModel
+            {
+                MainWindowSizeX = mainWindowSize.X,
+                MainWindowSizeY = mainWindowSize.Y
+            });
+            uof.Commit();
         }
 
         #endregion

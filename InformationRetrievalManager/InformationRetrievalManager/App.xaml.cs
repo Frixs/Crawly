@@ -1,5 +1,6 @@
 ﻿using InformationRetrievalManager.Core;
 using InformationRetrievalManager.Crawler;
+using InformationRetrievalManager.Relational;
 using Ixs.DNA;
 using Microsoft.Extensions.Logging;
 using System;
@@ -51,12 +52,14 @@ namespace InformationRetrievalManager
             // Set application's main window.
             Current.MainWindow = new MainWindow();
 
-            // Log it.
+            // Load state data
+            LoadStateData();
+
+            // Log it
             FrameworkDI.Logger.LogDebugSource("Application starting up" + /*(BaseDI.ViewModelApplication.AppAssembly.IsRunningAsAdministrator() ? " (As Administrator)" : "") +*/ "...");
 
-            // Open the MainWindow.
-            // TODO: remove startup url from app.xaml and make this work
-            //BaseDI.UI.ShowMainWindow();
+            // Open the MainWindow
+            Framework.Service<IUIManager>().ShowMainWindow();
         }
 
         /// <summary>
@@ -83,10 +86,15 @@ namespace InformationRetrievalManager
                     logPath: Framework.Construction.Environment.IsDevelopment ? "logs/debug.log" : "logs/InformationRetrievalManager.log",
                     logLevel: (LogLevel)Enum.Parse(typeof(LogLevel), Framework.Construction.Configuration.GetSection("Logging:LogLevel:Default")?.Value ?? LogLevel.Information.ToString(), true),
                     trimSize: 50000000) // 50MB limit
+                .AddDataStore()
                 .AddTheViewModels()
                 .AddTheServices()
                 .Build();
 
+            // Ensure the database is set up
+            await Framework.Service<IUnitOfWork>().EnsureDatabaseCreatedAsync();
+
+            // HECK: crawler creation
             // Add crawlers
             var crawler = new CrawlerEngine("bdo-naeu");
             crawler.SetControls(
@@ -102,25 +110,18 @@ namespace InformationRetrievalManager
                 siteArticleDateTimeParseData: new DatetimeParseData("MMM d, yyyy, HH:mm (UTC)", CultureInfo.CreateSpecificCulture("en-US"))
                 );
             await Framework.Service<ICrawlerManager>().AddCrawlerAsync(crawler);
+        }
 
-            // TODO: app setup
-            // Ensure the client data store
-            //await CoreDI.ClientDataStore.EnsureDataStoreAsync();
+        /// <summary>
+        /// Load the state data
+        /// </summary>
+        private void LoadStateData()
+        {
+            // Get state data
+            var data = Framework.Service<IUnitOfWork>().ApplicationState.Get();
 
-            // Init locally saved data structures after load of all modules.
-            //CoreDI.LocalSettingsStorage.InitData();
-
-            // App assembly.
-            //BaseDI.ViewModelApplication.AppAssembly = new AppAssembly(
-            //    Assembly.GetExecutingAssembly(),
-            //    //ApplicationDeployment.IsNetworkDeployed
-            //    //    ? ApplicationDeployment.CurrentDeployment.CurrentVersion.ToString()
-            //    //    : (args.ContainsKey(ApplicationArgument.Version.ToString())
-            //    //        ? args[ApplicationArgument.Version.ToString()]
-            //    //        : FileVersionInfo.GetVersionInfo(Assembly.GetEntryAssembly().Location).ProductVersion),
-            //    FileVersionInfo.GetVersionInfo(Assembly.GetEntryAssembly().Location).ProductVersion,
-            //    FileVersionInfo.GetVersionInfo(Assembly.GetEntryAssembly().Location).LegalCopyright
-            //    );
+            // Set main window size
+            Framework.Service<IUIManager>().SetMainWindowSize(new Vector(data.MainWindowSizeX, data.MainWindowSizeY));
         }
 
         #endregion

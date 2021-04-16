@@ -31,9 +31,6 @@ namespace InformationRetrievalManager
             //// Bind settings view model
             //construction.Services.AddSingleton<SettingsViewModel>();
 
-            //// Bind data view model
-            //construction.Services.AddSingleton<DataViewModel>();
-
             // Return the construction for chaining
             return construction;
         }
@@ -47,6 +44,9 @@ namespace InformationRetrievalManager
         {
             // Rewrite the default logger from DNA Framework to our own
             construction.Services.AddTransient(provider => provider.GetService<ILoggerFactory>().CreateLogger(typeof(App).Namespace));
+
+            // Bind a UI manager
+            construction.Services.AddSingleton<IUIManager, UIManager>();
 
             // Bind a task manager
             construction.Services.AddTransient<ITaskManager, BaseTaskManager>();
