@@ -435,6 +435,8 @@
     <Compile Include="Pages\HowToPage.xaml.cs">
       <DependentUpon>HowToPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\IUIManager.cs" />
+    <Compile Include="UI\UIManager.cs" />
     <Compile Include="ValueConverters\Base\ApplicationPageHelpers.cs" />
     <Compile Include="ViewModelsWPF\ViewModelLocator.cs" />
     <Compile Include="ViewModels\ApplicationViewModel.cs" />

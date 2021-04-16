@@ -1,6 +1,4 @@
-﻿using InformationRetrievalManager.Core;
-
-namespace InformationRetrievalManager
+﻿namespace InformationRetrievalManager
 {
     /// <summary>
     /// Locates view models from the IoC for use in binding in Xaml files.

@@ -4,7 +4,7 @@ namespace InformationRetrievalManager.Relational
 {
     /// <summary>
     /// The data model for the state of the application data that needs to be rembembered for the next run.
-    /// "Client app's memory"
+    /// "App's memory" on load from the previous closure.
     /// </summary>
     public class ApplicationStateDataModel
     {

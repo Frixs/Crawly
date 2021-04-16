@@ -1,6 +1,7 @@
 ﻿using Ixs.DNA;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace InformationRetrievalManager.Relational
 {
@@ -25,7 +26,7 @@ namespace InformationRetrievalManager.Relational
 
             // Add data store for easy access/use of the backing data store
             // Make it scoped so we can inject the scoped DbContext
-            construction.Services.AddTransient<IUnitOfWork>(provider => new UnitOfWork(provider.GetService<ApplicationDbContext>()));
+            construction.Services.AddTransient<IUnitOfWork>(provider => new UnitOfWork(provider.GetService<ApplicationDbContext>(), provider.GetService<ILogger>()));
 
             // Return framewrok for chaining
             return construction;
