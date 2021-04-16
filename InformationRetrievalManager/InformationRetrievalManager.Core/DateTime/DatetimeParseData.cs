@@ -33,7 +33,7 @@ namespace InformationRetrievalManager.Core
         {
             // Set format
             // TODO: check if the format is valid
-            if (format.IsNullOrEmpty())
+            if (!format.IsNullOrEmpty())
                 Format = format;
             else
                 Format = "yyyy-MM-dd HH:mm";

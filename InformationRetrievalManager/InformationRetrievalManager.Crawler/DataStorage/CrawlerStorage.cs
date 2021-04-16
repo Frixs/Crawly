@@ -60,12 +60,15 @@ namespace InformationRetrievalManager.Crawler
         #region Interface Methods
 
         /// <inheritdoc/>
-        public async Task SaveAsync(ICrawlerEngine crawler, string url, string title, DateTime timestamp, string contentHtml, string contentTextMin, string contentText)
+        public async Task SaveAsync(ICrawlerEngine crawler, string url, string title, string category, DateTime timestamp, string contentHtml, string contentTextMin, string contentText)
         {
-            if (!crawler.IsCurrentlyCrawlingFlag)
+            if (crawler == null)
+                throw new ArgumentNullException("Crawler is not defined!");
+
+            if (!crawler.IsCurrentlyCrawling || !crawler.IsSiteSet)
                 return;
 
-            string crawledDataDirPath = $"{Constants.CrawlerDataStorageDir}/{crawler.CurrentSiteDataIdentification}";
+            string crawledDataDirPath = $"{Constants.CrawlerDataStorageDir}/{crawler.GenerateCrawlerSiteIdentificationToken()}";
 
             // Check if the dir exists...
             if (!Directory.Exists(crawledDataDirPath))
@@ -92,6 +95,7 @@ namespace InformationRetrievalManager.Crawler
             var model = new CrawlerDataModel
             {
                 Title = title,
+                Category = category,
                 Timestamp = timestamp,
                 Content = contentText
             };
@@ -110,6 +114,34 @@ namespace InformationRetrievalManager.Crawler
                 fs.Write(System.Text.Encoding.UTF8.GetBytes("]"), 0, 1);
                 fs.SetLength(fs.Position); // Only needed if new content may be smaller than old
             }
+        }
+
+        /// <inheritdoc/>
+        public string[] GetDataFiles(ICrawlerEngine crawler)
+        {
+            if (crawler == null)
+                throw new ArgumentNullException("Crawler is not defined!");
+
+            if (crawler.IsCurrentlyCrawling)
+                return null;
+
+            var result = new List<string>();
+
+            if (Directory.Exists(Constants.CrawlerDataStorageDir))
+            {
+                // Get all crawler directories...
+                string[] dirs = Directory.GetDirectories(Constants.CrawlerDataStorageDir);
+                for (int i = 0; i < dirs.Length; ++i)
+                    // Find the one specific for the searched crawler...
+                    if (Path.GetFileName(dirs[i]).StartsWith(crawler.NameIdentifier))
+                    {
+                        result.AddRange(
+                            Directory.GetFiles(dirs[i])
+                            );
+                    }
+            }
+
+            return result.ToArray();
         }
 
         #endregion

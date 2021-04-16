@@ -1,6 +1,13 @@
 ﻿using InformationRetrievalManager.Core;
 using InformationRetrievalManager.Crawler;
+using InformationRetrievalManager.NLP;
+using Ixs.DNA;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
@@ -14,23 +21,31 @@ namespace InformationRetrievalManager
     {
         #region Private Members (Injects)
 
+        private readonly ILogger _logger;
         private readonly ICrawlerManager _crawlerManager;
         private readonly ITaskManager _taskManager;
+        private readonly IFileManager _fileManager;
+        private readonly ICrawlerStorage _crawlerStorage;
 
         #endregion
 
         #region Private Members
 
-        private ICrawlerEngine _crawler;
+        public ICrawlerEngine _crawler;
 
         #endregion
 
         #region Public Properties
 
-        /// <summary>
-        /// UNDONE
-        /// </summary>
+        public bool IsCurrentlyCrawlingFlag { get; set; }
+
         public string CrawlerProcessProgress { get; set; }
+
+        #endregion
+
+        #region Command Flags
+
+        public bool ProcessingCommandFlag { get; set; }
 
         #endregion
 
@@ -41,10 +56,11 @@ namespace InformationRetrievalManager
         /// </summary>
         public ICommand GoToHowToPageCommand { get; set; }
 
-        /// <summary>
-        /// UNDONE
-        /// </summary>
         public ICommand StartCrawlerCommand { get; set; }
+
+        public ICommand CancelCrawlerCommand { get; set; }
+
+        public ICommand StartProcessingCommand { get; set; }
 
         #endregion
 
@@ -58,15 +74,20 @@ namespace InformationRetrievalManager
             // Create commands.
             GoToHowToPageCommand = new RelayCommand(GoToHowToPageCommandRoutine);
             StartCrawlerCommand = new RelayCommand(async () => await StartCrawlerCommandRoutineAsync());
+            CancelCrawlerCommand = new RelayCommand(async () => await CancelCrawlerCommandRoutineAsync());
+            StartProcessingCommand = new RelayCommand(async () => await StartProcessingCommandRoutineAsync());
         }
 
         /// <summary>
         /// DI constructor
         /// </summary>
-        public HomePageViewModel(ICrawlerManager crawlerManager, ITaskManager taskManager) : this()
+        public HomePageViewModel(ILogger logger, ICrawlerManager crawlerManager, ITaskManager taskManager, IFileManager fileManager, ICrawlerStorage crawlerStorage) : this()
         {
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _crawlerManager = crawlerManager ?? throw new ArgumentNullException(nameof(crawlerManager));
             _taskManager = taskManager ?? throw new ArgumentNullException(nameof(taskManager));
+            _fileManager = fileManager ?? throw new ArgumentNullException(nameof(fileManager));
+            _crawlerStorage = crawlerStorage ?? throw new ArgumentNullException(nameof(crawlerStorage));
 
             // HACK: crawler starter
             _taskManager.RunAndForget(LoadAsync);
@@ -84,20 +105,59 @@ namespace InformationRetrievalManager
             DI.ViewModelApplication.GoToPage(ApplicationPage.HowTo);
         }
 
-        /// <summary>
-        /// UNDONE
-        /// </summary>
-        /// <returns></returns>
         private async Task StartCrawlerCommandRoutineAsync()
         {
             if (_crawler == null)
                 return;
 
             //await RunCommandAsync(() => StartStopAllFlag, async () => await StartStopAll(true));
-            // HACK: crawler starter
+            await LoadAsync();
             _crawler.Start();
+            IsCurrentlyCrawlingFlag = true;
 
             await Task.Delay(1);
+        }
+
+        private async Task CancelCrawlerCommandRoutineAsync()
+        {
+            if (_crawler == null)
+                return;
+
+            //await RunCommandAsync(() => StartStopAllFlag, async () => await StartStopAll(true));
+            _crawler.Cancel();
+            IsCurrentlyCrawlingFlag = false;
+
+            await Task.Delay(1);
+        }
+
+        private async Task StartProcessingCommandRoutineAsync()
+        {
+            await RunCommandAsync(() => ProcessingCommandFlag, async () =>
+            {
+                var filePaths = _crawlerStorage.GetDataFiles(_crawler);
+                if (filePaths != null)
+                {
+                    var dataFilePath = filePaths.FirstOrDefault(o => o.Contains(".json"));
+                    if (dataFilePath != null)
+                    {
+                        // Deserialize JSON directly from a file
+                        using (StreamReader file = File.OpenText(dataFilePath))
+                        {
+                            JsonSerializer serializer = new JsonSerializer();
+                            CrawlerDataModel[] data = (CrawlerDataModel[])serializer.Deserialize(file, typeof(CrawlerDataModel[]));
+
+                            List<IndexDocumentDataModel> docs = new List<IndexDocumentDataModel>();
+                            for (int i = 0; i < data.Length; ++i)
+                                docs.Add(new IndexDocumentDataModel(i, data[i].Title, data[i].Category, data[i].Timestamp, data[i].Content));
+
+                            // HACK - start processing
+                            var processing = new IndexProcessing("my_index", new Tokenizer(), new Stemmer(), new StopWordRemover(), _fileManager);
+                            processing.IndexDocuments(docs.ToArray(), true);
+                            _logger.LogDebugSource("Index processing done!");
+                        }
+                    }
+                }
+            });
         }
 
         #endregion
@@ -109,8 +169,7 @@ namespace InformationRetrievalManager
         /// </summary>
         private async Task LoadAsync()
         {
-            // HACK: crawler starter
-            _crawler = await _crawlerManager.GetCrawlerAsync("bdo-sea");
+            _crawler = await _crawlerManager.GetCrawlerAsync("bdo-naeu");
             // Set the events
             //     - Raise the property changed in the UI thread (crawler is running in a different assembly on a separate thread)
             _crawler.OnStartProcessEvent += (s, e) =>

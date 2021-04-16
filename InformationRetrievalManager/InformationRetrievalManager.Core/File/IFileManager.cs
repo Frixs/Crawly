@@ -10,6 +10,32 @@ namespace InformationRetrievalManager.Core
     public interface IFileManager
     {
         /// <summary>
+        /// Deserialize object from binary file
+        /// </summary>
+        /// <param name="path">File path</param>
+        /// <returns>
+        ///     Tuple that consists of status code and the deserialized object (it is null on error).
+        ///     Status code:
+        ///         0=OK, 
+        ///         1=IO exception, 
+        ///         2=Serialization error,
+        /// </returns>
+        Task<(short, object)> DeserializeObjectFromBinFileAsync(string path);
+
+        /// <summary>
+        /// Serialize object into binary file
+        /// </summary>
+        /// <param name="obj">The object</param>
+        /// <param name="path">File path</param>
+        /// <returns>
+        ///     Status code:
+        ///         0=OK, 
+        ///         1=IO exception, 
+        ///         2=Serialization error,
+        /// </returns>
+        Task<short> SerializeObjectToBinFileAsync(object obj, string path);
+
+        /// <summary>
         /// Writes the text to the specified file.
         /// </summary>
         /// <param name="text">The text to write.</param>

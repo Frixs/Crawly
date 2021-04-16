@@ -4,6 +4,7 @@ using Ixs.DNA;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -87,17 +88,18 @@ namespace InformationRetrievalManager
                 .Build();
 
             // Add crawlers
-            var crawler = new CrawlerEngine("bdo-sea");
+            var crawler = new CrawlerEngine("bdo-naeu");
             crawler.SetControls(
-                "https://www.sea.playblackdesert.com",
-                "/News/Notice?boardType=2&Page={0}",
-                1, 12, 1,
-                1000,
-                "//article[@class='content']//ul[@class='thumb_nail_list']//a",
-                "//div[@class='view_detail_area']//div[@class='contents_area']",
-                "//div[@class='view_detail_area']//div[@class='title_area']//strong[@class='title']",
-                "//div[@class='view_detail_area']//div[@class='title_area']//span[@class='date']",
-                new DatetimeParseData("yyyy-MM-dd HH:mm")
+                siteAddress: "https://www.naeu.playblackdesert.com",
+                siteSuffix: "/en-US/News/Notice?boardType=0&Page={0}",
+                startPageNo: 1, maxPageNo: 8, pageNoModifier: 1,
+                searchInterval: 1000,
+                siteUrlArticlesXPath: "//article[@class='content']//ul[@class='thumb_nail_list']//a",
+                siteArticleContentAreaXPath: "//div[@class='view_detail_area']//div[contains(@class, 'contents_area')]",
+                siteArticleTitleXPath: "//div[@class='view_detail_area']//div[@class='title_area']//strong[@class='title']",
+                siteArticleCategoryXPath: "//div[@class='view_detail_area']//div[@class='title_area']//span[contains(@class, 'tag_label')]",
+                siteArticleDateTimeXPath: "//div[@class='view_detail_area']//div[@class='title_area']//span[@class='date']",
+                siteArticleDateTimeParseData: new DatetimeParseData("MMM d, yyyy, HH:mm (UTC)", CultureInfo.CreateSpecificCulture("en-US"))
                 );
             await Framework.Service<ICrawlerManager>().AddCrawlerAsync(crawler);
 

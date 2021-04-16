@@ -5,9 +5,13 @@ VisualStudioVersion = 16.0.30717.126
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InformationRetrievalManager", "InformationRetrievalManager\InformationRetrievalManager.csproj", "{4909ECE6-5323-45BE-BC87-F28DE5DA8FA1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InformationRetrievalManager.Crawler", "InformationRetrievalManager.Crawler\InformationRetrievalManager.Crawler.csproj", "{966F566C-6691-4E1A-A2A0-5567EA2E70CD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InformationRetrievalManager.Crawler", "InformationRetrievalManager.Crawler\InformationRetrievalManager.Crawler.csproj", "{966F566C-6691-4E1A-A2A0-5567EA2E70CD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InformationRetrievalManager.Core", "InformationRetrievalManager.Core\InformationRetrievalManager.Core.csproj", "{E889FEED-0484-4106-950B-E25C62C50E60}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InformationRetrievalManager.Core", "InformationRetrievalManager.Core\InformationRetrievalManager.Core.csproj", "{E889FEED-0484-4106-950B-E25C62C50E60}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InformationRetrievalManager.NLP", "InformationRetrievalManager.NLP\InformationRetrievalManager.NLP.csproj", "{E428D812-186D-4F49-9022-9624CF952184}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InformationRetrievalManager.NLP.Test", "InformationRetrievalManager.NLP.Test\InformationRetrievalManager.NLP.Test.csproj", "{0C6F62EC-5A01-46F4-BEA8-786F5B15F32C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +31,14 @@ Global
 		{E889FEED-0484-4106-950B-E25C62C50E60}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E889FEED-0484-4106-950B-E25C62C50E60}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E889FEED-0484-4106-950B-E25C62C50E60}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E428D812-186D-4F49-9022-9624CF952184}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E428D812-186D-4F49-9022-9624CF952184}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E428D812-186D-4F49-9022-9624CF952184}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E428D812-186D-4F49-9022-9624CF952184}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0C6F62EC-5A01-46F4-BEA8-786F5B15F32C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0C6F62EC-5A01-46F4-BEA8-786F5B15F32C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0C6F62EC-5A01-46F4-BEA8-786F5B15F32C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0C6F62EC-5A01-46F4-BEA8-786F5B15F32C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
