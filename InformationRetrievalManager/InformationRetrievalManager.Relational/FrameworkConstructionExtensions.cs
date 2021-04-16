@@ -17,7 +17,7 @@ namespace InformationRetrievalManager.Relational
         public static FrameworkConstruction AddDataStore(this FrameworkConstruction construction)
         {
             // Inject our SQLite EF data store
-            construction.Services.AddDbContext<DataStoreDbContext>(options =>
+            construction.Services.AddDbContext<ApplicationDbContext>(options =>
             {
                 // Setup connection string
                 options.UseSqlite("Data Source=data.db");
@@ -25,7 +25,7 @@ namespace InformationRetrievalManager.Relational
 
             // Add data store for easy access/use of the backing data store
             // Make it scoped so we can inject the scoped DbContext
-            construction.Services.AddTransient<IDataStoreProvider>(provider => new DataStoreProvider(provider.GetService<DataStoreDbContext>()));
+            construction.Services.AddTransient<IUnitOfWork>(provider => new UnitOfWork(provider.GetService<ApplicationDbContext>()));
 
             // Return framewrok for chaining
             return construction;

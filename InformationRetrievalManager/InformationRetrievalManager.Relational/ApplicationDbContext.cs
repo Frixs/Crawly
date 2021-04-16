@@ -6,7 +6,7 @@ namespace InformationRetrievalManager.Relational
     /// The database context for the application data store
     /// "This is our database representation"
     /// </summary>
-    sealed class DataStoreDbContext : DbContext
+    internal sealed class ApplicationDbContext : DbContext
     {
         #region DbSets (Tables)
 
@@ -22,7 +22,7 @@ namespace InformationRetrievalManager.Relational
         /// <summary>
         /// Default constructor
         /// </summary>
-        public DataStoreDbContext(DbContextOptions<DataStoreDbContext> options) : base(options)
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
         }
 

@@ -89,8 +89,8 @@ namespace InformationRetrievalManager
                 .AddTheServices()
                 .Build();
 
-            // Ensure the data store is set up
-            await Framework.Service<IDataStoreProvider>().EnsureDataStoreCreatedAsync();
+            // Ensure the database is set up
+            await Framework.Service<IUnitOfWork>().EnsureDatabaseCreatedAsync();
 
             // Add crawlers
             var crawler = new CrawlerEngine("bdo-naeu");
