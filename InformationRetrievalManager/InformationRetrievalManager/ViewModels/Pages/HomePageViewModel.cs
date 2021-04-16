@@ -41,6 +41,8 @@ namespace InformationRetrievalManager
 
         public string CrawlerProcessProgress { get; set; }
 
+        public string DataProcessingStatus { get; set; }
+
         #endregion
 
         #region Command Flags
@@ -150,13 +152,23 @@ namespace InformationRetrievalManager
                             for (int i = 0; i < data.Length; ++i)
                                 docs.Add(new IndexDocumentDataModel(i, data[i].Title, data[i].Category, data[i].Timestamp, data[i].Content));
 
-                            // HACK - start processing
+                            // HACK - start index processing
+                            DataProcessingStatus = "Indexing...";
                             var processing = new IndexProcessing("my_index", new Tokenizer(), new Stemmer(), new StopWordRemover(), _fileManager);
-                            processing.IndexDocuments(docs.ToArray(), true);
-                            _logger.LogDebugSource("Index processing done!");
+                            await _taskManager.Run(() => {
+                                processing.IndexDocuments(docs.ToArray(), true);
+                                _logger.LogDebugSource("Index processing done!");
+                                DataProcessingStatus = "Done! Data has been indexed into a binary file.";
+                            });
                         }
                     }
+                    else
+                    {
+                        DataProcessingStatus = "No data found! Use crawler to get data first.";
+                    }
                 }
+
+                await Task.Delay(1);
             });
         }
 

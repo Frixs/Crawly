@@ -154,7 +154,8 @@ namespace InformationRetrievalManager.Crawler
         string GenerateCrawlerSiteIdentificationToken();
 
         /// <summary>
-        /// Start the crawling process
+        /// Start the crawling process. The process is started in a new thread.
+        /// Once the processing finishes, corresponding flags will be updated.
         /// </summary>
         /// <returns>
         ///     <see langword="true"/> = Started successfully.
