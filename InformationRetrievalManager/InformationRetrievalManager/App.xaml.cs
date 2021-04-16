@@ -1,5 +1,6 @@
 ﻿using InformationRetrievalManager.Core;
 using InformationRetrievalManager.Crawler;
+using InformationRetrievalManager.Relational;
 using Ixs.DNA;
 using Microsoft.Extensions.Logging;
 using System;
@@ -83,9 +84,13 @@ namespace InformationRetrievalManager
                     logPath: Framework.Construction.Environment.IsDevelopment ? "logs/debug.log" : "logs/InformationRetrievalManager.log",
                     logLevel: (LogLevel)Enum.Parse(typeof(LogLevel), Framework.Construction.Configuration.GetSection("Logging:LogLevel:Default")?.Value ?? LogLevel.Information.ToString(), true),
                     trimSize: 50000000) // 50MB limit
+                .AddDataStore()
                 .AddTheViewModels()
                 .AddTheServices()
                 .Build();
+
+            // Ensure the data store is set up
+            await Framework.Service<IDataStoreProvider>().EnsureDataStoreCreatedAsync();
 
             // Add crawlers
             var crawler = new CrawlerEngine("bdo-naeu");
@@ -102,10 +107,6 @@ namespace InformationRetrievalManager
                 siteArticleDateTimeParseData: new DatetimeParseData("MMM d, yyyy, HH:mm (UTC)", CultureInfo.CreateSpecificCulture("en-US"))
                 );
             await Framework.Service<ICrawlerManager>().AddCrawlerAsync(crawler);
-
-            // TODO: app setup
-            // Ensure the client data store
-            //await CoreDI.ClientDataStore.EnsureDataStoreAsync();
 
             // Init locally saved data structures after load of all modules.
             //CoreDI.LocalSettingsStorage.InitData();

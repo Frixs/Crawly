@@ -451,6 +451,10 @@
       <Project>{e428d812-186d-4f49-9022-9624cf952184}</Project>
       <Name>InformationRetrievalManager.NLP</Name>
     </ProjectReference>
+    <ProjectReference Include="..\InformationRetrievalManager.Relational\InformationRetrievalManager.Relational.csproj">
+      <Project>{99fe68eb-4b8e-4389-b8de-8f6e03d4c83f}</Project>
+      <Name>InformationRetrievalManager.Relational</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.8">
