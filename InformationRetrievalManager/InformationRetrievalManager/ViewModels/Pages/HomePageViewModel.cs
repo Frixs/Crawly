@@ -43,6 +43,10 @@ namespace InformationRetrievalManager
 
         public string DataProcessingStatus { get; set; }
 
+        public string Query { get; set; }
+
+        public string QueryStatus { get; set; }
+
         #endregion
 
         #region Command Flags
@@ -64,6 +68,8 @@ namespace InformationRetrievalManager
 
         public ICommand StartProcessingCommand { get; set; }
 
+        public ICommand RunQueryCommand { get; set; }
+
         #endregion
 
         #region Constructor
@@ -78,6 +84,7 @@ namespace InformationRetrievalManager
             StartCrawlerCommand = new RelayCommand(async () => await StartCrawlerCommandRoutineAsync());
             CancelCrawlerCommand = new RelayCommand(async () => await CancelCrawlerCommandRoutineAsync());
             StartProcessingCommand = new RelayCommand(async () => await StartProcessingCommandRoutineAsync());
+            RunQueryCommand = new RelayCommand(async () => await RunQueryCommandRoutineAsync());
         }
 
         /// <summary>
@@ -136,30 +143,39 @@ namespace InformationRetrievalManager
         {
             await RunCommandAsync(() => ProcessingCommandFlag, async () =>
             {
+                Console.WriteLine("XX");
                 var filePaths = _crawlerStorage.GetDataFiles(_crawler);
                 if (filePaths != null)
                 {
                     var dataFilePath = filePaths.FirstOrDefault(o => o.Contains(".json"));
                     if (dataFilePath != null)
                     {
-                        // Deserialize JSON directly from a file
-                        using (StreamReader file = File.OpenText(dataFilePath))
+                        if (!_crawler.IsCurrentlyCrawling)
                         {
-                            JsonSerializer serializer = new JsonSerializer();
-                            CrawlerDataModel[] data = (CrawlerDataModel[])serializer.Deserialize(file, typeof(CrawlerDataModel[]));
+                            // Deserialize JSON directly from a file
+                            using (StreamReader file = File.OpenText(dataFilePath))
+                            {
+                                JsonSerializer serializer = new JsonSerializer();
+                                CrawlerDataModel[] data = (CrawlerDataModel[])serializer.Deserialize(file, typeof(CrawlerDataModel[]));
 
-                            List<IndexDocumentDataModel> docs = new List<IndexDocumentDataModel>();
-                            for (int i = 0; i < data.Length; ++i)
-                                docs.Add(new IndexDocumentDataModel(i, data[i].Title, data[i].Category, data[i].Timestamp, data[i].Content));
+                                List<IndexDocumentDataModel> docs = new List<IndexDocumentDataModel>();
+                                for (int i = 0; i < data.Length; ++i)
+                                    docs.Add(new IndexDocumentDataModel(i, data[i].Title, data[i].Category, data[i].Timestamp, data[i].Content));
 
-                            // HACK - start index processing
-                            DataProcessingStatus = "Indexing...";
-                            var processing = new IndexProcessing("my_index", new Tokenizer(), new Stemmer(), new StopWordRemover(), _fileManager);
-                            await _taskManager.Run(() => {
-                                processing.IndexDocuments(docs.ToArray(), true);
-                                _logger.LogDebugSource("Index processing done!");
-                                DataProcessingStatus = "Done! Data has been indexed into a binary file.";
-                            });
+                                // HACK - start index processing
+                                DataProcessingStatus = "Indexing...";
+                                var processing = new IndexProcessing("my_index", new Tokenizer(), new Stemmer(), new StopWordRemover(), _fileManager);
+                                await _taskManager.Run(() =>
+                                {
+                                    processing.IndexDocuments(docs.ToArray(), true);
+                                    _logger.LogDebugSource("Index processing done!");
+                                    DataProcessingStatus = "Done! Data has been indexed into a binary file.";
+                                });
+                            }
+                        }
+                        else
+                        {
+                            DataProcessingStatus = "Cannot process data during crawling!";
                         }
                     }
                     else
@@ -168,6 +184,18 @@ namespace InformationRetrievalManager
                     }
                 }
 
+                await Task.Delay(1);
+            });
+        }
+
+        private async Task RunQueryCommandRoutineAsync()
+        {
+            // TODO : we need to have a currently processing index name list to be able to say when we are able to touch the data 
+            // (as a feature update while multiple processing will run and we want to query only the instances that are not indexing/processing atm and visa/versa).
+
+            await RunCommandAsync(() => ProcessingCommandFlag, async () =>
+            {
+                Console.WriteLine(Query);
                 await Task.Delay(1);
             });
         }
