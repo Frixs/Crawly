@@ -10,7 +10,7 @@ namespace InformationRetrievalManager.NLP
     /// <summary>
     /// Functionality to manage data as a inverted index.
     /// </summary>
-    internal sealed class InvertedIndex : IInvertedIndex
+    public sealed class InvertedIndex : IInvertedIndex
     {
         #region Private Members (Injects)
 
@@ -57,7 +57,9 @@ namespace InformationRetrievalManager.NLP
 
         #region Interface Methods
 
+        /// <summary>
         /// <inheritdoc/>
+        /// </summary>
         /// <remarks>O(n^2)</remarks>
         public IReadOnlyDictionary<string, IReadOnlyDictionary<int, IReadOnlyTermInfo>> GetReadOnlyVocabulary()
         {
@@ -113,7 +115,7 @@ namespace InformationRetrievalManager.NLP
             // Check deserialization result
             if (status == 2)
                 _logger?.LogWarningSource($"Failed to load index '{Name}'. Corrupted data.");
-            else
+            else if (status != 0)
                 _logger?.LogWarningSource($"Failed to load index '{Name}'. The index does not exist.");
 
             if (status == 0 && obj != null)

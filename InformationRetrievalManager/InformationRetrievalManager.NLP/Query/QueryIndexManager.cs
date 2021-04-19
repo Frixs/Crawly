@@ -33,7 +33,10 @@ namespace InformationRetrievalManager.NLP
         /// <inheritdoc/>
         public int[] Query(string query, IReadOnlyDictionary<string, IReadOnlyDictionary<int, IReadOnlyTermInfo>> data, QueryModelType modelType)
         {
-            throw new NotImplementedException();
+            // TODO >>>
+            Console.WriteLine(query);
+
+            return Array.Empty<int>();
         }
 
         #endregion

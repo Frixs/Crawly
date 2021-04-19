@@ -26,6 +26,7 @@ namespace InformationRetrievalManager
         private readonly ITaskManager _taskManager;
         private readonly IFileManager _fileManager;
         private readonly ICrawlerStorage _crawlerStorage;
+        private readonly IQueryIndexManager _queryIndexManager;
 
         #endregion
 
@@ -90,13 +91,14 @@ namespace InformationRetrievalManager
         /// <summary>
         /// DI constructor
         /// </summary>
-        public HomePageViewModel(ILogger logger, ICrawlerManager crawlerManager, ITaskManager taskManager, IFileManager fileManager, ICrawlerStorage crawlerStorage) : this()
+        public HomePageViewModel(ILogger logger, ICrawlerManager crawlerManager, ITaskManager taskManager, IFileManager fileManager, ICrawlerStorage crawlerStorage, IQueryIndexManager queryIndexManager) : this()
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _crawlerManager = crawlerManager ?? throw new ArgumentNullException(nameof(crawlerManager));
             _taskManager = taskManager ?? throw new ArgumentNullException(nameof(taskManager));
             _fileManager = fileManager ?? throw new ArgumentNullException(nameof(fileManager));
             _crawlerStorage = crawlerStorage ?? throw new ArgumentNullException(nameof(crawlerStorage));
+            _queryIndexManager = queryIndexManager ?? throw new ArgumentNullException(nameof(queryIndexManager));
 
             // HACK: crawler starter
             _taskManager.RunAndForget(LoadAsync);
@@ -194,7 +196,12 @@ namespace InformationRetrievalManager
 
             await RunCommandAsync(() => ProcessingCommandFlag, async () =>
             {
-                Console.WriteLine(Query);
+                var ii = new InvertedIndex("my_index", _fileManager, _logger);
+                await _taskManager.Run(() => ii.Load());
+
+                var results = _queryIndexManager.Query(Query, ii.GetReadOnlyVocabulary(), QueryModelType.TfIdf);
+                QueryStatus = "Results: [" + string.Join(",", results) + "]";
+
                 await Task.Delay(1);
             });
         }
