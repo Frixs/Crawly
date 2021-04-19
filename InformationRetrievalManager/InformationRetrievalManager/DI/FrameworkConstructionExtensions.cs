@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using InformationRetrievalManager.Core;
 using InformationRetrievalManager.Crawler;
+using InformationRetrievalManager.NLP;
 
 namespace InformationRetrievalManager
 {
@@ -59,6 +60,9 @@ namespace InformationRetrievalManager
 
             // Bind a crawler storage
             construction.Services.AddSingleton<ICrawlerStorage, CrawlerStorage>();
+
+            // Bind a query index manager
+            construction.Services.AddSingleton<IQueryIndexManager, QueryIndexManager>();
 
             // Return the construction for chaining
             return construction;
