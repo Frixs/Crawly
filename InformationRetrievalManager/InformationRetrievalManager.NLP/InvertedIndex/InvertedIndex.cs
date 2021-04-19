@@ -3,18 +3,14 @@ using Ixs.DNA;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace InformationRetrievalManager.NLP
 {
     /// <summary>
     /// Functionality to manage data as a inverted index.
     /// </summary>
-    public sealed class InvertedIndex : IInvertedIndex
+    internal sealed class InvertedIndex : IInvertedIndex
     {
         #region Private Members (Injects)
 

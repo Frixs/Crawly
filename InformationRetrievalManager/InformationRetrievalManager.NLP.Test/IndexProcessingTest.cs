@@ -57,7 +57,7 @@ namespace InformationRetrievalManager.NLP.Test
 
             _processing = new IndexProcessing(_processingName, new Tokenizer(), new Stemmer(ProcessingLanguage.CZ), null, null, null, false, true, true);
 
-            var text = new IndexDocumentDataModel(0, string.Empty, string.Empty, default, "Æauík");
+            var text = new IndexDocumentDataModel(0, string.Empty, string.Empty, string.Empty, default, "Æauík");
 
             #endregion
 
@@ -86,7 +86,7 @@ namespace InformationRetrievalManager.NLP.Test
 
             _processing = new IndexProcessing(_processingName, new Tokenizer(), new Stemmer(), null, null, null, false, true, true);
 
-            var text = new IndexDocumentDataModel(0, string.Empty, string.Empty, default, "<li>");
+            var text = new IndexDocumentDataModel(0, string.Empty, string.Empty, string.Empty, default, "<li>");
 
             #endregion
 
@@ -115,7 +115,7 @@ namespace InformationRetrievalManager.NLP.Test
 
             _processing = new IndexProcessing(_processingName, new Tokenizer(), new Stemmer(), null, null, null, false, true, true);
 
-            var text = new IndexDocumentDataModel(0, string.Empty, string.Empty, default, "http://www.csfd.cz/film/261379-deadpool/komentare/?comment=10355101 link");
+            var text = new IndexDocumentDataModel(0, string.Empty, string.Empty, string.Empty, default, "http://www.csfd.cz/film/261379-deadpool/komentare/?comment=10355101 link");
 
             #endregion
 
@@ -145,9 +145,9 @@ namespace InformationRetrievalManager.NLP.Test
 
             _processing = new IndexProcessing(_processingName, new Tokenizer(), new Stemmer(), null, null, null, false, false, false);
 
-            var text1 = new IndexDocumentDataModel(0, string.Empty, string.Empty, default, "(pìstí).");
-            var text2 = new IndexDocumentDataModel(1, string.Empty, string.Empty, default, "1280x800");
-            var text3 = new IndexDocumentDataModel(2, string.Empty, string.Empty, default, "pr*sata");
+            var text1 = new IndexDocumentDataModel(0, string.Empty, string.Empty, string.Empty, default, "(pìstí).");
+            var text2 = new IndexDocumentDataModel(1, string.Empty, string.Empty, string.Empty, default, "1280x800");
+            var text3 = new IndexDocumentDataModel(2, string.Empty, string.Empty, string.Empty, default, "pr*sata");
 
             #endregion
 
@@ -180,12 +180,12 @@ namespace InformationRetrievalManager.NLP.Test
 
             _processing = new IndexProcessing(_processingName, new Tokenizer(), new Stemmer(ProcessingLanguage.CZ), new StopWordRemover(ProcessingLanguage.CZ), null, null, true, false, false);
 
-            var text1 = new IndexDocumentDataModel(0, string.Empty, string.Empty, default, "Tímto textem britský The Guardian Jana Èulíka nepotìšil");
-            var text2 = new IndexDocumentDataModel(1, string.Empty, string.Empty, default, "Jestliže nepøijde, mìl by se omluvit.");
-            var text3 = new IndexDocumentDataModel(2, string.Empty, string.Empty, default, "Šedesát procent naší elektøiny vyrábíme z dováženého plynu, pøièemž prùmìr EU je okolo 40 %.");
-            var text4 = new IndexDocumentDataModel(3, string.Empty, string.Empty, default, "Tento seznam mùže být revidován po dvou letech, pøièemž samotné programy mohou být pøedloženy jednou za rok.");
-            var text5 = new IndexDocumentDataModel(4, string.Empty, string.Empty, default, "Tímto poznáním pøekroèuje ženské hnutí hranice feminismu a stává se hnutím pokrokovým, demokratickým. Doznávám, že jsem byl znaènì pøekvapen tímto novým dùkazem praktické stránky soudruhových theorií. Èechové byli stíženi tímtéž osudem po staletích hrdinského odboje proti nìmeckému útlaku. Tímto zpùsobem také, když opìt chcete zaèít pracovat, aktivní spoøiè obrazovky ukonèujete. Tím jste urèili, že program vyhledá všechny soubory, jejichž název tímto slovem zaèíná. Patnáct procent s tímto názorem nesouhlasilo a pìtina mužù nevìdìla, jak odpovìdìt. Celou tu pohádku o tøech Garridebech si patrnì vymyslel právì za tímto úèelem. Vložíte znaménko rovná se každý vzorec musí tímto znaménkem zaèínat. Zpøedu kráèel Stivín, za nim jel rytíø mladý a za tímto klusal starec. Pøed tímto gentlemanem mùžete øíci vše, co byste hodlal svìøit mnì. Všeobecnì dlužno uznati, že tímto nejvýhodnìším místem je škola. Chtìl bych Vás proto tímto dopisem poprosit o odpovìï na tyto otázky. Vím to a ráda bych, abyste i vy zaèal svou práci s tímto vìdomím. Tehdejší prezident Charles King musí pod tímto tlakem odstoupit. Pocítila jsem ostré bodnutí žárlivosti nad tímto cizincem. Páže, pohledem tímto pøekvapen, po celém tìle se tøásl. Tímto emailem bych se chtìla informovat o pøíznacích AIDS. Hlava mi témìø vybuchla snahou uvažovat tímto zpùsobem. Nechala jsem tímto temným zjištìním naplnit své oèi. Ètvrtina respondentù naopak s tímto názorem souhlasila. Rance zdál se býti ponìkud pozloben tímto odboèením. Tímto strašlivým zpùsobem jsem nabyl svoje dìdictví. Vìèná škoda, že tímto umìním plýtvala na Dolpha. Nepøipouštìl jsem si tímto smìrem jedinou myšlenku. Dodavatel tímto informuje odbìratele v souladu s zák. Víš, že mi nikdo neposlal kvìtiny tímto zpùsobem. Ne, rozhodnì se nesnese s tímto morbidním panákem. Tímto veèerem se poèalo podivínství kapitána J. Mohla být rána zasazena tímto pøedmìtem? Mohla. Jasnovidec byl zøejmì polichocen tímto uznáním. ");
-            var text6 = new IndexDocumentDataModel(5, string.Empty, string.Empty, default, "Aèkoli se celý rok uèil, známky na vysvìdèení má podprùmìrné.");
+            var text1 = new IndexDocumentDataModel(0, string.Empty, string.Empty, string.Empty, default, "Tímto textem britský The Guardian Jana Èulíka nepotìšil");
+            var text2 = new IndexDocumentDataModel(1, string.Empty, string.Empty, string.Empty, default, "Jestliže nepøijde, mìl by se omluvit.");
+            var text3 = new IndexDocumentDataModel(2, string.Empty, string.Empty, string.Empty, default, "Šedesát procent naší elektøiny vyrábíme z dováženého plynu, pøièemž prùmìr EU je okolo 40 %.");
+            var text4 = new IndexDocumentDataModel(3, string.Empty, string.Empty, string.Empty, default, "Tento seznam mùže být revidován po dvou letech, pøièemž samotné programy mohou být pøedloženy jednou za rok.");
+            var text5 = new IndexDocumentDataModel(4, string.Empty, string.Empty, string.Empty, default, "Tímto poznáním pøekroèuje ženské hnutí hranice feminismu a stává se hnutím pokrokovým, demokratickým. Doznávám, že jsem byl znaènì pøekvapen tímto novým dùkazem praktické stránky soudruhových theorií. Èechové byli stíženi tímtéž osudem po staletích hrdinského odboje proti nìmeckému útlaku. Tímto zpùsobem také, když opìt chcete zaèít pracovat, aktivní spoøiè obrazovky ukonèujete. Tím jste urèili, že program vyhledá všechny soubory, jejichž název tímto slovem zaèíná. Patnáct procent s tímto názorem nesouhlasilo a pìtina mužù nevìdìla, jak odpovìdìt. Celou tu pohádku o tøech Garridebech si patrnì vymyslel právì za tímto úèelem. Vložíte znaménko rovná se každý vzorec musí tímto znaménkem zaèínat. Zpøedu kráèel Stivín, za nim jel rytíø mladý a za tímto klusal starec. Pøed tímto gentlemanem mùžete øíci vše, co byste hodlal svìøit mnì. Všeobecnì dlužno uznati, že tímto nejvýhodnìším místem je škola. Chtìl bych Vás proto tímto dopisem poprosit o odpovìï na tyto otázky. Vím to a ráda bych, abyste i vy zaèal svou práci s tímto vìdomím. Tehdejší prezident Charles King musí pod tímto tlakem odstoupit. Pocítila jsem ostré bodnutí žárlivosti nad tímto cizincem. Páže, pohledem tímto pøekvapen, po celém tìle se tøásl. Tímto emailem bych se chtìla informovat o pøíznacích AIDS. Hlava mi témìø vybuchla snahou uvažovat tímto zpùsobem. Nechala jsem tímto temným zjištìním naplnit své oèi. Ètvrtina respondentù naopak s tímto názorem souhlasila. Rance zdál se býti ponìkud pozloben tímto odboèením. Tímto strašlivým zpùsobem jsem nabyl svoje dìdictví. Vìèná škoda, že tímto umìním plýtvala na Dolpha. Nepøipouštìl jsem si tímto smìrem jedinou myšlenku. Dodavatel tímto informuje odbìratele v souladu s zák. Víš, že mi nikdo neposlal kvìtiny tímto zpùsobem. Ne, rozhodnì se nesnese s tímto morbidním panákem. Tímto veèerem se poèalo podivínství kapitána J. Mohla být rána zasazena tímto pøedmìtem? Mohla. Jasnovidec byl zøejmì polichocen tímto uznáním. ");
+            var text6 = new IndexDocumentDataModel(5, string.Empty, string.Empty, string.Empty, default, "Aèkoli se celý rok uèil, známky na vysvìdèení má podprùmìrné.");
 
             #endregion
 
@@ -222,8 +222,8 @@ namespace InformationRetrievalManager.NLP.Test
 
             _processing = new IndexProcessing(_processingName, new Tokenizer(), new Stemmer(), new StopWordRemover(), null, null, false, false, false);
 
-            var text1 = new IndexDocumentDataModel(0, string.Empty, string.Empty, default, "11.2. 2015");
-            var text2 = new IndexDocumentDataModel(1, string.Empty, string.Empty, default, "15.5.2010");
+            var text1 = new IndexDocumentDataModel(0, string.Empty, string.Empty, string.Empty, default, "11.2. 2015");
+            var text2 = new IndexDocumentDataModel(1, string.Empty, string.Empty, string.Empty, default, "15.5.2010");
 
             #endregion
 
@@ -254,11 +254,11 @@ namespace InformationRetrievalManager.NLP.Test
 
             _processing = new IndexProcessing(_processingName, new Tokenizer(), new Stemmer(ProcessingLanguage.CZ), null, null, null, false, true, false);
 
-            var text1 = new IndexDocumentDataModel(0, string.Empty, string.Empty, default, "æau");
-            var text2 = new IndexDocumentDataModel(1, string.Empty, string.Empty, default, "cau");
-            var text3 = new IndexDocumentDataModel(2, string.Empty, string.Empty, default, "caú");
-            var text4 = new IndexDocumentDataModel(3, string.Empty, string.Empty, default, "cáu");
-            var text5 = new IndexDocumentDataModel(4, string.Empty, string.Empty, default, "èau");
+            var text1 = new IndexDocumentDataModel(0, string.Empty, string.Empty, string.Empty, default, "æau");
+            var text2 = new IndexDocumentDataModel(1, string.Empty, string.Empty, string.Empty, default, "cau");
+            var text3 = new IndexDocumentDataModel(2, string.Empty, string.Empty, string.Empty, default, "caú");
+            var text4 = new IndexDocumentDataModel(3, string.Empty, string.Empty, string.Empty, default, "cáu");
+            var text5 = new IndexDocumentDataModel(4, string.Empty, string.Empty, string.Empty, default, "èau");
 
             #endregion
 
@@ -295,10 +295,10 @@ namespace InformationRetrievalManager.NLP.Test
 
             _processing = new IndexProcessing(_processingName, new Tokenizer(), new Stemmer(ProcessingLanguage.CZ), null, null, null, true, false, false);
 
-            var text1 = new IndexDocumentDataModel(0, string.Empty, string.Empty, default, "BOMB");
-            var text2 = new IndexDocumentDataModel(1, string.Empty, string.Empty, default, "Bomba");
-            var text3 = new IndexDocumentDataModel(2, string.Empty, string.Empty, default, "bomba");
-            var text4 = new IndexDocumentDataModel(3, string.Empty, string.Empty, default, "BOMBY");
+            var text1 = new IndexDocumentDataModel(0, string.Empty, string.Empty, string.Empty, default, "BOMB");
+            var text2 = new IndexDocumentDataModel(1, string.Empty, string.Empty, string.Empty, default, "Bomba");
+            var text3 = new IndexDocumentDataModel(2, string.Empty, string.Empty, string.Empty, default, "bomba");
+            var text4 = new IndexDocumentDataModel(3, string.Empty, string.Empty, string.Empty, default, "BOMBY");
 
             #endregion
 
@@ -334,12 +334,12 @@ namespace InformationRetrievalManager.NLP.Test
 
             _processing = new IndexProcessing(_processingName, new Tokenizer(), new Stemmer(ProcessingLanguage.CZ), null, null, null, false, false, false);
 
-            var text1 = new IndexDocumentDataModel(0, string.Empty, string.Empty, default, "smìjí");
-            var text2 = new IndexDocumentDataModel(1, string.Empty, string.Empty, default, "smìju");
-            var text3 = new IndexDocumentDataModel(2, string.Empty, string.Empty, default, "smìješ");
-            var text4 = new IndexDocumentDataModel(3, string.Empty, string.Empty, default, "smìjeme");
-            var text5 = new IndexDocumentDataModel(4, string.Empty, string.Empty, default, "smìjí");
-            var text6 = new IndexDocumentDataModel(5, string.Empty, string.Empty, default, "smìjou");
+            var text1 = new IndexDocumentDataModel(0, string.Empty, string.Empty, string.Empty, default, "smìjí");
+            var text2 = new IndexDocumentDataModel(1, string.Empty, string.Empty, string.Empty, default, "smìju");
+            var text3 = new IndexDocumentDataModel(2, string.Empty, string.Empty, string.Empty, default, "smìješ");
+            var text4 = new IndexDocumentDataModel(3, string.Empty, string.Empty, string.Empty, default, "smìjeme");
+            var text5 = new IndexDocumentDataModel(4, string.Empty, string.Empty, string.Empty, default, "smìjí");
+            var text6 = new IndexDocumentDataModel(5, string.Empty, string.Empty, string.Empty, default, "smìjou");
 
             #endregion
 
@@ -389,10 +389,10 @@ namespace InformationRetrievalManager.NLP.Test
 
             _processing = new IndexProcessing(_processingName, new Tokenizer(), new Stemmer(ProcessingLanguage.CZ), null, null, null, true, false, false);
 
-            var text1 = new IndexDocumentDataModel(0, string.Empty, string.Empty, default, "BOMB");
-            var text2 = new IndexDocumentDataModel(1, string.Empty, string.Empty, default, "Bomba");
-            var text3 = new IndexDocumentDataModel(2, string.Empty, string.Empty, default, "bomba");
-            var text4 = new IndexDocumentDataModel(3, string.Empty, string.Empty, default, "bomby");
+            var text1 = new IndexDocumentDataModel(0, string.Empty, string.Empty, string.Empty, default, "BOMB");
+            var text2 = new IndexDocumentDataModel(1, string.Empty, string.Empty, string.Empty, default, "Bomba");
+            var text3 = new IndexDocumentDataModel(2, string.Empty, string.Empty, string.Empty, default, "bomba");
+            var text4 = new IndexDocumentDataModel(3, string.Empty, string.Empty, string.Empty, default, "bomby");
 
             #endregion
 
@@ -428,7 +428,7 @@ namespace InformationRetrievalManager.NLP.Test
 
             _processing = new IndexProcessing(_processingName, new Tokenizer(), new Stemmer(ProcessingLanguage.CZ), null, null, null, true, false, false);
 
-            var text = new IndexDocumentDataModel(0, string.Empty, string.Empty, default, "èáú jak se máš?" +
+            var text = new IndexDocumentDataModel(0, string.Empty, string.Empty, string.Empty, default, "èáú jak se máš?" +
                 "<li> o co jsti se snažil a jak,</li>\n" +
                 "<li> jakým výsledkem skonèila vaše akce,</li>\n" +
                 "<li> v kolik hodin jste akci provádìli,</li>\n" +

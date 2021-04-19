@@ -95,6 +95,7 @@ namespace InformationRetrievalManager.Crawler
             var model = new CrawlerDataModel
             {
                 Title = title,
+                SourceUrl = url,
                 Category = category,
                 Timestamp = timestamp,
                 Content = contentText

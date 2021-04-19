@@ -143,7 +143,6 @@ namespace InformationRetrievalManager
         {
             await RunCommandAsync(() => ProcessingCommandFlag, async () =>
             {
-                Console.WriteLine("XX");
                 var filePaths = _crawlerStorage.GetDataFiles(_crawler);
                 if (filePaths != null)
                 {
@@ -160,7 +159,7 @@ namespace InformationRetrievalManager
 
                                 List<IndexDocumentDataModel> docs = new List<IndexDocumentDataModel>();
                                 for (int i = 0; i < data.Length; ++i)
-                                    docs.Add(new IndexDocumentDataModel(i, data[i].Title, data[i].Category, data[i].Timestamp, data[i].Content));
+                                    docs.Add(new IndexDocumentDataModel(i, data[i].Title, data[i].SourceUrl, data[i].Category, data[i].Timestamp, data[i].Content));
 
                                 // HACK - start index processing
                                 DataProcessingStatus = "Indexing...";

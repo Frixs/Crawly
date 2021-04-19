@@ -12,7 +12,7 @@ namespace InformationRetrievalManager
         /// <returns>Index data model with initialized ID</returns>
         public static IndexDocumentDataModel ToIndexDocument(this CrawlerDataModel model, int id)
         {
-            return new IndexDocumentDataModel(id, model.Title, model.Category, model.Timestamp, model.Content);
+            return new IndexDocumentDataModel(id, model.Title, model.SourceUrl, model.Category, model.Timestamp, model.Content);
         }
     }
 }
