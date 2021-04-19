@@ -15,7 +15,7 @@ namespace InformationRetrievalManager.Crawler
     /// Crawler engineú scrapes the web data and parse them into files
     /// TODO: Make category and timestamp optional
     /// </summary>
-    public class CrawlerEngine : ICrawlerEngine
+    public sealed class CrawlerEngine : ICrawlerEngine
     {
         #region Private Members (Injects)
 
