@@ -18,15 +18,17 @@ namespace InformationRetrievalManager.NLP
         /// <summary>
         /// Calculates model for query
         /// </summary>
-        /// <param name="query"></param>
+        /// <param name="query">The query</param>
+        /// <param name="processingConfiguration">Processing configuration to use for the query index processing</param>
         /// <exception cref="ArgumentNullException">Missing query reference.</exception>
-        /// <exception cref="InvalidOperationException">Term IDF map is not defined or document vectors are not defined!. <see cref="CalculateData"/> must be called beforehand.</exception>
-        void CalculateQuery(string query);
+        /// <exception cref="InvalidOperationException">Missing parameters. <see cref="CalculateData"/> must be called beforehand.</exception>
+        void CalculateQuery(string query, IndexProcessingConfigurationDataModel processingConfiguration);
 
         /// <summary>
         /// Calculate best matching documents by the query.
         /// </summary>
         /// <returns>Sorted array of document IDs from the best matching to the least.</returns>
+        /// <exception cref="InvalidOperationException">Missing parameters. <see cref="CalculateData"/> and <see cref="CalculateQuery"/> must be called beforehand.</exception>
         int[] CalculateBestMatch();
     }
 }

@@ -117,6 +117,33 @@ namespace InformationRetrievalManager.NLP
             RemoveAccentsAfterStemming = removeAccentsAfterStemming;
         }
 
+        /// <summary>
+        /// Constructor with configuration as a parameter
+        /// </summary>
+        /// <param name="name">Name of the processing</param>
+        /// <param name="configuration">The configuration for the processing</param>
+        /// <param name="fileManager">File manager used used for storing the processed index (the index will be stored in-memory only if the manager is not set)</param>
+        /// <param name="logger">Connect logger from the rest of the system (if not set, the logger will not log anything)</param>
+        public IndexProcessing(string name, IndexProcessingConfigurationDataModel configuration, IFileManager fileManager = null, ILogger logger = null)
+        {
+            if (configuration == null)
+                throw new ArgumentNullException(nameof(configuration));
+
+            // TODO: check name allowed characters (should allow double underscore, but not in user inputs) - Names with double underscore are wildcards
+            Name = name;
+
+            _tokenizer = new Tokenizer(configuration.CustomRegex);
+            _stemmer = new Stemmer(configuration.Language);
+            _stopWordRemover = new StopWordRemover(configuration.Language, configuration.CustomStopWords);
+            _invertedIndex = new InvertedIndex(name, fileManager, logger);
+
+            _logger = logger;
+
+            ToLowerCase = configuration.ToLowerCase;
+            RemoveAccentsBeforeStemming = configuration.RemoveAccentsBeforeStemming;
+            RemoveAccentsAfterStemming = configuration.RemoveAccentsAfterStemming;
+        }
+
         #endregion
 
         #region Public Methods

@@ -101,7 +101,7 @@ namespace InformationRetrievalManager.NLP
         }
 
         /// <inheritdoc/>
-        public void CalculateQuery(string query)
+        public void CalculateQuery(string query, IndexProcessingConfigurationDataModel processingConfiguration)
         {
             if (query == null)
                 throw new ArgumentNullException("Data not specified!");
@@ -118,8 +118,16 @@ namespace InformationRetrievalManager.NLP
             _queryVector = null;
 
             // Process the query and indexate it for vocabulary
-            // TODO --- settings lang custom stop words etc as a parameter
-            var processing = new IndexProcessing("__tfidf", new Tokenizer(), new Stemmer(ProcessingLanguage.EN), new StopWordRemover(ProcessingLanguage.EN), null, null, true, true, false);
+            var processing = new IndexProcessing("__tfidf", 
+                new Tokenizer(processingConfiguration.CustomRegex), 
+                new Stemmer(processingConfiguration.Language), 
+                new StopWordRemover(processingConfiguration.Language, processingConfiguration.CustomStopWords),
+                fileManager: null,
+                logger: null,
+                processingConfiguration.ToLowerCase,
+                processingConfiguration.RemoveAccentsBeforeStemming,
+                processingConfiguration.RemoveAccentsAfterStemming
+                );
             var data = processing.IndexText(query);
 
             _queryVector = CalculateDocumentVector(data, 0);
