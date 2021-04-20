@@ -14,7 +14,9 @@ namespace InformationRetrievalManager.NLP
         /// <param name="query">The query</param>
         /// <param name="data"><see cref="InvertedIndex._vocabulary"/> - data used for query</param>
         /// <param name="modelType">Type of the model to use for querying.</param>
+        /// <param name="configuration">Processing configuration to use for the query index processing</param>
         /// <returns>Array of document IDs sorted from the most relevant to the least.</returns>
-        Task<int[]> QueryAsync(string query, IReadOnlyDictionary<string, IReadOnlyDictionary<int, IReadOnlyTermInfo>> data, QueryModelType modelType);
+        /// <exception cref="ArgumentNullException">Invalid parameters.</exception>
+        Task<int[]> QueryAsync(string query, IReadOnlyDictionary<string, IReadOnlyDictionary<int, IReadOnlyTermInfo>> data, QueryModelType modelType, IndexProcessingConfigurationDataModel configuration);
     }
 }

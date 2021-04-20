@@ -27,7 +27,7 @@ namespace InformationRetrievalManager.NLP
         /// <summary>
         /// Calculated document vectors based on the last run of <see cref="CalculateData"/>.
         /// </summary>
-        private double[][] _documentVectors = null;
+        private Dictionary<int, double[]> _documentVectors = null;
 
         /// <summary>
         /// Calculated query vector based on the last run of <see cref="CalculateQuery"/>.
@@ -83,21 +83,17 @@ namespace InformationRetrievalManager.NLP
             }
 
             // Create array for document vectors
-            double[][] docVectors = new double[documents.Count][];
+            Dictionary<int, double[]> docVectors = new Dictionary<int, double[]>();
 
             // Go through documents and create document vectors...
-            int i = 0;
             foreach (var documentId in documents)
-            {
-                docVectors[i] = CalculateDocumentVector(data, documentId);
-                i++;
-            }
+                docVectors[documentId] = CalculateDocumentVector(data, documentId);
 
             // Save the vectors
             _documentVectors = docVectors;
 
             // Log it
-            _logger?.LogDebugSource("Data has been calculated into vectors.");
+            _logger?.LogDebugSource("Data has been successfully calculated into vectors.");
         }
 
         /// <inheritdoc/>
@@ -118,9 +114,9 @@ namespace InformationRetrievalManager.NLP
             _queryVector = null;
 
             // Process the query and indexate it for vocabulary
-            var processing = new IndexProcessing("__tfidf", 
-                new Tokenizer(processingConfiguration.CustomRegex), 
-                new Stemmer(processingConfiguration.Language), 
+            var processing = new IndexProcessing("__tfidf",
+                new Tokenizer(processingConfiguration.CustomRegex),
+                new Stemmer(processingConfiguration.Language),
                 new StopWordRemover(processingConfiguration.Language, processingConfiguration.CustomStopWords),
                 fileManager: null,
                 logger: null,
@@ -131,13 +127,32 @@ namespace InformationRetrievalManager.NLP
             var data = processing.IndexText(query);
 
             _queryVector = CalculateDocumentVector(data, 0);
+
+            // Log it
+            _logger?.LogDebugSource("Query has been successfully calculated into vector.");
         }
 
         /// <inheritdoc/>
         public int[] CalculateBestMatch()
         {
-            // TODO --- TF-IDF results
-            return null;
+            var documentVectors = _documentVectors;
+            var queryVector = _queryVector;
+
+            if (documentVectors == null)
+                throw new InvalidOperationException("Document vectors are not defined!");
+            if (queryVector == null)
+                throw new InvalidOperationException("Query vector is not defined!");
+
+            // Calculate cosine similarity for each document...
+            List<(int, double)> results = new List<(int, double)>();
+            foreach (var document in documentVectors)
+                results.Add(
+                    (document.Key, CalculateCosSimilarity(queryVector, document.Value))
+                    );
+
+            // Sort and return result
+            results.Sort((x, y) => x.Item2.CompareTo(y.Item2));
+            return results.Select(o => o.Item1).ToArray();
         }
 
         #endregion
