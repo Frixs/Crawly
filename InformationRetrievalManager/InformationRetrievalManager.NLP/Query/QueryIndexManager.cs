@@ -61,13 +61,16 @@ namespace InformationRetrievalManager.NLP
         #region Interface Methods
 
         /// <inheritdoc/>
-        public async Task<int[]> QueryAsync(string query, IReadOnlyDictionary<string, IReadOnlyDictionary<int, IReadOnlyTermInfo>> data, QueryModelType modelType, IndexProcessingConfigurationDataModel configuration)
+        public async Task<int[]> QueryAsync(string query, IReadOnlyDictionary<string, IReadOnlyDictionary<int, IReadOnlyTermInfo>> data, QueryModelType modelType, IndexProcessingConfigurationDataModel configuration, int select = 0)
         {
             if (query == null || data == null)
                 throw new ArgumentNullException("Query data not specified!");
 
+            if (select < 0)
+                throw new InvalidCastException($"Parameter '{nameof(select)}' cannot be negative number!");
+
             // Lock the task.
-            return await AsyncLock.LockResultAsync(nameof(QueryIndexManager) + nameof(QueryAsync), async () =>
+            return await AsyncLock.LockResultAsync(nameof(QueryIndexManager) + nameof(QueryAsync), () =>
             {
                 var t_query = query;
                 var t_data = data;
@@ -120,7 +123,7 @@ namespace InformationRetrievalManager.NLP
                 _lastQuery = t_query;
                 _lastDataChecksum = dataChecksum;
 
-                return _lastModel.CalculateBestMatch();
+                return _lastModel.CalculateBestMatch(select);
             });
         }
 

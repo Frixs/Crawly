@@ -27,8 +27,9 @@ namespace InformationRetrievalManager.NLP
         /// <summary>
         /// Calculate best matching documents by the query.
         /// </summary>
+        /// <param name="select">Limit number of records to select (0 to ignore limit).</param>
         /// <returns>Sorted array of document IDs from the best matching to the least.</returns>
         /// <exception cref="InvalidOperationException">Missing parameters. <see cref="CalculateData"/> and <see cref="CalculateQuery"/> must be called beforehand.</exception>
-        int[] CalculateBestMatch();
+        int[] CalculateBestMatch(int select);
     }
 }

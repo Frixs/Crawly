@@ -32,7 +32,13 @@ namespace InformationRetrievalManager
 
         #region Private Members
 
-        public ICrawlerEngine _crawler;
+        private ICrawlerEngine _crawler;
+        private IndexProcessingConfigurationDataModel _processingConfiguration = new IndexProcessingConfigurationDataModel
+        {
+            Language = ProcessingLanguage.EN,
+            ToLowerCase = true,
+            RemoveAccentsBeforeStemming = true,
+        };
 
         #endregion
 
@@ -165,7 +171,7 @@ namespace InformationRetrievalManager
 
                                 // HACK - start index processing
                                 DataProcessingStatus = "Indexing...";
-                                var processing = new IndexProcessing("my_index", new Tokenizer(), new Stemmer(), new StopWordRemover(), _fileManager);
+                                var processing = new IndexProcessing("my_index", _processingConfiguration, _fileManager, _logger);
                                 await _taskManager.Run(() =>
                                 {
                                     processing.IndexDocuments(docs.ToArray(), true);
@@ -197,9 +203,17 @@ namespace InformationRetrievalManager
             await RunCommandAsync(() => ProcessingCommandFlag, async () =>
             {
                 var ii = new InvertedIndex("my_index", _fileManager, _logger);
-                await _taskManager.Run(() => ii.Load());
 
-                var results = _queryIndexManager.QueryAsync(Query, ii.GetReadOnlyVocabulary(), QueryModelType.TfIdf);
+                QueryStatus = "Searching...";
+
+                int[] results = Array.Empty<int>();
+
+                await _taskManager.Run(async () =>
+                {
+                    ii.Load();
+                    results = await _queryIndexManager.QueryAsync(Query, ii.GetReadOnlyVocabulary(), QueryModelType.TfIdf, _processingConfiguration, 10);
+                });
+
                 QueryStatus = "Results: [" + string.Join(",", results) + "]";
 
                 await Task.Delay(1);

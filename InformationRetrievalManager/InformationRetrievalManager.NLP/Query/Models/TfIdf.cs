@@ -102,12 +102,9 @@ namespace InformationRetrievalManager.NLP
             if (query == null)
                 throw new ArgumentNullException("Data not specified!");
 
-            var termIdf = _termIdf;
-            var documentVectors = _documentVectors;
-
-            if (termIdf == null)
+            if (_termIdf == null)
                 throw new InvalidOperationException("Term IDF map is not defined!");
-            if (documentVectors == null)
+            if (_documentVectors == null)
                 throw new InvalidOperationException("Document vectors are not defined!");
 
             // (Re)Initialize the values
@@ -133,10 +130,13 @@ namespace InformationRetrievalManager.NLP
         }
 
         /// <inheritdoc/>
-        public int[] CalculateBestMatch()
+        public int[] CalculateBestMatch(int select = 0)
         {
             var documentVectors = _documentVectors;
             var queryVector = _queryVector;
+
+            if (select < 0)
+                throw new InvalidCastException($"Parameter '{nameof(select)}' cannot be negative number!");
 
             if (documentVectors == null)
                 throw new InvalidOperationException("Document vectors are not defined!");
@@ -151,7 +151,9 @@ namespace InformationRetrievalManager.NLP
                     );
 
             // Sort and return result
-            results.Sort((x, y) => x.Item2.CompareTo(y.Item2));
+            results.Sort((x, y) => y.Item2.CompareTo(x.Item2));
+            if (select > 0)
+                return results.Select(o => o.Item1).Take(select).ToArray();
             return results.Select(o => o.Item1).ToArray();
         }
 
@@ -205,7 +207,7 @@ namespace InformationRetrievalManager.NLP
                     // Calculate term TF-IDF
                     double tf = term.Value[documentId].Frequency; // Term Frequency
                     double ntf = tf > 0 ? 1 + Math.Log(tf, 10) : 0; // 1 + log(TF) --- if TF == 0 => 0
-                    double tfidf = ntf * _termIdf[term.Key];
+                    double tfidf = _termIdf.ContainsKey(term.Key) ? ntf * _termIdf[term.Key] : 0; // If the term does not exist yet (query call), TF-IDF of the term is 0
                     docVector.Add(tfidf);
                 }
             }
