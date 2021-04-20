@@ -1,5 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace InformationRetrievalManager.NLP
 {
@@ -12,9 +12,9 @@ namespace InformationRetrievalManager.NLP
         /// Query documents from the most relevant to the least.
         /// </summary>
         /// <param name="query">The query</param>
-        /// <param name="data">Data used for the query</param>
+        /// <param name="data"><see cref="InvertedIndex._vocabulary"/> - data used for query</param>
         /// <param name="modelType">Type of the model to use for querying.</param>
         /// <returns>Array of document IDs sorted from the most relevant to the least.</returns>
-        int[] Query(string query, IReadOnlyDictionary<string, IReadOnlyDictionary<int, IReadOnlyTermInfo>> data, QueryModelType modelType);
+        Task<int[]> QueryAsync(string query, IReadOnlyDictionary<string, IReadOnlyDictionary<int, IReadOnlyTermInfo>> data, QueryModelType modelType);
     }
 }

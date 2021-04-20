@@ -1,6 +1,7 @@
 ﻿using InformationRetrievalManager.Core;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
 
 namespace InformationRetrievalManager.NLP
 {
@@ -47,7 +48,7 @@ namespace InformationRetrievalManager.NLP
         private StopWordRemover _stopWordRemover;
 
         /// <summary>
-        /// Inverted indexation
+        /// Document inverted indexation
         /// </summary>
         private IInvertedIndex _invertedIndex;
 
@@ -101,7 +102,7 @@ namespace InformationRetrievalManager.NLP
         /// <param name="removeAccentsAfterStemming">Should we remove accents from tokens after stemming?</param>
         public IndexProcessing(string name, Tokenizer tokenizer, Stemmer stemmer, StopWordRemover stopWordRemover = null, IFileManager fileManager = null, ILogger logger = null, bool toLowerCase = false, bool removeAccentsBeforeStemming = false, bool removeAccentsAfterStemming = false)
         {
-            // TODO: check name allowed characters
+            // TODO: check name allowed characters (should allow double underscore, but not in user inputs) - Names with double underscore are wildcards
             Name = name;
 
             _tokenizer = tokenizer ?? throw new ArgumentNullException(nameof(tokenizer));
@@ -121,7 +122,7 @@ namespace InformationRetrievalManager.NLP
         #region Public Methods
 
         /// <summary>
-        /// Process the documents by the processing settings and indexate it. 
+        /// Go through the documents and run process for each of the documents according to the processing settings set initially onto this instance.
         /// Additionally, the method calls for inverted index to save data (if file manager was defined in constructor for this instance).
         /// </summary>
         /// <param name="documents">Array of the documents</param>
@@ -147,7 +148,7 @@ namespace InformationRetrievalManager.NLP
         }
 
         /// <summary>
-        /// Process the document by the processing settings and indexate it
+        /// Run process for the document according to the processing settings set initially onto this instance.
         /// </summary>
         /// <param name="document">The document</param>
         /// <param name="save">Once the indexation will be done, the indexed data will be saved into file storage, and working in-memory storage will be cleared.</param>
@@ -165,37 +166,8 @@ namespace InformationRetrievalManager.NLP
             if (load)
                 _invertedIndex.Load();
 
-            // To lower
-            if (ToLowerCase)
-                docContent = docContent.ToLower();
-
-            // Remove newlines from the document to prepare the doc for tokenization
-            docContent = docContent.Replace(Environment.NewLine, " ");
-
-            // Remove accents before stemming
-            if (RemoveAccentsBeforeStemming)
-                docContent = RemoveAccents(docContent);
-
-            // Tokenize
-            var terms = _tokenizer.Tokenize(docContent);
-
-            // Remove stopwords
-            if (_stopWordRemover != null)
-                terms = _stopWordRemover.Process(terms);
-
-            // Go through all terms
-            for (int i = 0; i < terms.Length; ++i)
-            {
-                // Stemming
-                terms[i] = _stemmer.Stem(terms[i]);
-
-                // Remove accents after stemming
-                if (RemoveAccentsAfterStemming)
-                    terms[i] = RemoveAccents(terms[i]);
-
-                // Indexate it
-                _invertedIndex.Put(terms[i], document.Id);
-            }
+            // Process the data
+            Process(docContent, document.Id, _invertedIndex);
 
             // Save indexed data
             if (save)
@@ -203,7 +175,28 @@ namespace InformationRetrievalManager.NLP
         }
 
         /// <summary>
-        /// Process the word (no sentence is expected - just a word) by the processing settings
+        /// Run process for the text independently of the rest of this instance (documents) and get the indexed vocabulary instantly.
+        /// </summary>
+        /// <param name="text">The text</param>
+        /// <returns>Indexed vocabulary based on the <paramref name="text"/>. The structure is the same as <see cref="InvertedIndex._vocabulary"/> with the only document here (ID=0).</returns>
+        public IReadOnlyDictionary<string, IReadOnlyDictionary<int, IReadOnlyTermInfo>> IndexText(string text)
+        {
+            if (text == null)
+                throw new ArgumentNullException("Text not specified!");
+
+            // Define inverted index instance special for separate query indexing...
+            var ii = new InvertedIndex(Name + "(query)", null, _logger);
+
+            // Process the text data
+            Process(text, 0, ii);
+
+            // Return the vocabulary straight back
+            return ii.GetReadOnlyVocabulary();
+        }
+
+        /// <summary>
+        /// Process the word (no sentence is expected - just a word) by the processing settings. 
+        /// The process follows <see cref="Process"/>.
         /// </summary>
         /// <returns>Processed word</returns>
         public string ProcessWord(string word)
@@ -228,7 +221,48 @@ namespace InformationRetrievalManager.NLP
 
         #endregion
 
-        #region Private Methods
+        #region Private Helpers
+
+        /// <summary>
+        /// Process specific text by the processing settings and indexate it according to <paramref name="documentId"/>.
+        /// </summary>
+        /// <param name="text">The text</param>
+        /// <param name="documentId">The document ID</param>
+        /// <param name="invertedIndex">Inverted index instance used for the indexation.</param>
+        private void Process(string text, int documentId, IInvertedIndex invertedIndex)
+        {
+            // To lower
+            if (ToLowerCase)
+                text = text.ToLower();
+
+            // Remove newlines from the document to prepare the doc for tokenization
+            text = text.Replace(Environment.NewLine, " ");
+
+            // Remove accents before stemming
+            if (RemoveAccentsBeforeStemming)
+                text = RemoveAccents(text);
+
+            // Tokenize
+            var terms = _tokenizer.Tokenize(text);
+
+            // Remove stopwords
+            if (_stopWordRemover != null)
+                terms = _stopWordRemover.Process(terms);
+
+            // Go through all terms
+            for (int i = 0; i < terms.Length; ++i)
+            {
+                // Stemming
+                terms[i] = _stemmer.Stem(terms[i]);
+
+                // Remove accents after stemming
+                if (RemoveAccentsAfterStemming)
+                    terms[i] = RemoveAccents(terms[i]);
+
+                // Indexate it
+                invertedIndex.Put(terms[i], documentId);
+            }
+        }
 
         /// <summary>
         /// Remove accents from text

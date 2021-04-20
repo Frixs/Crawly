@@ -199,7 +199,7 @@ namespace InformationRetrievalManager
                 var ii = new InvertedIndex("my_index", _fileManager, _logger);
                 await _taskManager.Run(() => ii.Load());
 
-                var results = _queryIndexManager.Query(Query, ii.GetReadOnlyVocabulary(), QueryModelType.TfIdf);
+                var results = _queryIndexManager.QueryAsync(Query, ii.GetReadOnlyVocabulary(), QueryModelType.TfIdf);
                 QueryStatus = "Results: [" + string.Join(",", results) + "]";
 
                 await Task.Delay(1);
