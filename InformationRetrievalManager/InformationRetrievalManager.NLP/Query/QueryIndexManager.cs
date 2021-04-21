@@ -89,14 +89,14 @@ namespace InformationRetrievalManager.NLP
                         // ... check if the query is different...
                         if (!t_query.Equals(_lastQuery))
                             // If so, recalculate query
-                            _lastModel.CalculateQuery(t_query, t_configuration);
+                            _lastModel.CalculateQuery(t_query, t_data, t_configuration);
                         // Otherwise, there is not need to do anything, the query data are the same as the previous request.
                     }
                     // Otherwise, recalculate everything...
                     else
                     {
                         _lastModel.CalculateData(t_data);
-                        _lastModel.CalculateQuery(t_query, t_configuration);
+                        _lastModel.CalculateQuery(t_query, t_data, t_configuration);
                     }
                 }
                 // Otherwise, recalculate the whole model straight away...
@@ -115,7 +115,7 @@ namespace InformationRetrievalManager.NLP
                     }
 
                     _lastModel.CalculateData(t_data);
-                    _lastModel.CalculateQuery(t_query, t_configuration);
+                    _lastModel.CalculateQuery(t_query, t_data, t_configuration);
                 }
 
                 // Save information about last query request

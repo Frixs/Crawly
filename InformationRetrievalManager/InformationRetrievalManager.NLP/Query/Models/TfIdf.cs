@@ -97,9 +97,9 @@ namespace InformationRetrievalManager.NLP
         }
 
         /// <inheritdoc/>
-        public void CalculateQuery(string query, IndexProcessingConfigurationDataModel processingConfiguration)
+        public void CalculateQuery(string query, IReadOnlyDictionary<string, IReadOnlyDictionary<int, IReadOnlyTermInfo>> data, IndexProcessingConfigurationDataModel processingConfiguration)
         {
-            if (query == null)
+            if (query == null || data == null)
                 throw new ArgumentNullException("Data not specified!");
 
             if (_termIdf == null)
@@ -121,9 +121,9 @@ namespace InformationRetrievalManager.NLP
                 processingConfiguration.RemoveAccentsBeforeStemming,
                 processingConfiguration.RemoveAccentsAfterStemming
                 );
-            var data = processing.IndexText(query);
+            var queryData = processing.IndexText(query);
 
-            _queryVector = CalculateDocumentVector(data, 0);
+            _queryVector = CalculateDocumentVector(CreateQueryDataVocabulary(queryData, data), 0);
 
             // Log it
             _logger?.LogDebugSource("Query has been successfully calculated into vector.");
@@ -207,12 +207,41 @@ namespace InformationRetrievalManager.NLP
                     // Calculate term TF-IDF
                     double tf = term.Value[documentId].Frequency; // Term Frequency
                     double ntf = tf > 0 ? 1 + Math.Log(tf, 10) : 0; // 1 + log(TF) --- if TF == 0 => 0
-                    double tfidf = _termIdf.ContainsKey(term.Key) ? ntf * _termIdf[term.Key] : 0; // If the term does not exist yet (query call), TF-IDF of the term is 0
+                    double tfidf = _termIdf.ContainsKey(term.Key) ? ntf * _termIdf[term.Key] : 0; // If the term does not exist (query call), TF-IDF of the term is 0
                     docVector.Add(tfidf);
+                }
+                // Otherwise, it is 0...
+                else
+                {
+                    docVector.Add(0);
                 }
             }
 
             return docVector.ToArray();
+        }
+
+        /// <summary>
+        /// Map <paramref name="query"/> vocabulary into <paramref name="data"/> representing documents vocabulary.
+        /// </summary>
+        /// <param name="query">The query vocabulary</param>
+        /// <param name="data">The document vocabulary</param>
+        /// <returns>Query vocabulary in scope of document vocabulary terms.</returns>
+        private IReadOnlyDictionary<string, IReadOnlyDictionary<int, IReadOnlyTermInfo>> CreateQueryDataVocabulary(IReadOnlyDictionary<string, IReadOnlyDictionary<int, IReadOnlyTermInfo>> query, IReadOnlyDictionary<string, IReadOnlyDictionary<int, IReadOnlyTermInfo>> data)
+        {
+            SortedDictionary<string, Dictionary<int, TermInfo>> result = new SortedDictionary<string, Dictionary<int, TermInfo>>();
+
+            foreach (var term in data)
+            {
+                var postingList = new Dictionary<int, TermInfo>();
+
+                if (query.ContainsKey(term.Key))
+                    foreach (var document in query[term.Key])
+                        postingList.Add(document.Key, (TermInfo)document.Value);
+
+                result.Add(term.Key, postingList);
+            }
+
+            return result.ToDictionary(o => o.Key, o => (IReadOnlyDictionary<int, IReadOnlyTermInfo>)o.Value.ToDictionary(x => x.Key, x => (IReadOnlyTermInfo)x.Value)); ;
         }
 
         #endregion

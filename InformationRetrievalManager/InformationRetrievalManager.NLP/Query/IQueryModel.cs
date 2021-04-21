@@ -11,7 +11,7 @@ namespace InformationRetrievalManager.NLP
         /// <summary>
         /// Calculates model for documents
         /// </summary>
-        /// <param name="data"><see cref="InvertedIndex._vocabulary"/></param>
+        /// <param name="data">Documents data(<see cref="InvertedIndex._vocabulary"/>)</param>
         /// <exception cref="ArgumentNullException">Missing data reference.</exception>
         void CalculateData(IReadOnlyDictionary<string, IReadOnlyDictionary<int, IReadOnlyTermInfo>> data);
 
@@ -19,10 +19,11 @@ namespace InformationRetrievalManager.NLP
         /// Calculates model for query
         /// </summary>
         /// <param name="query">The query</param>
+        /// <param name="data">Documents data(<see cref="InvertedIndex._vocabulary"/>)</param>
         /// <param name="processingConfiguration">Processing configuration to use for the query index processing</param>
         /// <exception cref="ArgumentNullException">Missing query reference.</exception>
         /// <exception cref="InvalidOperationException">Missing parameters. <see cref="CalculateData"/> must be called beforehand.</exception>
-        void CalculateQuery(string query, IndexProcessingConfigurationDataModel processingConfiguration);
+        void CalculateQuery(string query, IReadOnlyDictionary<string, IReadOnlyDictionary<int, IReadOnlyTermInfo>> data, IndexProcessingConfigurationDataModel processingConfiguration);
 
         /// <summary>
         /// Calculate best matching documents by the query.
