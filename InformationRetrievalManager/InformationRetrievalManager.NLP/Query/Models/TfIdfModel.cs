@@ -9,7 +9,7 @@ namespace InformationRetrievalManager.NLP
     /// <summary>
     /// Definition of vector space model TF-IDF
     /// </summary>
-    internal sealed class TfIdf : IQueryModel
+    internal sealed class TfIdfModel : IQueryModel
     {
         #region Private Members (Injects)
 
@@ -42,7 +42,7 @@ namespace InformationRetrievalManager.NLP
         /// Default constructor
         /// </summary>
         /// <param name="logger">Logger instance - not required, if not defined, the logger does log nothing</param>
-        public TfIdf(ILogger logger = null)
+        public TfIdfModel(ILogger logger = null)
         {
             _logger = logger;
         }
