@@ -211,7 +211,7 @@ namespace InformationRetrievalManager
                 await _taskManager.Run(async () =>
                 {
                     ii.Load();
-                    results = await _queryIndexManager.QueryAsync(Query, ii.GetReadOnlyVocabulary(), QueryModelType.TfIdf, _processingConfiguration, 10);
+                    results = await _queryIndexManager.QueryAsync(Query, ii.GetReadOnlyVocabulary(), QueryModelType.Boolean, _processingConfiguration, 10);
                 });
 
                 QueryStatus = "Results: [" + string.Join(",", results) + "]";

@@ -194,7 +194,7 @@ namespace InformationRetrievalManager.NLP
                 _invertedIndex.Load();
 
             // Process the data
-            Process(docContent, document.Id, _invertedIndex);
+            _ = Process(docContent, document.Id, _invertedIndex);
 
             // Save indexed data
             if (save)
@@ -215,19 +215,36 @@ namespace InformationRetrievalManager.NLP
             var ii = new InvertedIndex(Name + "(query)", null, _logger);
 
             // Process the text data
-            Process(text, 0, ii);
+            _ = Process(text, 0, ii);
 
             // Return the vocabulary straight back
             return ii.GetReadOnlyVocabulary();
         }
 
         /// <summary>
-        /// Process the word (no sentence is expected - just a word) by the processing settings. 
+        /// Process the <paramref name="text"/> by the processing settings. 
+        /// </summary>
+        /// <param name="text">The text</param>
+        /// <returns>Processed text into terms.</returns>
+        public string[] ProcessText(string text)
+        {
+            if (text == null)
+                throw new ArgumentNullException("Text not specified!");
+
+            return Process(text, -1);
+        }
+
+        /// <summary>
+        /// Process the <paramref name="word"/> (no sentence/text is expected - just a word) by the processing settings. 
         /// The process follows <see cref="Process"/>.
         /// </summary>
-        /// <returns>Processed word</returns>
+        /// <param name="word">The word to be processed.</param>
+        /// <returns>Processed word.</returns>
         public string ProcessWord(string word)
         {
+            if (word == null)
+                throw new ArgumentNullException("Word not specified!");
+
             // To lower
             if (ToLowerCase)
                 word = word.ToLower();
@@ -251,12 +268,13 @@ namespace InformationRetrievalManager.NLP
         #region Private Helpers
 
         /// <summary>
-        /// Process specific text by the processing settings and indexate it according to <paramref name="documentId"/>.
+        /// Process specific text by the processing settings and indexate it according to <paramref name="documentId"/> (only if <paramref name="invertedIndex"/> is defined).
         /// </summary>
         /// <param name="text">The text</param>
-        /// <param name="documentId">The document ID</param>
+        /// <param name="documentId">The document ID for indexation (If <paramref name="invertedIndex"/> is not defined, indexation will not proceed and this parameter will be ignored).</param>
         /// <param name="invertedIndex">Inverted index instance used for the indexation.</param>
-        private void Process(string text, int documentId, IInvertedIndex invertedIndex)
+        /// <returns>Processed terms</returns>
+        private string[] Process(string text, int documentId, IInvertedIndex invertedIndex = null)
         {
             // To lower
             if (ToLowerCase)
@@ -287,8 +305,11 @@ namespace InformationRetrievalManager.NLP
                     terms[i] = RemoveAccents(terms[i]);
 
                 // Indexate it
-                invertedIndex.Put(terms[i], documentId);
+                if (invertedIndex != null)
+                    invertedIndex.Put(terms[i], documentId);
             }
+
+            return terms;
         }
 
         /// <summary>

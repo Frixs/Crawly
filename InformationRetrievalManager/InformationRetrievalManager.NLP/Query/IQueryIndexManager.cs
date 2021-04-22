@@ -19,5 +19,11 @@ namespace InformationRetrievalManager.NLP
         /// <returns>Array of document IDs sorted from the most relevant to the least.</returns>
         /// <exception cref="ArgumentNullException">Invalid parameters.</exception>
         Task<int[]> QueryAsync(string query, IReadOnlyDictionary<string, IReadOnlyDictionary<int, IReadOnlyTermInfo>> data, QueryModelType modelType, IndexProcessingConfigurationDataModel configuration, int select);
+
+        /// <summary>
+        /// Resets model data that are saved from previous query calls. 
+        /// After reset, next called query is forced to recalculate everything.
+        /// </summary>
+        void ResetLastModelData();
     }
 }

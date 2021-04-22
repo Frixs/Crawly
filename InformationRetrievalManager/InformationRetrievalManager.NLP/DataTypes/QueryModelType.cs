@@ -1,12 +1,11 @@
-﻿using System;
-
-namespace InformationRetrievalManager.NLP
+﻿namespace InformationRetrievalManager.NLP
 {
     /// <summary>
     /// Type of the models supported by this system for queries
     /// </summary>
     public enum QueryModelType
     {
-        TfIdf = 0
+        TfIdf = 0,
+        Boolean
     }
 }

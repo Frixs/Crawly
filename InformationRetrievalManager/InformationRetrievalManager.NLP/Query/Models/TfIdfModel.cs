@@ -151,7 +151,8 @@ namespace InformationRetrievalManager.NLP
                     );
 
             // Sort and return result
-            results.Sort((x, y) => y.Item2.CompareTo(x.Item2));
+            //results.Sort((x, y) => y.Item2.CompareTo(x.Item2));
+            results = results.OrderByDescending(o => o.Item2).ThenBy(o => o.Item1).ToList();
             if (select > 0)
                 return results.Select(o => o.Item1).Take(select).ToArray();
             return results.Select(o => o.Item1).ToArray();

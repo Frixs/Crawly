@@ -22,7 +22,7 @@ namespace InformationRetrievalManager.NLP
 
         #endregion
 
-        #region Private Members (Models)
+        #region Private Members (Model Data)
 
         /// <summary>
         /// Model type of last queried data
@@ -105,7 +105,11 @@ namespace InformationRetrievalManager.NLP
                     switch (t_modelType)
                     {
                         case QueryModelType.TfIdf:
-                            _lastModel = new TfIdf();
+                            _lastModel = new TfIdfModel(_logger);
+                            break;
+
+                        case QueryModelType.Boolean:
+                            _lastModel = new BooleanModel(_logger);
                             break;
 
                         default:
@@ -125,6 +129,15 @@ namespace InformationRetrievalManager.NLP
 
                 return _lastModel.CalculateBestMatch(select);
             });
+        }
+
+        /// <inheritdoc/>
+        public void ResetLastModelData()
+        {
+            _lastModelType = null;
+            _lastModel = null;
+            _lastQuery = null;
+            _lastDataChecksum = null;
         }
 
         #endregion
