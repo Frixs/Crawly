@@ -6,7 +6,6 @@ namespace InformationRetrievalManager.NLP
 {
     /// <summary>
     /// Expression recursive descent parser with logical (boolean) operations for <see cref="BooleanModel"/>.
-    /// TODO: advanced/complex queries does not work to parse
     /// </summary>
     /// <remarks>
     /// Grammar: <br />
@@ -126,11 +125,15 @@ namespace InformationRetrievalManager.NLP
         private Node ParseE(string[] tokens, ref int index)
         {
             Node leftExp = ParseT(tokens, ref index);
-            if (index >= tokens.Length) // Last token => Rule 2
+            if (index >= tokens.Length - 1) // Last token => Rule 2
                 return leftExp;
 
             string token = tokens[index];
-            if (token == KeywordAnd) // Rule 3
+            if (token == KeywordRightParen) // Closure ')' - force return expression
+            {
+                return leftExp;
+            }
+            else if (token == KeywordAnd) // Rule 3
             {
                 index++;
                 Node rightExp = ParseE(tokens, ref index);

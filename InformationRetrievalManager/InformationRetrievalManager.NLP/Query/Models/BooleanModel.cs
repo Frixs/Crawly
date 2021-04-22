@@ -108,7 +108,7 @@ namespace InformationRetrievalManager.NLP
                 _queryResults = results.OrderBy(o => o).ToArray();
 
                 // Log it
-                _logger?.LogDebugSource("Query has been successfully calculated and data are prepared.");
+                _logger?.LogDebugSource("Query has been successfully calculated and data prepared.");
             }
         }
 
