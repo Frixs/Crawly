@@ -1,4 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.Json;
 
 namespace InformationRetrievalManager.Relational
 {
@@ -14,6 +19,21 @@ namespace InformationRetrievalManager.Relational
         /// The state data of the application
         /// </summary>
         public DbSet<ApplicationStateDataModel> ApplicationState { get; set; }
+
+        /// <summary>
+        /// Data instances made by the user
+        /// </summary>
+        public DbSet<DataInstanceDataModel> DataInstances { get; set; }
+
+        /// <summary>
+        /// Processing configuration data
+        /// </summary>
+        public DbSet<IndexProcessingConfigurationDataModel> IndexProcessingConfigurations { get; set; }
+
+        /// <summary>
+        /// Indexed document references
+        /// </summary>
+        public DbSet<IndexedDocumentDataModel> IndexedDocuments { get; set; }
 
         #endregion
 
@@ -45,6 +65,53 @@ namespace InformationRetrievalManager.Relational
             //
             // Set Id as primary key
             modelBuilder.Entity<ApplicationStateDataModel>().HasKey(a => a.Id);
+
+            // Configure Data Instances
+            // ------------------------------
+            //
+            // Set Id as primary key
+            modelBuilder.Entity<DataInstanceDataModel>().HasKey(a => a.Id);
+
+            // Configure Index Processing Configurations
+            // ------------------------------
+            //
+            // Set Id as primary key
+            modelBuilder.Entity<IndexProcessingConfigurationDataModel>().HasKey(a => a.Id);
+            // Set Foreign Key
+            modelBuilder.Entity<IndexProcessingConfigurationDataModel>()
+                .HasOne(o => o.DataInstance)
+                .WithOne(o => o.IndexProcessingConfiguration)
+                .HasForeignKey<IndexProcessingConfigurationDataModel>(o => o.DataInstanceId)
+                .OnDelete(DeleteBehavior.Cascade);
+            // Data type conversion management
+            modelBuilder.Entity<IndexProcessingConfigurationDataModel>()
+                .Property(e => e.CustomStopWords)
+                .HasConversion(
+                    v => JsonSerializer.Serialize(v, null),
+                    v => JsonSerializer.Deserialize<HashSet<string>>(v, null)
+                    );
+            // Set comparer to CustomStopWords
+            var valueComparer = new ValueComparer<HashSet<string>>(
+                (c1, c2) => c1.SequenceEqual(c2),
+                c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
+                c => new HashSet<string>(c)
+                );
+            modelBuilder
+                .Entity<IndexProcessingConfigurationDataModel>()
+                .Property(e => e.CustomStopWords)
+                .Metadata.SetValueComparer(valueComparer);
+
+            // Configure Indexed Documents
+            // ------------------------------
+            //
+            // Set Id as primary key
+            modelBuilder.Entity<IndexedDocumentDataModel>().HasKey(a => a.Id);
+            // Set Foreign Key
+            modelBuilder.Entity<IndexedDocumentDataModel>()
+                .HasOne(o => o.DataInstance)
+                .WithMany(o => o.IndexedDocuments)
+                .HasForeignKey(o => o.DataInstanceId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
 
         #endregion

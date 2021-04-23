@@ -33,7 +33,7 @@ namespace InformationRetrievalManager
         #region Private Members
 
         private ICrawlerEngine _crawler;
-        private IndexProcessingConfigurationDataModel _processingConfiguration = new IndexProcessingConfigurationDataModel
+        private IndexProcessingConfiguration _processingConfiguration = new IndexProcessingConfiguration
         {
             Language = ProcessingLanguage.EN,
             ToLowerCase = true,
@@ -165,9 +165,9 @@ namespace InformationRetrievalManager
                                 JsonSerializer serializer = new JsonSerializer();
                                 CrawlerDataModel[] data = (CrawlerDataModel[])serializer.Deserialize(file, typeof(CrawlerDataModel[]));
 
-                                List<IndexDocumentDataModel> docs = new List<IndexDocumentDataModel>();
+                                List<IndexDocument> docs = new List<IndexDocument>();
                                 for (int i = 0; i < data.Length; ++i)
-                                    docs.Add(new IndexDocumentDataModel(i, data[i].Title, data[i].SourceUrl, data[i].Category, data[i].Timestamp, data[i].Content));
+                                    docs.Add(new IndexDocument(i, data[i].Title, data[i].SourceUrl, data[i].Category, data[i].Timestamp, data[i].Content));
 
                                 // HACK - start index processing
                                 DataProcessingStatus = "Indexing...";

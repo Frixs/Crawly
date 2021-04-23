@@ -124,7 +124,7 @@ namespace InformationRetrievalManager.NLP
         /// <param name="configuration">The configuration for the processing</param>
         /// <param name="fileManager">File manager used used for storing the processed index (the index will be stored in-memory only if the manager is not set)</param>
         /// <param name="logger">Connect logger from the rest of the system (if not set, the logger will not log anything)</param>
-        public IndexProcessing(string name, IndexProcessingConfigurationDataModel configuration, IFileManager fileManager = null, ILogger logger = null)
+        public IndexProcessing(string name, IndexProcessingConfiguration configuration, IFileManager fileManager = null, ILogger logger = null)
         {
             if (configuration == null)
                 throw new ArgumentNullException(nameof(configuration));
@@ -156,7 +156,7 @@ namespace InformationRetrievalManager.NLP
         /// <param name="save">Once the indexation will be done, the indexed data will be saved into file storage, and working in-memory storage will be cleared.</param>
         /// <param name="load">Loads already indexed data of <see cref="_invertedIndex"/> under the same <see cref="IReadOnlyInvertedIndex.Name"/> into working in-memory storage and <paramref name="documents"/> will be indexed into the loaded data as a addition.</param>
         /// <exception cref="ArgumentNullException">If the array is null</exception>
-        public void IndexDocuments(IndexDocumentDataModel[] documents, bool save = false, bool load = false)
+        public void IndexDocuments(IndexDocument[] documents, bool save = false, bool load = false)
         {
             if (documents == null)
                 throw new ArgumentNullException("Array of documents not specified!");
@@ -181,7 +181,7 @@ namespace InformationRetrievalManager.NLP
         /// <param name="save">Once the indexation will be done, the indexed data will be saved into file storage, and working in-memory storage will be cleared.</param>
         /// <param name="load">Loads already indexed data of <see cref="_invertedIndex"/> under the same <see cref="IReadOnlyInvertedIndex.Name"/> into working in-memory storage and <paramref name="documents"/> will be indexed into the loaded data as a addition.</param>
         /// <exception cref="ArgumentNullException">If the document is null</exception>
-        public void IndexDocument(IndexDocumentDataModel document, bool save = false, bool load = false)
+        public void IndexDocument(IndexDocument document, bool save = false, bool load = false)
         {
             if (document == null)
                 throw new ArgumentNullException("Document not specified!");

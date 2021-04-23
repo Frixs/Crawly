@@ -13,6 +13,21 @@ namespace InformationRetrievalManager.Relational
         IApplicationStateRepository ApplicationState { get; }
 
         /// <summary>
+        /// Data instance repository
+        /// </summary>
+        IRepository<DataInstanceDataModel> DataInstances { get; }
+
+        /// <summary>
+        /// Index processing configuration repository
+        /// </summary>
+        IRepository<IndexProcessingConfigurationDataModel> IndexProcessingConfigurations { get; }
+
+        /// <summary>
+        /// Indexed document repository
+        /// </summary>
+        IRepository<IndexedDocumentDataModel> IndexedDocuments { get; }
+
+        /// <summary>
         /// Commit database context changes
         /// </summary>
         void Commit();

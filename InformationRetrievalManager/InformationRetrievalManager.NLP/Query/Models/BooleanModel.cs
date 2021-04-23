@@ -1,4 +1,5 @@
-﻿using Ixs.DNA;
+﻿using InformationRetrievalManager.Core;
+using Ixs.DNA;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -54,7 +55,7 @@ namespace InformationRetrievalManager.NLP
         }
 
         /// <inheritdoc/>
-        public void CalculateQuery(string query, IReadOnlyDictionary<string, IReadOnlyDictionary<int, IReadOnlyTermInfo>> data, IndexProcessingConfigurationDataModel processingConfiguration)
+        public void CalculateQuery(string query, IReadOnlyDictionary<string, IReadOnlyDictionary<int, IReadOnlyTermInfo>> data, IndexProcessingConfiguration processingConfiguration)
         {
             if (query == null || data == null)
                 throw new ArgumentNullException("Data not specified!");
@@ -140,7 +141,7 @@ namespace InformationRetrievalManager.NLP
             /// </summary>
             /// <param name="documentId">Document ID for which the evaluation is made.</param>
             /// <param name="data">Documents data(<see cref="InvertedIndex._vocabulary"/>)</param>
-            public DocumentTermEvaluator(int documentId, IReadOnlyDictionary<string, IReadOnlyDictionary<int, IReadOnlyTermInfo>> data, IndexProcessingConfigurationDataModel processingConfiguration)
+            public DocumentTermEvaluator(int documentId, IReadOnlyDictionary<string, IReadOnlyDictionary<int, IReadOnlyTermInfo>> data, IndexProcessingConfiguration processingConfiguration)
             {
                 if (documentId < 0)
                     throw new ArgumentNullException("Invalid document ID!");

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using InformationRetrievalManager.Core;
+using System;
 using System.Collections.Generic;
 
 namespace InformationRetrievalManager.NLP
@@ -23,7 +24,7 @@ namespace InformationRetrievalManager.NLP
         /// <param name="processingConfiguration">Processing configuration to use for the query index processing</param>
         /// <exception cref="ArgumentNullException">Missing query reference.</exception>
         /// <exception cref="InvalidOperationException">Missing parameters. <see cref="CalculateData"/> must be called beforehand.</exception>
-        void CalculateQuery(string query, IReadOnlyDictionary<string, IReadOnlyDictionary<int, IReadOnlyTermInfo>> data, IndexProcessingConfigurationDataModel processingConfiguration);
+        void CalculateQuery(string query, IReadOnlyDictionary<string, IReadOnlyDictionary<int, IReadOnlyTermInfo>> data, IndexProcessingConfiguration processingConfiguration);
 
         /// <summary>
         /// Calculate best matching documents by the query.

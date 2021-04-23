@@ -5,7 +5,7 @@ namespace InformationRetrievalManager.NLP
     /// <summary>
     /// Defines the structure of the document data
     /// </summary>
-    public class IndexDocumentDataModel
+    public class IndexDocument
     {
         #region Public Properties
 
@@ -58,7 +58,7 @@ namespace InformationRetrievalManager.NLP
         ///     - <paramref name="sourceUrl"/> is null.
         ///     - <paramref name="content"/> is null.
         /// </exception>
-        public IndexDocumentDataModel(int id, string title, string sourceUrl, string category, DateTime timestamp, string content)
+        public IndexDocument(int id, string title, string sourceUrl, string category, DateTime timestamp, string content)
         {
             if (id < 0) throw new ArgumentNullException("Invalid document ID!");
 

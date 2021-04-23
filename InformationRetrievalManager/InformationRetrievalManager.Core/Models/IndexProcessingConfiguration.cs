@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
-namespace InformationRetrievalManager.NLP
+namespace InformationRetrievalManager.Core
 {
     /// <summary>
-    /// Data model holding all necessary configuration for <see cref="IndexProcessing"/>.
+    /// Data model holding all necessary configuration for index processing in NLP project.
     /// </summary>
-    public class IndexProcessingConfigurationDataModel
+    public class IndexProcessingConfiguration
     {
         /// <summary>
         /// Processing language used for the processing
