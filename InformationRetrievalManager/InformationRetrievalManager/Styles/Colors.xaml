@@ -13,21 +13,37 @@
     <Color x:Key="DarkColor">#121517</Color>
     <SolidColorBrush x:Key="DarkColorBrushKey" Color="{StaticResource DarkColor}" />
 
-    <Color x:Key="DarkInvColor">#BBC0C3</Color>
+    <Color x:Key="DarkInvColor">#D3E1E9</Color>
     <SolidColorBrush x:Key="DarkInvColorBrushKey" Color="{StaticResource DarkInvColor}" />
 
     <Color x:Key="LightColor">#421E33</Color>
     <SolidColorBrush x:Key="LightColorBrushKey" Color="{StaticResource LightColor}" />
 
+    <Color x:Key="LightColorAlt">#F1E2EF</Color>
+    <SolidColorBrush x:Key="LightColorAltBrushKey" Color="{StaticResource LightColorAlt}" />
+
+    <Color x:Key="LightColorDry">#543848</Color>
+    <SolidColorBrush x:Key="LightColorDryBrushKey" Color="{StaticResource LightColorDry}" />
+
+    <Color x:Key="LightColorDark">#210b18</Color>
+    <SolidColorBrush x:Key="LightColorDarkBrushKey" Color="{StaticResource LightColorDark}" />
+
     <Color x:Key="LightColorLight">#AA143F</Color>
     <SolidColorBrush x:Key="LightColorLightBrushKey" Color="{StaticResource LightColorLight}" />
 
-    <Color x:Key="Background">#f7f7fc</Color>
+    <Color x:Key="LightColorShiny">#ec3052</Color>
+    <SolidColorBrush x:Key="LightColorShinyBrushKey" Color="{StaticResource LightColorShiny}" />
+
+
+
+    <Color x:Key="Background">#ECECF7</Color>
     <SolidColorBrush x:Key="BackgroundBrushKey" Color="{StaticResource Background}" />
+    <Color x:Key="BackgroundAlt">#ECDDEA</Color>
+    <SolidColorBrush x:Key="BackgroundAltBrushKey" Color="{StaticResource BackgroundAlt}" />
 
     <SolidColorBrush x:Key="ForegroundBrushKey" Color="{StaticResource DarkColor}" />
-
     <SolidColorBrush x:Key="ForegroundInvBrushKey" Color="{StaticResource DarkInvColor}" />
+    <SolidColorBrush x:Key="ForegroundInvAltBrushKey" Color="{StaticResource LightColorAlt}" />
 
     <!--#endregion-->
 

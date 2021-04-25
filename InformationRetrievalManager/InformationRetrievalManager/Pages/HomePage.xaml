@@ -13,95 +13,103 @@
     x:TypeArguments="local:HomePageViewModel"
     mc:Ignorable="d">
 
-    <Grid>
-        <TextBlock
-            HorizontalAlignment="Center"
-            VerticalAlignment="Center"
-            FontFamily="{StaticResource DosisExtraBold}"
-            Text="THIS IS TEMPORARY USER INTERFACE" />
+    <Border>
+        <Border.Background>
+            <LinearGradientBrush StartPoint="0,0" EndPoint="0.04,1.4">
+                <GradientStop Offset="0.0" Color="{StaticResource Background}" />
+                <GradientStop Offset="1.0" Color="{StaticResource BackgroundAlt}" />
+            </LinearGradientBrush>
+        </Border.Background>
 
-        <Image
-            Width="100"
-            Margin="0,-250,0,0"
-            Source="/Resources/Images/logo_crawly_bold.png" />
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="4*" />
+                <RowDefinition Height="5.5*" />
+            </Grid.RowDefinitions>
 
-        <Button
-            Width="25"
-            Height="25"
-            Margin="0,50,0,0"
-            HorizontalAlignment="Center"
-            VerticalAlignment="Center"
-            Command="{Binding GoToHowToPageCommand}"
-            Content="?" />
+            <!--  Texture  -->
+            <Grid.Background>
+                <VisualBrush
+                    Opacity="0.7"
+                    TileMode="Tile"
+                    Viewport="0,0,0.5,0.5">
+                    <VisualBrush.Visual>
+                        <Image Source="/Resources/Images/texture_data_seamless.png" />
+                    </VisualBrush.Visual>
+                </VisualBrush>
+            </Grid.Background>
 
-        <TextBlock
-            Margin="-200,-100,0,0"
-            HorizontalAlignment="Center"
-            VerticalAlignment="Center"
-            Text="{Binding CrawlerProcessProgress}" />
+            <!--  White Row  -->
+            <Border Grid.Row="0" Padding="10,10,10,25">
+                <Grid>
+                    <!--  Logo  -->
+                    <Image
+                        Height="135"
+                        Margin="0,0,0,0"
+                        VerticalAlignment="Bottom"
+                        Source="/Resources/Images/logo_crawly_bold.png" />
+                </Grid>
+            </Border>
 
-        <Button
-            Height="25"
-            Margin="-200,-50,0,0"
-            Padding="10,0,10,0"
-            HorizontalAlignment="Center"
-            VerticalAlignment="Center">
-            <Button.Style>
-                <Style TargetType="{x:Type Button}">
-                    <Setter Property="Command" Value="{Binding StartCrawlerCommand}" />
-                    <Setter Property="Content" Value="START CRAWLER" />
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding IsCurrentlyCrawlingFlag}" Value="True">
-                            <Setter Property="Command" Value="{Binding CancelCrawlerCommand}" />
-                            <Setter Property="Content" Value="CANCEL" />
-                        </DataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </Button.Style>
-        </Button>
+            <!--  Colored Row  -->
+            <Border Grid.Row="1" Padding="10,40,10,10">
+                <Border.Background>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="0.0,1.4">
+                        <GradientStop Offset="0.1" Color="{StaticResource LightColorDark}" />
+                        <GradientStop Offset="1.0" Color="{StaticResource LightColorDark}" />
+                    </LinearGradientBrush>
+                </Border.Background>
+                <Grid>
+                    <!--  Middle contour line  -->
+                    <Border
+                        Height="4"
+                        Margin="-10,-41,-10,-10"
+                        VerticalAlignment="Top">
+                        <Border.Background>
+                            <LinearGradientBrush>
+                                <GradientStop Offset="0.0" Color="{StaticResource LightColorLight}" />
+                                <GradientStop Offset="0.5" Color="Transparent" />
+                                <GradientStop Offset="0.5" Color="Transparent" />
+                                <GradientStop Offset="1.0" Color="{StaticResource LightColorLight}" />
+                            </LinearGradientBrush>
+                        </Border.Background>
+                    </Border>
+                    <!--  Colored Row Texture  -->
+                    <Border Margin="-10,-41,-10,-10">
+                        <Border.Background>
+                            <VisualBrush TileMode="Tile" Viewport="0,0,0.2,0.5">
+                                <VisualBrush.Visual>
+                                    <Image Source="/Resources/Images/texture_data_seamless.png" />
+                                </VisualBrush.Visual>
+                            </VisualBrush>
+                        </Border.Background>
+                        <Border.OpacityMask>
+                            <LinearGradientBrush StartPoint="0,1" EndPoint="0.0,0.5">
+                                <LinearGradientBrush.GradientStops>
+                                    <GradientStop Offset="0" Color="#30000000" />
+                                    <GradientStop Offset="1" Color="Transparent" />
+                                </LinearGradientBrush.GradientStops>
+                            </LinearGradientBrush>
+                        </Border.OpacityMask>
+                    </Border>
 
-        <TextBlock
-            Margin="200,-100,0,0"
-            HorizontalAlignment="Center"
-            VerticalAlignment="Center"
-            Text="{Binding DataProcessingStatus}" />
+                    <TextBlock
+                        Margin="0,-15,0,0"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Top"
+                        FontFamily="{StaticResource Pacifico}"
+                        FontSize="48"
+                        Foreground="{StaticResource LightColorAltBrushKey}"
+                        Text="Crawly" />
 
-        <Button
-            Height="25"
-            Margin="200,-50,0,0"
-            Padding="10,0,10,0"
-            HorizontalAlignment="Center"
-            VerticalAlignment="Center"
-            Command="{Binding StartProcessingCommand}"
-            Content="START PROCESSING" />
-
-        <TextBlock
-            Margin="0,125,0,0"
-            HorizontalAlignment="Center"
-            VerticalAlignment="Center"
-            Text="QUERY" />
-
-        <TextBox
-            Width="300"
-            Height="25"
-            Margin="0,175,0,0"
-            HorizontalAlignment="Center"
-            VerticalAlignment="Center"
-            Text="{Binding Query}" />
-
-        <Button
-            Height="25"
-            Margin="350,175,0,0"
-            Padding="10,0,10,0"
-            HorizontalAlignment="Center"
-            VerticalAlignment="Center"
-            Command="{Binding RunQueryCommand}"
-            Content="-&gt;" />
-
-        <TextBlock
-            Margin="0,225,0,0"
-            HorizontalAlignment="Center"
-            VerticalAlignment="Center"
-            Text="{Binding QueryStatus}" />
-    </Grid>
+                    <TextBlock
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        FontFamily="{StaticResource DosisBold}"
+                        Foreground="{StaticResource ForegroundInvBrushKey}"
+                        Text="THIS IS TEMPORARY USER INTERFACE" />
+                </Grid>
+            </Border>
+        </Grid>
+    </Border>
 </local:BasePage>
