@@ -398,9 +398,25 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Styles\Texts.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Styles\Colors.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Styles\Buttons.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Styles\Fonts.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Styles\Scroll.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Styles\Windows.xaml">
       <SubType>Designer</SubType>
@@ -419,6 +435,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="AttachedProperties\Base\BaseAttachedProperty.cs" />
+    <Compile Include="AttachedProperties\ButtonAttachedProperty.cs" />
     <Compile Include="AttachedProperties\FrameworkElementAnimationAttachedProperties.cs" />
     <Compile Include="AttachedProperties\NoFrameHistory.cs" />
     <Compile Include="Controls\Base\PageHost.xaml.cs">
@@ -438,6 +455,11 @@
     <Compile Include="UI\IUIManager.cs" />
     <Compile Include="UI\UIManager.cs" />
     <Compile Include="ValueConverters\Base\ApplicationPageHelpers.cs" />
+    <Compile Include="ValueConverters\Base\BaseMultiValueConverter.cs" />
+    <Compile Include="ValueConverters\Base\BaseValueConverter.cs" />
+    <Compile Include="ValueConverters\BooleanInvertConverter.cs" />
+    <Compile Include="ValueConverters\BooleanToVisibilityConverter.cs" />
+    <Compile Include="ValueConverters\BooleanToVisibilityGoneConverter.cs" />
     <Compile Include="ViewModelsWPF\ViewModelLocator.cs" />
     <Compile Include="ViewModels\ApplicationViewModel.cs" />
     <Compile Include="ViewModels\Base\BaseViewModel.cs" />
@@ -478,6 +500,17 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
+    <Resource Include="Resources\Fonts\Dosis\Bold\Dosis-Bold.ttf" />
+    <Resource Include="Resources\Fonts\Pacifico\Pacifico-Regular.ttf" />
+    <Resource Include="Resources\Fonts\Dosis\ExtraBold\Dosis-ExtraBold.ttf" />
+    <Resource Include="Resources\Fonts\Dosis\ExtraLight\Dosis-ExtraLight.ttf" />
+    <Resource Include="Resources\Fonts\Dosis\Light\Dosis-Light.ttf" />
+    <Resource Include="Resources\Fonts\Dosis\Medium\Dosis-Medium.ttf" />
+    <Resource Include="Resources\Fonts\Dosis\Dosis-Regular.ttf" />
+    <Resource Include="Resources\Fonts\Dosis\SemiBold\Dosis-SemiBold.ttf" />
+    <Resource Include="Resources\Fonts\FontAwesome\fa-brands-400.ttf" />
+    <Resource Include="Resources\Fonts\FontAwesome\fa-regular-400.ttf" />
+    <Resource Include="Resources\Fonts\FontAwesome\fa-solid-900.ttf" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -511,6 +544,12 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Images\logo_crawly_bold.png" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

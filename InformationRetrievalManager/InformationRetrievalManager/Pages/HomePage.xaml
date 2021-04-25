@@ -17,8 +17,13 @@
         <TextBlock
             HorizontalAlignment="Center"
             VerticalAlignment="Center"
-            FontWeight="Bold"
+            FontFamily="{StaticResource DosisExtraBold}"
             Text="THIS IS TEMPORARY USER INTERFACE" />
+
+        <Image
+            Width="100"
+            Margin="0,-250,0,0"
+            Source="/Resources/Images/logo_crawly_bold.png" />
 
         <Button
             Width="25"

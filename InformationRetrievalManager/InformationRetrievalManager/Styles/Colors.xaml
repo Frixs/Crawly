@@ -10,13 +10,45 @@
     <Color x:Key="DisabledBackground">#88BDBDC3</Color>
     <SolidColorBrush x:Key="DisabledBackgroundBrushKey" Color="{StaticResource DisabledBackground}" />
 
+    <Color x:Key="DarkColor">#121517</Color>
+    <SolidColorBrush x:Key="DarkColorBrushKey" Color="{StaticResource DarkColor}" />
+
+    <Color x:Key="DarkInvColor">#BBC0C3</Color>
+    <SolidColorBrush x:Key="DarkInvColorBrushKey" Color="{StaticResource DarkInvColor}" />
+
+    <Color x:Key="LightColor">#421E33</Color>
+    <SolidColorBrush x:Key="LightColorBrushKey" Color="{StaticResource LightColor}" />
+
+    <Color x:Key="LightColorLight">#AA143F</Color>
+    <SolidColorBrush x:Key="LightColorLightBrushKey" Color="{StaticResource LightColorLight}" />
+
     <Color x:Key="Background">#f7f7fc</Color>
     <SolidColorBrush x:Key="BackgroundBrushKey" Color="{StaticResource Background}" />
 
-    <SolidColorBrush x:Key="ForegroundBrushKey" Color="{StaticResource ChameleonDark}" />
+    <SolidColorBrush x:Key="ForegroundBrushKey" Color="{StaticResource DarkColor}" />
 
-    <SolidColorBrush x:Key="ForegroundInvBrushKey" Color="{StaticResource ChameleonPureLight}" />
+    <SolidColorBrush x:Key="ForegroundInvBrushKey" Color="{StaticResource DarkInvColor}" />
 
+    <!--#endregion-->
+
+    <!--#region Regular Button-->
+    <Color x:Key="RegularButtonForeground">#CBCBD4</Color>
+    <SolidColorBrush x:Key="RegularButtonForegroundBrushKey" Color="{StaticResource RegularButtonForeground}" />
+
+    <Color x:Key="RegularButtonBackground">#63626D</Color>
+    <SolidColorBrush x:Key="RegularButtonBackgroundBrushKey" Color="{StaticResource RegularButtonBackground}" />
+
+    <Color x:Key="RegularButtonHoverForeground">#CBCBD4</Color>
+    <SolidColorBrush x:Key="RegularButtonHoverForegroundBrushKey" Color="{StaticResource RegularButtonHoverForeground}" />
+
+    <Color x:Key="RegularButtonHoverBackground">#3A3849</Color>
+    <SolidColorBrush x:Key="RegularButtonHoverBackgroundBrushKey" Color="{StaticResource RegularButtonHoverBackground}" />
+
+    <Color x:Key="RegularButtonActionForeground">#070516</Color>
+    <SolidColorBrush x:Key="RegularButtonActionForegroundBrushKey" Color="{StaticResource RegularButtonActionForeground}" />
+
+    <Color x:Key="RegularButtonActionBackground">#FDB154</Color>
+    <SolidColorBrush x:Key="RegularButtonActionBackgroundBrushKey" Color="{StaticResource RegularButtonActionBackground}" />
     <!--#endregion-->
 
 </ResourceDictionary>

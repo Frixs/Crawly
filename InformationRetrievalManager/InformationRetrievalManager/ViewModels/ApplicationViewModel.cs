@@ -35,7 +35,7 @@ namespace InformationRetrievalManager
         /// Application Title/Name.
         /// What user can see in the app UI, e.g.
         /// </summary>
-        public string ApplicationName { get; private set; } = "InformationRetrievalManager";
+        public string ApplicationName { get; private set; } = "Crawly";
 
         /// <summary>
         /// Window default title.
