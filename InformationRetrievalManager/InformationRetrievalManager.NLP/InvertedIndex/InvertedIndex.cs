@@ -3,11 +3,7 @@ using Ixs.DNA;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace InformationRetrievalManager.NLP
 {
@@ -61,7 +57,9 @@ namespace InformationRetrievalManager.NLP
 
         #region Interface Methods
 
+        /// <summary>
         /// <inheritdoc/>
+        /// </summary>
         /// <remarks>O(n^2)</remarks>
         public IReadOnlyDictionary<string, IReadOnlyDictionary<int, IReadOnlyTermInfo>> GetReadOnlyVocabulary()
         {
@@ -117,7 +115,7 @@ namespace InformationRetrievalManager.NLP
             // Check deserialization result
             if (status == 2)
                 _logger?.LogWarningSource($"Failed to load index '{Name}'. Corrupted data.");
-            else
+            else if (status != 0)
                 _logger?.LogWarningSource($"Failed to load index '{Name}'. The index does not exist.");
 
             if (status == 0 && obj != null)

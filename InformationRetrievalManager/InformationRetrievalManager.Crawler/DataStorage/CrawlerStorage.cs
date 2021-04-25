@@ -11,7 +11,7 @@ namespace InformationRetrievalManager.Crawler
     /// <summary>
     /// Singleton boxing for managing crawler data
     /// </summary>
-    public class CrawlerStorage : ICrawlerStorage
+    public sealed class CrawlerStorage : ICrawlerStorage
     {
         #region Private Members (Injects)
 
@@ -95,6 +95,7 @@ namespace InformationRetrievalManager.Crawler
             var model = new CrawlerDataModel
             {
                 Title = title,
+                SourceUrl = url,
                 Category = category,
                 Timestamp = timestamp,
                 Content = contentText

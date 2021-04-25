@@ -29,19 +29,44 @@ namespace InformationRetrievalManager.Relational
         /// </summary>
         private IApplicationStateRepository _applicationState;
 
+        /// <summary>
+        /// Private reference of property <see cref="DataInstances"/>
+        /// </summary>
+        private IRepository<DataInstanceDataModel> _dataInstances;
+
+        /// <summary>
+        /// Private reference of property <see cref="IndexProcessingConfigurations"/>
+        /// </summary>
+        private IRepository<IndexProcessingConfigurationDataModel> _indexProcessingConfigurations;
+
+        /// <summary>
+        /// Private reference of property <see cref="IndexedDocuments"/>
+        /// </summary>
+        private IRepository<IndexedDocumentDataModel> _indexedDocuments;
+
         #endregion
 
         #region Public Properties
 
         /// <inheritdoc/>
-        public IApplicationStateRepository ApplicationState
-        {
-            get
-            {
-                return _applicationState ??
-                    (_applicationState = new ApplicationStateRepository(_dbContext));
-            }
-        }
+        public IApplicationStateRepository ApplicationState =>
+            _applicationState ??
+                (_applicationState = new ApplicationStateRepository(_dbContext));
+
+        /// <inheritdoc/>
+        public IRepository<DataInstanceDataModel> DataInstances =>
+            _dataInstances ??
+                (_dataInstances = new DataInstanceRepository(_dbContext));
+
+        /// <inheritdoc/>
+        public IRepository<IndexProcessingConfigurationDataModel> IndexProcessingConfigurations =>
+            _indexProcessingConfigurations ??
+                (_indexProcessingConfigurations = new IndexProcessingConfigurationRepository(_dbContext));
+
+        /// <inheritdoc/>
+        public IRepository<IndexedDocumentDataModel> IndexedDocuments =>
+            _indexedDocuments ??
+                (_indexedDocuments = new IndexedDocumentRepository(_dbContext));
 
         #endregion
 

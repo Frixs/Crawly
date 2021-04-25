@@ -3,7 +3,7 @@
     /// <summary>
     /// Keeps all necessary constants used widely through this project
     /// </summary>
-    static class Constants
+    internal static class Constants
     {
         /// <summary>
         /// Place where indexated data are placed

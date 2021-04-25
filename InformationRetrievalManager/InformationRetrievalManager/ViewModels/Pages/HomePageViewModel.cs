@@ -26,12 +26,19 @@ namespace InformationRetrievalManager
         private readonly ITaskManager _taskManager;
         private readonly IFileManager _fileManager;
         private readonly ICrawlerStorage _crawlerStorage;
+        private readonly IQueryIndexManager _queryIndexManager;
 
         #endregion
 
         #region Private Members
 
-        public ICrawlerEngine _crawler;
+        private ICrawlerEngine _crawler;
+        private IndexProcessingConfiguration _processingConfiguration = new IndexProcessingConfiguration
+        {
+            Language = ProcessingLanguage.EN,
+            ToLowerCase = true,
+            RemoveAccentsBeforeStemming = true,
+        };
 
         #endregion
 
@@ -42,6 +49,10 @@ namespace InformationRetrievalManager
         public string CrawlerProcessProgress { get; set; }
 
         public string DataProcessingStatus { get; set; }
+
+        public string Query { get; set; }
+
+        public string QueryStatus { get; set; }
 
         #endregion
 
@@ -64,6 +75,8 @@ namespace InformationRetrievalManager
 
         public ICommand StartProcessingCommand { get; set; }
 
+        public ICommand RunQueryCommand { get; set; }
+
         #endregion
 
         #region Constructor
@@ -78,18 +91,20 @@ namespace InformationRetrievalManager
             StartCrawlerCommand = new RelayCommand(async () => await StartCrawlerCommandRoutineAsync());
             CancelCrawlerCommand = new RelayCommand(async () => await CancelCrawlerCommandRoutineAsync());
             StartProcessingCommand = new RelayCommand(async () => await StartProcessingCommandRoutineAsync());
+            RunQueryCommand = new RelayCommand(async () => await RunQueryCommandRoutineAsync());
         }
 
         /// <summary>
         /// DI constructor
         /// </summary>
-        public HomePageViewModel(ILogger logger, ICrawlerManager crawlerManager, ITaskManager taskManager, IFileManager fileManager, ICrawlerStorage crawlerStorage) : this()
+        public HomePageViewModel(ILogger logger, ICrawlerManager crawlerManager, ITaskManager taskManager, IFileManager fileManager, ICrawlerStorage crawlerStorage, IQueryIndexManager queryIndexManager) : this()
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _crawlerManager = crawlerManager ?? throw new ArgumentNullException(nameof(crawlerManager));
             _taskManager = taskManager ?? throw new ArgumentNullException(nameof(taskManager));
             _fileManager = fileManager ?? throw new ArgumentNullException(nameof(fileManager));
             _crawlerStorage = crawlerStorage ?? throw new ArgumentNullException(nameof(crawlerStorage));
+            _queryIndexManager = queryIndexManager ?? throw new ArgumentNullException(nameof(queryIndexManager));
 
             // HACK: crawler starter
             _taskManager.RunAndForget(LoadAsync);
@@ -142,24 +157,32 @@ namespace InformationRetrievalManager
                     var dataFilePath = filePaths.FirstOrDefault(o => o.Contains(".json"));
                     if (dataFilePath != null)
                     {
-                        // Deserialize JSON directly from a file
-                        using (StreamReader file = File.OpenText(dataFilePath))
+                        if (!_crawler.IsCurrentlyCrawling)
                         {
-                            JsonSerializer serializer = new JsonSerializer();
-                            CrawlerDataModel[] data = (CrawlerDataModel[])serializer.Deserialize(file, typeof(CrawlerDataModel[]));
+                            // Deserialize JSON directly from a file
+                            using (StreamReader file = File.OpenText(dataFilePath))
+                            {
+                                JsonSerializer serializer = new JsonSerializer();
+                                CrawlerDataModel[] data = (CrawlerDataModel[])serializer.Deserialize(file, typeof(CrawlerDataModel[]));
 
-                            List<IndexDocumentDataModel> docs = new List<IndexDocumentDataModel>();
-                            for (int i = 0; i < data.Length; ++i)
-                                docs.Add(new IndexDocumentDataModel(i, data[i].Title, data[i].Category, data[i].Timestamp, data[i].Content));
+                                List<IndexDocument> docs = new List<IndexDocument>();
+                                for (int i = 0; i < data.Length; ++i)
+                                    docs.Add(new IndexDocument(i, data[i].Title, data[i].SourceUrl, data[i].Category, data[i].Timestamp, data[i].Content));
 
-                            // HACK - start index processing
-                            DataProcessingStatus = "Indexing...";
-                            var processing = new IndexProcessing("my_index", new Tokenizer(), new Stemmer(), new StopWordRemover(), _fileManager);
-                            await _taskManager.Run(() => {
-                                processing.IndexDocuments(docs.ToArray(), true);
-                                _logger.LogDebugSource("Index processing done!");
-                                DataProcessingStatus = "Done! Data has been indexed into a binary file.";
-                            });
+                                // HACK - start index processing
+                                DataProcessingStatus = "Indexing...";
+                                var processing = new IndexProcessing("my_index", _processingConfiguration, _fileManager, _logger);
+                                await _taskManager.Run(() =>
+                                {
+                                    processing.IndexDocuments(docs.ToArray(), true);
+                                    _logger.LogDebugSource("Index processing done!");
+                                    DataProcessingStatus = "Done! Data has been indexed into a binary file.";
+                                });
+                            }
+                        }
+                        else
+                        {
+                            DataProcessingStatus = "Cannot process data during crawling!";
                         }
                     }
                     else
@@ -167,6 +190,31 @@ namespace InformationRetrievalManager
                         DataProcessingStatus = "No data found! Use crawler to get data first.";
                     }
                 }
+
+                await Task.Delay(1);
+            });
+        }
+
+        private async Task RunQueryCommandRoutineAsync()
+        {
+            // TODO : we need to have a currently processing index name list to be able to say when we are able to touch the data 
+            // (as a feature update while multiple processing will run and we want to query only the instances that are not indexing/processing atm and visa/versa).
+
+            await RunCommandAsync(() => ProcessingCommandFlag, async () =>
+            {
+                var ii = new InvertedIndex("my_index", _fileManager, _logger);
+
+                QueryStatus = "Searching...";
+
+                int[] results = Array.Empty<int>();
+
+                await _taskManager.Run(async () =>
+                {
+                    ii.Load();
+                    results = await _queryIndexManager.QueryAsync(Query, ii.GetReadOnlyVocabulary(), QueryModelType.Boolean, _processingConfiguration, 10);
+                });
+
+                QueryStatus = "Results: [" + string.Join(",", results) + "]";
 
                 await Task.Delay(1);
             });

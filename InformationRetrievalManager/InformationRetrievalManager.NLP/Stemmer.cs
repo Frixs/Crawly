@@ -1,4 +1,5 @@
-﻿using Iveonik.Stemmers;
+﻿using InformationRetrievalManager.Core;
+using Iveonik.Stemmers;
 using System.Diagnostics;
 
 namespace InformationRetrievalManager.NLP

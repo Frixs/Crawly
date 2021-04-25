@@ -9,7 +9,7 @@ namespace InformationRetrievalManager.Crawler
     /// <summary>
     /// Base crawler manager
     /// </summary>
-    public class CrawlerManager : ICrawlerManager
+    public sealed class CrawlerManager : ICrawlerManager
     {
         #region Private Members (Injects)
 

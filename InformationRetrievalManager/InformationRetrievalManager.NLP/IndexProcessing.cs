@@ -1,6 +1,7 @@
 ﻿using InformationRetrievalManager.Core;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
 
 namespace InformationRetrievalManager.NLP
 {
@@ -47,7 +48,7 @@ namespace InformationRetrievalManager.NLP
         private StopWordRemover _stopWordRemover;
 
         /// <summary>
-        /// Inverted indexation
+        /// Document inverted indexation
         /// </summary>
         private IInvertedIndex _invertedIndex;
 
@@ -101,7 +102,7 @@ namespace InformationRetrievalManager.NLP
         /// <param name="removeAccentsAfterStemming">Should we remove accents from tokens after stemming?</param>
         public IndexProcessing(string name, Tokenizer tokenizer, Stemmer stemmer, StopWordRemover stopWordRemover = null, IFileManager fileManager = null, ILogger logger = null, bool toLowerCase = false, bool removeAccentsBeforeStemming = false, bool removeAccentsAfterStemming = false)
         {
-            // TODO: check name allowed characters
+            // TODO: check name allowed characters (should allow double underscore, but not in user inputs) - Names with double underscore are wildcards
             Name = name;
 
             _tokenizer = tokenizer ?? throw new ArgumentNullException(nameof(tokenizer));
@@ -116,19 +117,46 @@ namespace InformationRetrievalManager.NLP
             RemoveAccentsAfterStemming = removeAccentsAfterStemming;
         }
 
+        /// <summary>
+        /// Constructor with configuration as a parameter
+        /// </summary>
+        /// <param name="name">Name of the processing</param>
+        /// <param name="configuration">The configuration for the processing</param>
+        /// <param name="fileManager">File manager used used for storing the processed index (the index will be stored in-memory only if the manager is not set)</param>
+        /// <param name="logger">Connect logger from the rest of the system (if not set, the logger will not log anything)</param>
+        public IndexProcessing(string name, IndexProcessingConfiguration configuration, IFileManager fileManager = null, ILogger logger = null)
+        {
+            if (configuration == null)
+                throw new ArgumentNullException(nameof(configuration));
+
+            // TODO: check name allowed characters (should allow double underscore, but not in user inputs) - Names with double underscore are wildcards
+            Name = name;
+
+            _tokenizer = new Tokenizer(configuration.CustomRegex);
+            _stemmer = new Stemmer(configuration.Language);
+            _stopWordRemover = new StopWordRemover(configuration.Language, configuration.CustomStopWords);
+            _invertedIndex = new InvertedIndex(name, fileManager, logger);
+
+            _logger = logger;
+
+            ToLowerCase = configuration.ToLowerCase;
+            RemoveAccentsBeforeStemming = configuration.RemoveAccentsBeforeStemming;
+            RemoveAccentsAfterStemming = configuration.RemoveAccentsAfterStemming;
+        }
+
         #endregion
 
         #region Public Methods
 
         /// <summary>
-        /// Process the documents by the processing settings and indexate it. 
+        /// Go through the documents and run process for each of the documents according to the processing settings set initially onto this instance.
         /// Additionally, the method calls for inverted index to save data (if file manager was defined in constructor for this instance).
         /// </summary>
         /// <param name="documents">Array of the documents</param>
         /// <param name="save">Once the indexation will be done, the indexed data will be saved into file storage, and working in-memory storage will be cleared.</param>
         /// <param name="load">Loads already indexed data of <see cref="_invertedIndex"/> under the same <see cref="IReadOnlyInvertedIndex.Name"/> into working in-memory storage and <paramref name="documents"/> will be indexed into the loaded data as a addition.</param>
         /// <exception cref="ArgumentNullException">If the array is null</exception>
-        public void IndexDocuments(IndexDocumentDataModel[] documents, bool save = false, bool load = false)
+        public void IndexDocuments(IndexDocument[] documents, bool save = false, bool load = false)
         {
             if (documents == null)
                 throw new ArgumentNullException("Array of documents not specified!");
@@ -147,13 +175,13 @@ namespace InformationRetrievalManager.NLP
         }
 
         /// <summary>
-        /// Process the document by the processing settings and indexate it
+        /// Run process for the document according to the processing settings set initially onto this instance.
         /// </summary>
         /// <param name="document">The document</param>
         /// <param name="save">Once the indexation will be done, the indexed data will be saved into file storage, and working in-memory storage will be cleared.</param>
         /// <param name="load">Loads already indexed data of <see cref="_invertedIndex"/> under the same <see cref="IReadOnlyInvertedIndex.Name"/> into working in-memory storage and <paramref name="documents"/> will be indexed into the loaded data as a addition.</param>
         /// <exception cref="ArgumentNullException">If the document is null</exception>
-        public void IndexDocument(IndexDocumentDataModel document, bool save = false, bool load = false)
+        public void IndexDocument(IndexDocument document, bool save = false, bool load = false)
         {
             if (document == null)
                 throw new ArgumentNullException("Document not specified!");
@@ -165,37 +193,8 @@ namespace InformationRetrievalManager.NLP
             if (load)
                 _invertedIndex.Load();
 
-            // To lower
-            if (ToLowerCase)
-                docContent = docContent.ToLower();
-
-            // Remove newlines from the document to prepare the doc for tokenization
-            docContent = docContent.Replace(Environment.NewLine, " ");
-
-            // Remove accents before stemming
-            if (RemoveAccentsBeforeStemming)
-                docContent = RemoveAccents(docContent);
-
-            // Tokenize
-            var terms = _tokenizer.Tokenize(docContent);
-
-            // Remove stopwords
-            if (_stopWordRemover != null)
-                terms = _stopWordRemover.Process(terms);
-
-            // Go through all terms
-            for (int i = 0; i < terms.Length; ++i)
-            {
-                // Stemming
-                terms[i] = _stemmer.Stem(terms[i]);
-
-                // Remove accents after stemming
-                if (RemoveAccentsAfterStemming)
-                    terms[i] = RemoveAccents(terms[i]);
-
-                // Indexate it
-                _invertedIndex.Put(terms[i], document.Id);
-            }
+            // Process the data
+            _ = Process(docContent, document.Id, _invertedIndex);
 
             // Save indexed data
             if (save)
@@ -203,11 +202,49 @@ namespace InformationRetrievalManager.NLP
         }
 
         /// <summary>
-        /// Process the word (no sentence is expected - just a word) by the processing settings
+        /// Run process for the text independently of the rest of this instance (documents) and get the indexed vocabulary instantly.
         /// </summary>
-        /// <returns>Processed word</returns>
+        /// <param name="text">The text</param>
+        /// <returns>Indexed vocabulary based on the <paramref name="text"/>. The structure is the same as <see cref="InvertedIndex._vocabulary"/> with the only document here (ID=0).</returns>
+        public IReadOnlyDictionary<string, IReadOnlyDictionary<int, IReadOnlyTermInfo>> IndexText(string text)
+        {
+            if (text == null)
+                throw new ArgumentNullException("Text not specified!");
+
+            // Define inverted index instance special for separate query indexing...
+            var ii = new InvertedIndex(Name + "(query)", null, _logger);
+
+            // Process the text data
+            _ = Process(text, 0, ii);
+
+            // Return the vocabulary straight back
+            return ii.GetReadOnlyVocabulary();
+        }
+
+        /// <summary>
+        /// Process the <paramref name="text"/> by the processing settings. 
+        /// </summary>
+        /// <param name="text">The text</param>
+        /// <returns>Processed text into terms.</returns>
+        public string[] ProcessText(string text)
+        {
+            if (text == null)
+                throw new ArgumentNullException("Text not specified!");
+
+            return Process(text, -1);
+        }
+
+        /// <summary>
+        /// Process the <paramref name="word"/> (no sentence/text is expected - just a word) by the processing settings. 
+        /// The process follows <see cref="Process"/>.
+        /// </summary>
+        /// <param name="word">The word to be processed.</param>
+        /// <returns>Processed word.</returns>
         public string ProcessWord(string word)
         {
+            if (word == null)
+                throw new ArgumentNullException("Word not specified!");
+
             // To lower
             if (ToLowerCase)
                 word = word.ToLower();
@@ -228,7 +265,52 @@ namespace InformationRetrievalManager.NLP
 
         #endregion
 
-        #region Private Methods
+        #region Private Helpers
+
+        /// <summary>
+        /// Process specific text by the processing settings and indexate it according to <paramref name="documentId"/> (only if <paramref name="invertedIndex"/> is defined).
+        /// </summary>
+        /// <param name="text">The text</param>
+        /// <param name="documentId">The document ID for indexation (If <paramref name="invertedIndex"/> is not defined, indexation will not proceed and this parameter will be ignored).</param>
+        /// <param name="invertedIndex">Inverted index instance used for the indexation.</param>
+        /// <returns>Processed terms</returns>
+        private string[] Process(string text, int documentId, IInvertedIndex invertedIndex = null)
+        {
+            // To lower
+            if (ToLowerCase)
+                text = text.ToLower();
+
+            // Remove newlines from the document to prepare the doc for tokenization
+            text = text.Replace(Environment.NewLine, " ");
+
+            // Remove accents before stemming
+            if (RemoveAccentsBeforeStemming)
+                text = RemoveAccents(text);
+
+            // Tokenize
+            var terms = _tokenizer.Tokenize(text);
+
+            // Remove stopwords
+            if (_stopWordRemover != null)
+                terms = _stopWordRemover.Process(terms);
+
+            // Go through all terms
+            for (int i = 0; i < terms.Length; ++i)
+            {
+                // Stemming
+                terms[i] = _stemmer.Stem(terms[i]);
+
+                // Remove accents after stemming
+                if (RemoveAccentsAfterStemming)
+                    terms[i] = RemoveAccents(terms[i]);
+
+                // Indexate it
+                if (invertedIndex != null)
+                    invertedIndex.Put(terms[i], documentId);
+            }
+
+            return terms;
+        }
 
         /// <summary>
         /// Remove accents from text

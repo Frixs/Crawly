@@ -14,6 +14,11 @@ namespace InformationRetrievalManager.Crawler
         public string Title { get; set; }
 
         /// <summary>
+        /// Source URL of the data
+        /// </summary>
+        public string SourceUrl { get; set; }
+
+        /// <summary>
         /// Category (of specific article)
         /// </summary>
         public string Category { get; set; }

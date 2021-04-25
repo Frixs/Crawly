@@ -1,4 +1,4 @@
-﻿
+﻿using InformationRetrievalManager.Core;
 using Microsoft.ML;
 using Microsoft.ML.Transforms.Text;
 using System;

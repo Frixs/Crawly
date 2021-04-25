@@ -1,5 +1,5 @@
 ﻿
-namespace InformationRetrievalManager.NLP
+namespace InformationRetrievalManager.Core
 {
     /// <summary>
     /// Supported languages for NLP processing

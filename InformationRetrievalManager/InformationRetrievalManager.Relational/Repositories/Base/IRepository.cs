@@ -9,7 +9,7 @@ namespace InformationRetrievalManager.Relational
     /// General database repository interface
     /// </summary>
     /// <typeparam name="TEntity">Data model representing data set of the repository</typeparam>
-    internal interface IRepository<TEntity>
+    public interface IRepository<TEntity>
         where TEntity : class
     {
         /// <summary>
