@@ -180,6 +180,16 @@
                             </Path>
                         </Grid>
                     </Canvas>
+
+                    <!--  Guide BTN  -->
+                    <Button
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Top"
+                        Command="{Binding GoToHowToPageCommand}"
+                        Content="{StaticResource FontAwesomeQuestionmarkIcon}"
+                        FontFamily="{StaticResource FontAwesomeSolid}"
+                        FontSize="16"
+                        Style="{StaticResource LightDarkTextButton}" />
                 </Grid>
             </Border>
 
