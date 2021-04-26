@@ -247,8 +247,53 @@
 
                         <!--  Instance Wrapper  -->
                         <Grid Grid.Row="1" HorizontalAlignment="Center">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+
                             <!--  Data Instance View  -->
-                            <local:DataInstanceView d:DataContext="{x:Static local:DataInstanceView.DesignInstance}" Items="{Binding DataInstances}" />
+                            <local:DataInstanceView
+                                Grid.Row="0"
+                                d:DataContext="{x:Static local:DataInstanceView.DesignInstance}"
+                                ItemCommand="{Binding GoToDataInstanceCommand}"
+                                Items="{Binding DataInstances}">
+                                <local:DataInstanceView.Style>
+                                    <Style TargetType="{x:Type local:DataInstanceView}">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding DataInstances, Converter={local:CollectionHasAnyItemsConverter}}" Value="False">
+                                                <Setter Property="Visibility" Value="Collapsed" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </local:DataInstanceView.Style>
+                            </local:DataInstanceView>
+
+                            <!--  Create BTN  -->
+                            <Border
+                                Grid.Row="1"
+                                Width="235"
+                                Height="50"
+                                Margin="0,15,0,0"
+                                BorderThickness="7">
+                                <Border.BorderBrush>
+                                    <VisualBrush>
+                                        <VisualBrush.Visual>
+                                            <Rectangle
+                                                Width="{Binding RelativeSource={RelativeSource AncestorType={x:Type Border}}, Path=ActualWidth}"
+                                                Height="{Binding RelativeSource={RelativeSource AncestorType={x:Type Border}}, Path=ActualHeight}"
+                                                Stroke="{StaticResource CreateDarkButtonBorderBrushKey}"
+                                                StrokeDashArray="19 12"
+                                                StrokeThickness="5" />
+                                        </VisualBrush.Visual>
+                                    </VisualBrush>
+                                </Border.BorderBrush>
+                                <Button
+                                    Command="{Binding CreateNewDataInstanceCommand}"
+                                    Content="CREATE NEW DATA INSTANCE"
+                                    Style="{StaticResource CreateDarkButton}" />
+                            </Border>
                         </Grid>
                     </Grid>
 

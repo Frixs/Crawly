@@ -9,7 +9,7 @@
     d:DataContext="{x:Static local:DataInstanceView.DesignInstance}"
     mc:Ignorable="d">
     <Grid>
-        <ItemsControl ItemsSource="{Binding Items}">
+        <ItemsControl d:ItemsSource="{Binding Items}" ItemsSource="{Binding Items, ElementName=this}">
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
                     <WrapPanel Margin="5,5,5,0" Orientation="Horizontal" />
@@ -20,6 +20,8 @@
                 <DataTemplate>
                     <Button
                         Margin="5"
+                        Command="{Binding ItemCommand, ElementName=this}"
+                        CommandParameter="{Binding Id}"
                         Content="{Binding Name}"
                         Style="{StaticResource RegularButton}" />
                 </DataTemplate>

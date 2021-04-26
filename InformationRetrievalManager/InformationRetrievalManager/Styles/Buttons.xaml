@@ -19,7 +19,7 @@
         </Setter>
     </Style>
 
-    <!--  Regular Button  -->
+    <!--#region RegularButton-->
     <Style
         x:Key="RegularButton"
         BasedOn="{StaticResource Hoverless}"
@@ -114,5 +114,103 @@
             </Setter.Value>
         </Setter>
     </Style>
+    <!--#endregion-->
+
+    <!--#region CreateDarkButton-->
+    <Style
+        x:Key="CreateDarkButton"
+        BasedOn="{StaticResource Hoverless}"
+        TargetType="{x:Type Button}">
+        <Setter Property="Background" Value="{StaticResource CreateDarkButtonBackgroundBrushKey}" />
+        <Setter Property="Foreground" Value="{StaticResource CreateDarkButtonForegroundBrushKey}" />
+        <Setter Property="FontFamily" Value="{StaticResource DosisBold}" />
+        <Setter Property="FontSize" Value="20" />
+        <Setter Property="Cursor" Value="Hand" />
+
+        <Setter Property="local:IsBusyProperty.Value" Value="False" />
+
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ButtonBase}">
+                    <Border
+                        x:Name="border"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="0"
+                        SnapsToDevicePixels="True">
+                        <Grid>
+                            <TextBlock
+                                Margin="{TemplateBinding Padding}"
+                                HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                Focusable="False"
+                                FontFamily="{TemplateBinding FontFamily}"
+                                SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
+                                Text="{TemplateBinding Content}"
+                                Visibility="{TemplateBinding local:IsBusyProperty.Value,
+                                                             Converter={local:BooleanToVisibilityConverter}}" />
+                            <TextBlock
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Style="{StaticResource SpinningText}"
+                                Visibility="{TemplateBinding local:IsBusyProperty.Value,
+                                                             Converter={local:BooleanToVisibilityConverter},
+                                                             ConverterParameter=True}">
+                                <TextBlock.RenderTransform>
+                                    <RotateTransform />
+                                </TextBlock.RenderTransform>
+                            </TextBlock>
+                        </Grid>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <!--  Hover On  -->
+                        <EventTrigger RoutedEvent="MouseEnter">
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <ColorAnimation
+                                        Storyboard.TargetName="border"
+                                        Storyboard.TargetProperty="Background.Color"
+                                        To="{StaticResource CreateDarkButtonHoverBackground}"
+                                        Duration="0:0:0.1" />
+                                    <ColorAnimation
+                                        Storyboard.TargetProperty="Foreground.Color"
+                                        To="{StaticResource CreateDarkButtonHoverForeground}"
+                                        Duration="0:0:0.1" />
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
+                        <!--  Hover Off  -->
+                        <EventTrigger RoutedEvent="MouseLeave">
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <ColorAnimation
+                                        Storyboard.TargetName="border"
+                                        Storyboard.TargetProperty="Background.Color"
+                                        To="{StaticResource CreateDarkButtonBackground}"
+                                        Duration="0:0:0.1" />
+                                    <ColorAnimation
+                                        Storyboard.TargetProperty="Foreground.Color"
+                                        To="{StaticResource CreateDarkButtonForeground}"
+                                        Duration="0:0:0.1" />
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
+                        <!--  IsPressed - Action  -->
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter Property="Foreground" Value="{StaticResource CreateDarkButtonActionForegroundBrushKey}" />
+                            <Setter TargetName="border" Property="Background" Value="{StaticResource CreateDarkButtonActionBackgroundBrushKey}" />
+                        </Trigger>
+                        <!--  IsEnabled  -->
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="border" Property="Background" Value="{StaticResource CreateDarkButtonHoverBackgroundBrushKey}" />
+                            <Setter Property="Opacity" Value="0.6" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <!--#endregion-->
 
 </ResourceDictionary>

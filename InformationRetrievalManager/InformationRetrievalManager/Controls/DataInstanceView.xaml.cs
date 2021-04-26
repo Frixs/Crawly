@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace InformationRetrievalManager
 {
@@ -37,8 +38,15 @@ namespace InformationRetrievalManager
             get { return (ObservableCollection<DataInstanceDataModel>)GetValue(ItemsProperty); }
             set { SetValue(ItemsProperty, value); }
         }
-        // Using a DependencyProperty as the backing store for Text1.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty ItemsProperty =
             DependencyProperty.Register(nameof(Items), typeof(ObservableCollection<DataInstanceDataModel>), typeof(DataInstanceView));
+
+        public ICommand ItemCommand
+        {
+            get { return (ICommand)GetValue(ItemCommandProperty); }
+            set { SetValue(ItemCommandProperty, value); }
+        }
+        public static readonly DependencyProperty ItemCommandProperty =
+            DependencyProperty.Register(nameof(ItemCommand), typeof(ICommand), typeof(DataInstanceView));
     }
 }
