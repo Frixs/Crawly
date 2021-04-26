@@ -88,6 +88,7 @@
                                 Margin="56,0,-56,-57"
                                 VerticalAlignment="Bottom"
                                 Panel.ZIndex="1"
+                                FontFamily="{StaticResource DosisRegular}"
                                 FontSize="16"
                                 Opacity="0"
                                 Text="Howdy!">
@@ -111,6 +112,7 @@
                                 Margin="108,0,-108,-57"
                                 VerticalAlignment="Bottom"
                                 Panel.ZIndex="1"
+                                FontFamily="{StaticResource DosisRegular}"
                                 FontSize="16"
                                 Opacity="0"
                                 Text="I'm Crawly!">
@@ -135,6 +137,7 @@
                                 Margin="38,0,-40,-85"
                                 VerticalAlignment="Bottom"
                                 Panel.ZIndex="1"
+                                FontFamily="{StaticResource DosisRegular}"
                                 FontSize="13"
                                 Opacity="0"
                                 Text="The web crawler &amp; data indexer!">
@@ -236,18 +239,14 @@
                         <TextBlock
                             Grid.Row="0"
                             Margin="0,0,0,15"
+                            HorizontalAlignment="Center"
                             FontFamily="{StaticResource Pacifico}"
                             FontSize="48"
                             Foreground="{StaticResource LightColorAltBrushKey}"
                             Text="Crawly" />
 
-                        <Grid Grid.Row="1">
-                            <TextBlock
-                                HorizontalAlignment="Center"
-                                VerticalAlignment="Center"
-                                FontFamily="{StaticResource DosisBold}"
-                                Foreground="{StaticResource ForegroundInvBrushKey}"
-                                Text="TODO BUTTONS" />
+                        <!--  Instance Wrapper  -->
+                        <Grid Grid.Row="1" HorizontalAlignment="Center">
                             <!--  Data Instance View  -->
                             <local:DataInstanceView d:DataContext="{x:Static local:DataInstanceView.DesignInstance}" Items="{Binding DataInstances}" />
                         </Grid>

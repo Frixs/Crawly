@@ -1,5 +1,4 @@
-﻿
-using InformationRetrievalManager.Relational;
+﻿using InformationRetrievalManager.Relational;
 using System.Collections.ObjectModel;
 
 namespace InformationRetrievalManager

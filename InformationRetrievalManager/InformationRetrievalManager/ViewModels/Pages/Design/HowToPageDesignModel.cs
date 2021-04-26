@@ -1,5 +1,4 @@
-﻿
-namespace InformationRetrievalManager
+﻿namespace InformationRetrievalManager
 {
     public class HowToPageDesignModel : HowToPageViewModel
     {
