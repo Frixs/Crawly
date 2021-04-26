@@ -1,11 +1,13 @@
 ﻿using InformationRetrievalManager.Core;
 using InformationRetrievalManager.Crawler;
 using InformationRetrievalManager.NLP;
+using InformationRetrievalManager.Relational;
 using Ixs.DNA;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -43,6 +45,11 @@ namespace InformationRetrievalManager
         #endregion
 
         #region Public Properties
+
+        /// <summary>
+        /// Collection of data instances created in this app by the user
+        /// </summary>
+        public ObservableCollection<DataInstanceDataModel> DataInstances { get; set; }
 
         public bool IsCurrentlyCrawlingFlag { get; set; }
 

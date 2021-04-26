@@ -390,6 +390,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Controls\DataInstanceView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Pages\HomePage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -440,6 +444,9 @@
     <Compile Include="AttachedProperties\NoFrameHistory.cs" />
     <Compile Include="Controls\Base\PageHost.xaml.cs">
       <DependentUpon>PageHost.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\DataInstanceView.xaml.cs">
+      <DependentUpon>DataInstanceView.xaml</DependentUpon>
     </Compile>
     <Compile Include="DataTypes\ApplicationPage.cs" />
     <Compile Include="DI\DI.cs" />

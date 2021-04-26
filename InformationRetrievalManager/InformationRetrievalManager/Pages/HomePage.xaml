@@ -222,22 +222,36 @@
                         </Border.OpacityMask>
                     </Border>
 
-                    <!--  Title  -->
-                    <TextBlock
+                    <!--  Content  -->
+                    <Grid
                         Margin="0,-15,0,0"
                         HorizontalAlignment="Center"
-                        VerticalAlignment="Top"
-                        FontFamily="{StaticResource Pacifico}"
-                        FontSize="48"
-                        Foreground="{StaticResource LightColorAltBrushKey}"
-                        Text="Crawly" />
+                        VerticalAlignment="Top">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
 
-                    <TextBlock
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Center"
-                        FontFamily="{StaticResource DosisBold}"
-                        Foreground="{StaticResource ForegroundInvBrushKey}"
-                        Text="TODO BUTTONS" />
+                        <!--  Title  -->
+                        <TextBlock
+                            Grid.Row="0"
+                            Margin="0,0,0,15"
+                            FontFamily="{StaticResource Pacifico}"
+                            FontSize="48"
+                            Foreground="{StaticResource LightColorAltBrushKey}"
+                            Text="Crawly" />
+
+                        <Grid Grid.Row="1">
+                            <TextBlock
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                FontFamily="{StaticResource DosisBold}"
+                                Foreground="{StaticResource ForegroundInvBrushKey}"
+                                Text="TODO BUTTONS" />
+                            <!--  Data Instance View  -->
+                            <local:DataInstanceView d:DataContext="{x:Static local:DataInstanceView.DesignInstance}" Items="{Binding DataInstances}" />
+                        </Grid>
+                    </Grid>
 
                     <!--  Copyright  -->
                     <TextBlock
