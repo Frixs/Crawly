@@ -36,6 +36,8 @@ namespace InformationRetrievalManager
 
         #region Public Properties
 
+        public bool DataLoaded { get; set; }
+
         /// <summary>
         /// Collection of data instances created in this app by the user
         /// </summary>
@@ -257,6 +259,9 @@ namespace InformationRetrievalManager
             DataInstances = new ObservableCollection<DataInstanceDataModel>(
                 _uow.DataInstances.Get(null, q => q.OrderBy(o => o.Name))
                 );
+            
+            DataLoaded = true;
+            await Task.Delay(1);
         }
 
         #endregion

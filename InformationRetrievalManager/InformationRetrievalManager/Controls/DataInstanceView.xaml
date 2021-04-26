@@ -7,12 +7,20 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     x:Name="this"
     d:DataContext="{x:Static local:DataInstanceView.DesignInstance}"
+    d:MaxWidth="380"
     mc:Ignorable="d">
-    <Grid>
+    <ScrollViewer
+        Padding="5"
+        HorizontalScrollBarVisibility="Disabled"
+        VerticalScrollBarVisibility="Auto">
+        <ScrollViewer.Background>
+            <SolidColorBrush Opacity="0.1" Color="{StaticResource LightColorDry}" />
+        </ScrollViewer.Background>
+
         <ItemsControl d:ItemsSource="{Binding Items}" ItemsSource="{Binding Items, ElementName=this}">
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
-                    <WrapPanel Margin="5,5,5,0" Orientation="Horizontal" />
+                    <local:AlignableWrapPanel HorizontalContentAlignment="Center" Orientation="Horizontal" />
                 </ItemsPanelTemplate>
             </ItemsControl.ItemsPanel>
 
@@ -20,12 +28,14 @@
                 <DataTemplate>
                     <Button
                         Margin="5"
+                        Padding="10,5,10,5"
                         Command="{Binding ItemCommand, ElementName=this}"
                         CommandParameter="{Binding Id}"
                         Content="{Binding Name}"
-                        Style="{StaticResource RegularButton}" />
+                        FontSize="18"
+                        Style="{StaticResource DarkLightButton}" />
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
-    </Grid>
+    </ScrollViewer>
 </UserControl>

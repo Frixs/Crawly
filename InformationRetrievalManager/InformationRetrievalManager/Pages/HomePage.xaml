@@ -226,10 +226,7 @@
                     </Border>
 
                     <!--  Content  -->
-                    <Grid
-                        Margin="0,-15,0,0"
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Top">
+                    <Grid Margin="0,-15,0,0" VerticalAlignment="Top">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="*" />
@@ -246,10 +243,34 @@
                             Text="Crawly" />
 
                         <!--  Instance Wrapper  -->
-                        <Grid Grid.Row="1" HorizontalAlignment="Center">
+                        <Grid Grid.Row="1">
+                            <!--  Load animation  -->
+                            <Grid.Style>
+                                <Style TargetType="{x:Type Grid}">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding DataLoaded}" Value="True">
+                                            <Setter Property="Opacity" Value="0" />
+                                            <Setter Property="Visibility" Value="Visible" />
+                                            <DataTrigger.EnterActions>
+                                                <BeginStoryboard>
+                                                    <Storyboard>
+                                                        <DoubleAnimation
+                                                            BeginTime="0:0:0.1"
+                                                            Storyboard.TargetProperty="(Grid.Opacity)"
+                                                            From="0"
+                                                            To="1"
+                                                            Duration="0:0:0.1" />
+                                                    </Storyboard>
+                                                </BeginStoryboard>
+                                            </DataTrigger.EnterActions>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Grid.Style>
                             <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto" />
                                 <RowDefinition Height="*" />
+                                <RowDefinition Height="Auto" />
                             </Grid.RowDefinitions>
 
                             <!--  Data Instance View  -->
@@ -283,7 +304,7 @@
                                             <Rectangle
                                                 Width="{Binding RelativeSource={RelativeSource AncestorType={x:Type Border}}, Path=ActualWidth}"
                                                 Height="{Binding RelativeSource={RelativeSource AncestorType={x:Type Border}}, Path=ActualHeight}"
-                                                Stroke="{StaticResource CreateDarkButtonBorderBrushKey}"
+                                                Stroke="{StaticResource DarkDarkButtonBorderBrushKey}"
                                                 StrokeDashArray="19 12"
                                                 StrokeThickness="5" />
                                         </VisualBrush.Visual>
@@ -292,9 +313,50 @@
                                 <Button
                                     Command="{Binding CreateNewDataInstanceCommand}"
                                     Content="CREATE NEW DATA INSTANCE"
-                                    Style="{StaticResource CreateDarkButton}" />
+                                    FontSize="14"
+                                    Style="{StaticResource DarkDarkButton}" />
                             </Border>
                         </Grid>
+                        <!--  Instance Wrapper Loading  -->
+                        <Border
+                            Grid.Row="1"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Top">
+                            <!--  Unload animation  -->
+                            <Border.Style>
+                                <Style TargetType="{x:Type Border}">
+                                    <Setter Property="Visibility" Value="Visible" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding DataLoaded}" Value="True">
+                                            <DataTrigger.EnterActions>
+                                                <BeginStoryboard>
+                                                    <Storyboard>
+                                                        <DoubleAnimation
+                                                            Storyboard.TargetProperty="(Grid.Opacity)"
+                                                            From="1"
+                                                            To="0"
+                                                            Duration="0:0:0.1" />
+                                                    </Storyboard>
+                                                </BeginStoryboard>
+                                                <BeginStoryboard>
+                                                    <Storyboard>
+                                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Visibility">
+                                                            <DiscreteObjectKeyFrame KeyTime="0:0:0.1" Value="{x:Static Visibility.Collapsed}" />
+                                                        </ObjectAnimationUsingKeyFrames>
+                                                    </Storyboard>
+                                                </BeginStoryboard>
+                                            </DataTrigger.EnterActions>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Border.Style>
+                            <!--  Spinner  -->
+                            <TextBlock
+                                FontSize="28"
+                                Foreground="{StaticResource LightColorAlt2BrushKey}"
+                                Opacity="0.4"
+                                Style="{StaticResource SpinningText}" />
+                        </Border>
                     </Grid>
 
                     <!--  Copyright  -->
