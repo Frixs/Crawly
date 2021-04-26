@@ -11,13 +11,4 @@
         <Setter Property="Margin" Value="0,0,0,50" />
     </Style>
 
-    <!--  Window background style color  -->
-    <Style x:Key="WindowBackgroundPanelStyle" TargetType="{x:Type Panel}">
-        <Setter Property="Background" Value="{StaticResource BackgroundBrushKey}" />
-    </Style>
-    <!--  Window background style color  -->
-    <Style x:Key="WindowBackgroundControlStyle" TargetType="{x:Type Control}">
-        <Setter Property="Background" Value="{StaticResource BackgroundBrushKey}" />
-    </Style>
-
 </ResourceDictionary>
