@@ -8,7 +8,7 @@
     <Style BasedOn="{StaticResource BaseStyle}" TargetType="{x:Type TextBox}">
 
         <Setter Property="FontSize" Value="14" />
-        <Setter Property="FontFamily" Value="{StaticResource MplusMedium}" />
+        <Setter Property="FontFamily" Value="{StaticResource DosisMedium}" />
         <Setter Property="Padding" Value="10" />
         <Setter Property="Margin" Value="0" />
         <Setter Property="Background" Value="{StaticResource InputBackgroundBrushKey}" />
@@ -39,7 +39,7 @@
                             Padding="{TemplateBinding Padding}"
                             HorizontalAlignment="{TemplateBinding HorizontalAlignment}"
                             VerticalAlignment="Center"
-                            FontFamily="{StaticResource MplusMedium}"
+                            FontFamily="{StaticResource DosisMedium}"
                             Foreground="{StaticResource InputPlaceholderForegroundBrushKey}"
                             IsHitTestVisible="False"
                             Text="{TemplateBinding Tag}">
@@ -112,7 +112,7 @@
         TargetType="{x:Type TextBox}">
 
         <Setter Property="FontSize" Value="12" />
-        <Setter Property="FontFamily" Value="{StaticResource MplusMedium}" />
+        <Setter Property="FontFamily" Value="{StaticResource DosisMedium}" />
         <Setter Property="Padding" Value="5" />
         <Setter Property="Margin" Value="0" />
         <Setter Property="BorderBrush" Value="{StaticResource InputBorderBackgroundBrushKey}" />
@@ -141,7 +141,7 @@
                             Padding="{TemplateBinding Padding}"
                             HorizontalAlignment="{TemplateBinding HorizontalAlignment}"
                             VerticalAlignment="Center"
-                            FontFamily="{StaticResource MplusMedium}"
+                            FontFamily="{StaticResource DosisMedium}"
                             Foreground="{StaticResource InputPlaceholderForegroundBrushKey}"
                             IsHitTestVisible="False"
                             Text="{TemplateBinding Tag}">
@@ -204,7 +204,7 @@
     <!--  Checkbox Input  -->
     <Style BasedOn="{StaticResource BaseStyle}" TargetType="{x:Type CheckBox}">
         <Setter Property="FontSize" Value="14" />
-        <Setter Property="FontFamily" Value="{StaticResource MplusMedium}" />
+        <Setter Property="FontFamily" Value="{StaticResource DosisMedium}" />
         <Setter Property="Padding" Value="10" />
         <Setter Property="Margin" Value="0" />
         <Setter Property="Background" Value="{StaticResource InputBackgroundBrushKey}" />
@@ -251,7 +251,7 @@
     <!--  Radio Input  -->
     <Style BasedOn="{StaticResource BaseStyle}" TargetType="{x:Type RadioButton}">
         <Setter Property="FontSize" Value="14" />
-        <Setter Property="FontFamily" Value="{StaticResource MplusMedium}" />
+        <Setter Property="FontFamily" Value="{StaticResource DosisMedium}" />
         <Setter Property="Padding" Value="10" />
         <Setter Property="Margin" Value="0" />
         <Setter Property="Background" Value="{StaticResource InputBackgroundBrushKey}" />
@@ -280,7 +280,7 @@
     <!--  ComboBox Input  -->
     <Style BasedOn="{StaticResource BaseStyle}" TargetType="{x:Type ComboBox}">
         <Setter Property="FontSize" Value="14" />
-        <Setter Property="FontFamily" Value="{StaticResource MplusMedium}" />
+        <Setter Property="FontFamily" Value="{StaticResource DosisMedium}" />
         <Setter Property="Padding" Value="10" />
         <Setter Property="Margin" Value="0" />
         <Setter Property="Background" Value="{StaticResource InputBackgroundBrushKey}" />
@@ -317,7 +317,7 @@
     <!--  Integer Input  -->
     <Style BasedOn="{StaticResource BaseStyle}" TargetType="{x:Type xctk:IntegerUpDown}">
         <Setter Property="FontSize" Value="14" />
-        <Setter Property="FontFamily" Value="{StaticResource MplusMedium}" />
+        <Setter Property="FontFamily" Value="{StaticResource DosisMedium}" />
         <Setter Property="Padding" Value="10" />
         <Setter Property="Margin" Value="0" />
         <Setter Property="Background" Value="{StaticResource InputBackgroundBrushKey}" />
@@ -354,7 +354,7 @@
     <!--  Double Input  -->
     <Style BasedOn="{StaticResource BaseStyle}" TargetType="{x:Type xctk:DoubleUpDown}">
         <Setter Property="FontSize" Value="14" />
-        <Setter Property="FontFamily" Value="{StaticResource MplusMedium}" />
+        <Setter Property="FontFamily" Value="{StaticResource DosisMedium}" />
         <Setter Property="Padding" Value="10" />
         <Setter Property="Margin" Value="0" />
         <Setter Property="Background" Value="{StaticResource InputBackgroundBrushKey}" />
@@ -391,7 +391,7 @@
     <!--  TimeSpan Input  -->
     <Style BasedOn="{StaticResource BaseStyle}" TargetType="{x:Type xctk:TimeSpanUpDown}">
         <Setter Property="FontSize" Value="14" />
-        <Setter Property="FontFamily" Value="{StaticResource MplusMedium}" />
+        <Setter Property="FontFamily" Value="{StaticResource DosisMedium}" />
         <Setter Property="Padding" Value="10" />
         <Setter Property="Margin" Value="0" />
         <Setter Property="Background" Value="{StaticResource InputBackgroundBrushKey}" />

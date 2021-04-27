@@ -413,6 +413,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Controls\Inputs\TextEntry.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Controls\ProcessingConfigurationForm.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -482,6 +486,9 @@
     <Compile Include="Controls\CrawlerConfigurationForm.xaml.cs">
       <DependentUpon>CrawlerConfigurationForm.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\Inputs\TextEntry.xaml.cs">
+      <DependentUpon>TextEntry.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Controls\ProcessingConfigurationForm.xaml.cs">
       <DependentUpon>ProcessingConfigurationForm.xaml</DependentUpon>
     </Compile>
@@ -523,9 +530,12 @@
     <Compile Include="ValueConverters\CollectionHasAnyItemsConverter.cs" />
     <Compile Include="ViewModelsWPF\ViewModelLocator.cs" />
     <Compile Include="ViewModels\ApplicationViewModel.cs" />
+    <Compile Include="ViewModels\Base\BaseEntryViewModel.cs" />
     <Compile Include="ViewModels\Base\BaseViewModel.cs" />
     <Compile Include="ViewModels\Base\RelayCommand.cs" />
     <Compile Include="ViewModels\Base\RelayParameterizedCommand.cs" />
+    <Compile Include="ViewModels\Inputs\Design\TextEntryDesignModel.cs" />
+    <Compile Include="ViewModels\Inputs\TextEntryViewModel.cs" />
     <Compile Include="ViewModels\Pages\CreateDataInstancePageViewModel.cs" />
     <Compile Include="ViewModels\Pages\DataInstancePageViewModel.cs" />
     <Compile Include="ViewModels\Pages\Design\CreateDataInstancePageDesignModel.cs" />
@@ -619,6 +629,7 @@
   <ItemGroup>
     <Resource Include="Resources\Images\texture_data_seamless.png" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\Fody.6.3.0\build\Fody.targets" Condition="Exists('..\packages\Fody.6.3.0\build\Fody.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
