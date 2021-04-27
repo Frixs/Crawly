@@ -3,11 +3,11 @@
 namespace InformationRetrievalManager
 {
     /// <summary>
-    /// Interaction logic for CheckboxEntry.xaml
+    /// Interaction logic for CheckEntry.xaml
     /// </summary>
-    public partial class CheckboxEntry : UserControl
+    public partial class CheckEntry : UserControl
     {
-        public CheckboxEntry()
+        public CheckEntry()
         {
             InitializeComponent();
         }

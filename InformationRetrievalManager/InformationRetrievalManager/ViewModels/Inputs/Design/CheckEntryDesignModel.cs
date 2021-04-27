@@ -1,13 +1,13 @@
 ﻿namespace InformationRetrievalManager
 {
-    public class CheckboxEntryDesignModel : CheckboxEntryViewModel
+    public class CheckEntryDesignModel : CheckEntryViewModel
     {
         #region New Instance Getter (Design)
 
         /// <summary>
         /// Create a new instance of this class.
         /// </summary>
-        public static CheckboxEntryDesignModel Instance => new CheckboxEntryDesignModel();
+        public static CheckEntryDesignModel Instance => new CheckEntryDesignModel();
 
         #endregion
 
@@ -16,7 +16,7 @@
         /// <summary>
         /// Default constructor
         /// </summary>
-        public CheckboxEntryDesignModel()
+        public CheckEntryDesignModel()
         {
 
         }

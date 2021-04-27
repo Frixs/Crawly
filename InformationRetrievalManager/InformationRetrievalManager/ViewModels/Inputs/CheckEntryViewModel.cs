@@ -5,7 +5,7 @@ namespace InformationRetrievalManager
     /// <summary>
     /// The view model for a checkbox entry
     /// <summary>
-    public class CheckboxEntryViewModel : BaseEntryViewModel<bool>
+    public class CheckEntryViewModel : BaseEntryViewModel<bool>
     {
         #region Public Properties
 
@@ -19,7 +19,7 @@ namespace InformationRetrievalManager
         /// <summary>
         /// Default constructor
         /// </summary>
-        public CheckboxEntryViewModel() : base()
+        public CheckEntryViewModel() : base()
         {
         }
 
