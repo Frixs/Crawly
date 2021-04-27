@@ -511,6 +511,9 @@
     </Compile>
     <Compile Include="UI\IUIManager.cs" />
     <Compile Include="UI\UIManager.cs" />
+    <Compile Include="ValidationRules\Base\BaseValidationRule.cs" />
+    <Compile Include="ValidationRules\DataIntegerValidationRule.cs" />
+    <Compile Include="ValidationRules\DataStringValidationRule.cs" />
     <Compile Include="ValueConverters\Base\ApplicationPageHelpers.cs" />
     <Compile Include="ValueConverters\Base\BaseMultiValueConverter.cs" />
     <Compile Include="ValueConverters\Base\BaseValueConverter.cs" />
