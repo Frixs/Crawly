@@ -18,7 +18,7 @@
 
         <Button
             VerticalAlignment="Bottom"
-            Command="{Binding GoToHomePageCommand}"
+            Command="{Binding GoToHomePageCommand, Mode=OneTime}"
             Content="GO BACK" />
     </Grid>
 </local:BasePage>

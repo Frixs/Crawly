@@ -37,6 +37,7 @@
 
     <!--  FA Icons  -->
     <system:String x:Key="FontAwesomeCircleNotchIcon">&#xf1ce;</system:String>
+    <system:String x:Key="FontAwesomeExclamationCircleIcon">&#xf06a;</system:String>
     <system:String x:Key="FontAwesomeQuestionmarkIcon">&#xf128;</system:String>
 
 </ResourceDictionary>

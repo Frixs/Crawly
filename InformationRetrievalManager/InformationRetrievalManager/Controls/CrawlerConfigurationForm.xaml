@@ -12,28 +12,6 @@
     d:DesignWidth="800"
     mc:Ignorable="d">
     <Grid>
-
-        <TextBox
-            Margin="10,7"
-            Padding="5,3.5"
-            VerticalAlignment="Center"
-            FontSize="14"
-            MaxLength="255">
-            <!--
-            <TextBox.Resources>
-                <local:BindingProxy x:Key="TargetProxy" Data="{Binding Validation}" />
-            </TextBox.Resources>
-            <TextBox.Text>
-                <Binding Path="EditedValue" UpdateSourceTrigger="PropertyChanged">
-                    <Binding.ValidationRules>
-                        <local:DataStringValidationRule ValidationStep="UpdatedValue">
-                            <local:ValidationStringAttributeProperty Value="{Binding Data, Source={StaticResource TargetProxy}}" />
-                        </local:DataStringValidationRule>
-                    </Binding.ValidationRules>
-                </Binding>
-            </TextBox.Text>
-            -->
-        </TextBox>
-
+        <local:TextEntry DataContext="{Binding FormContext.SiteAddress, ElementName=this, Mode=OneTime}" />
     </Grid>
 </UserControl>

@@ -15,6 +15,15 @@ namespace InformationRetrievalManager
 
         #endregion
 
+        #region Public Properties
+
+        /// <summary>
+        /// Context of the <see cref="CrawlerConfigurationForm"/> control.
+        /// </summary>
+        public CrawlerConfigurationFormContext CrawlerConfigurationContext { get; set; }
+
+        #endregion
+
         #region Command Flags
 
         #endregion

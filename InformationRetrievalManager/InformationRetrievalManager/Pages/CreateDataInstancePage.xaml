@@ -72,13 +72,15 @@
                     <ColumnDefinition Width="2*" />
                     <ColumnDefinition Width="2*" />
                 </Grid.ColumnDefinitions>
+
+                <local:CrawlerConfigurationForm FormContext="{Binding CrawlerConfigurationContext, Mode=OneTime}" />
             </Grid>
 
             <Grid Grid.Row="2" Margin="0,15,0,0">
                 <Button
                     HorizontalAlignment="Center"
                     VerticalAlignment="Bottom"
-                    Command="{Binding GoToHomePageCommand}"
+                    Command="{Binding GoToHomePageCommand, Mode=OneTime}"
                     Content="GO BACK"
                     Style="{StaticResource DarkLightButton}" />
             </Grid>
