@@ -1,0 +1,14 @@
+﻿<UserControl
+    x:Class="InformationRetrievalManager.CrawlerConfigurationForm"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:InformationRetrievalManager"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    x:Name="this"
+    d:DataContext="{x:Static local:CrawlerConfigurationForm.DesignInstance}"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    mc:Ignorable="d">
+    <Grid />
+</UserControl>
