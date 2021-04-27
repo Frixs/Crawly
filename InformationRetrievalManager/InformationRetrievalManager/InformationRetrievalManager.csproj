@@ -413,6 +413,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Controls\Inputs\IntegerEntry.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Controls\Inputs\TextEntry.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -486,6 +490,9 @@
     <Compile Include="Controls\CrawlerConfigurationForm.xaml.cs">
       <DependentUpon>CrawlerConfigurationForm.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\Inputs\IntegerEntry.xaml.cs">
+      <DependentUpon>IntegerEntry.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Controls\Inputs\TextEntry.xaml.cs">
       <DependentUpon>TextEntry.xaml</DependentUpon>
     </Compile>
@@ -534,7 +541,9 @@
     <Compile Include="ViewModels\Base\BaseViewModel.cs" />
     <Compile Include="ViewModels\Base\RelayCommand.cs" />
     <Compile Include="ViewModels\Base\RelayParameterizedCommand.cs" />
+    <Compile Include="ViewModels\Inputs\Design\IntegerEntryDesignModel.cs" />
     <Compile Include="ViewModels\Inputs\Design\TextEntryDesignModel.cs" />
+    <Compile Include="ViewModels\Inputs\IntegerEntryViewModel.cs" />
     <Compile Include="ViewModels\Inputs\TextEntryViewModel.cs" />
     <Compile Include="ViewModels\Pages\CreateDataInstancePageViewModel.cs" />
     <Compile Include="ViewModels\Pages\DataInstancePageViewModel.cs" />
