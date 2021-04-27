@@ -413,6 +413,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Controls\Inputs\ComboEntry.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Controls\Inputs\IntegerEntry.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -488,8 +492,12 @@
     <Compile Include="AttachedProperties\NoFrameHistory.cs" />
     <Compile Include="AttachedProperties\TextAttachedProperties.cs" />
     <Compile Include="ControlContexts\CrawlerConfigurationFormContext.cs" />
+    <Compile Include="ControlContexts\ProcessingConfigurationFormContext.cs" />
     <Compile Include="Controls\CrawlerConfigurationForm.xaml.cs">
       <DependentUpon>CrawlerConfigurationForm.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\Inputs\ComboEntry.xaml.cs">
+      <DependentUpon>ComboEntry.xaml</DependentUpon>
     </Compile>
     <Compile Include="Controls\Inputs\IntegerEntry.xaml.cs">
       <DependentUpon>IntegerEntry.xaml</DependentUpon>
@@ -532,6 +540,7 @@
     <Compile Include="ValueConverters\Base\ApplicationPageHelpers.cs" />
     <Compile Include="ValueConverters\Base\BaseMultiValueConverter.cs" />
     <Compile Include="ValueConverters\Base\BaseValueConverter.cs" />
+    <Compile Include="ValueConverters\ComboBoxDescriptionConverter.cs" />
     <Compile Include="ValueConverters\BooleanInvertConverter.cs" />
     <Compile Include="ValueConverters\BooleanToVisibilityConverter.cs" />
     <Compile Include="ValueConverters\BooleanToVisibilityGoneConverter.cs" />
@@ -542,6 +551,8 @@
     <Compile Include="ViewModels\Base\BaseViewModel.cs" />
     <Compile Include="ViewModels\Base\RelayCommand.cs" />
     <Compile Include="ViewModels\Base\RelayParameterizedCommand.cs" />
+    <Compile Include="ViewModels\Inputs\ComboEntryViewModel.cs" />
+    <Compile Include="ViewModels\Inputs\Design\ComboEntryDesignModel.cs" />
     <Compile Include="ViewModels\Inputs\Design\IntegerEntryDesignModel.cs" />
     <Compile Include="ViewModels\Inputs\Design\TextEntryDesignModel.cs" />
     <Compile Include="ViewModels\Inputs\IntegerEntryViewModel.cs" />
