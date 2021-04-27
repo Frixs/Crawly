@@ -50,6 +50,24 @@
 
     <!--#endregion-->
 
+    <!--#region Forms-->
+    <SolidColorBrush x:Key="InputPlaceholderForegroundBrushKey" Color="{StaticResource LightColorAlt2}" />
+
+    <SolidColorBrush x:Key="InputForegroundBrushKey" Color="{StaticResource DarkColor}" />
+
+    <SolidColorBrush x:Key="InputBackgroundBrushKey" Color="{StaticResource LightColorAlt}" />
+
+    <SolidColorBrush x:Key="InputBorderBackgroundBrushKey" Color="{StaticResource LightColorDry}" />
+
+    <SolidColorBrush x:Key="InputFocusBorderBackgroundBrushKey" Color="{StaticResource LightColor}" />
+
+    <SolidColorBrush x:Key="InputErrorBorderBackgroundBrushKey" Color="{StaticResource LightColorLight}" />
+
+    <SolidColorBrush x:Key="InputDisabledForegroundBrushKey" Color="{StaticResource LightColorAlt2}" />
+
+    <SolidColorBrush x:Key="InputDisabledBackgroundBrushKey" Color="{StaticResource DisabledBackground}" />
+    <!--#endregion-->
+
     <!--#region RegularButton-->
     <Color x:Key="RegularButtonForeground">#CBCBD4</Color>
     <SolidColorBrush x:Key="RegularButtonForegroundBrushKey" Color="{StaticResource RegularButtonForeground}" />
