@@ -14,12 +14,32 @@ namespace InformationRetrievalManager.Relational
         /// <summary>
         /// Limit property for this data model property
         /// </summary>
-        public static readonly double MainWindowSizeX_MinValue = 800;
+        public static readonly double MainWindowSizeX_MinValue = 960;
 
         /// <summary>
         /// Limit property for this data model property
         /// </summary>
         public static readonly double MainWindowSizeX_MaxValue = int.MaxValue;
+
+        /// <summary>
+        /// Limit property for this data model property
+        /// </summary>
+        public static readonly double MainWindowSizeX_DefaultValue = MainWindowSizeX_MinValue;
+
+        /// <summary>
+        /// Limit property for this data model property
+        /// </summary>
+        public static readonly double MainWindowSizeY_MinValue = 560;
+
+        /// <summary>
+        /// Limit property for this data model property
+        /// </summary>
+        public static readonly double MainWindowSizeY_MaxValue = int.MaxValue;
+
+        /// <summary>
+        /// Limit property for this data model property
+        /// </summary>
+        public static readonly double MainWindowSizeY_DefaultValue = MainWindowSizeY_MinValue;
 
         #endregion
 
@@ -38,17 +58,18 @@ namespace InformationRetrievalManager.Relational
         /// <summary>
         /// MainWindow size size on X axis
         /// </summary>
-        [ConstraintRange(800, int.MaxValue)]
         [ValidateDouble(nameof(MainWindowSizeX), typeof(ApplicationStateDataModel),
             pMinValue: nameof(MainWindowSizeX_MinValue),
             pMaxValue: nameof(MainWindowSizeX_MaxValue))]
-        public double MainWindowSizeX { get; set; } = 803;
+        public double MainWindowSizeX { get; set; } = MainWindowSizeX_DefaultValue;
 
         /// <summary>
         /// MainWindow size size on Y axis
         /// </summary>
-        [ConstraintRange(450, int.MaxValue)]
-        public double MainWindowSizeY { get; set; } = 450;
+        [ValidateDouble(nameof(MainWindowSizeY), typeof(ApplicationStateDataModel),
+            pMinValue: nameof(MainWindowSizeY_MinValue),
+            pMaxValue: nameof(MainWindowSizeY_MaxValue))]
+        public double MainWindowSizeY { get; set; } = MainWindowSizeY_DefaultValue;
 
         #endregion
     }
