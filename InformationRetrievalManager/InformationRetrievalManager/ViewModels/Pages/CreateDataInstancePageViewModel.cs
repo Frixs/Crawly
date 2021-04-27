@@ -20,7 +20,7 @@ namespace InformationRetrievalManager
         /// <summary>
         /// Context of the <see cref="CrawlerConfigurationForm"/> control.
         /// </summary>
-        public CrawlerConfigurationFormContext CrawlerConfigurationContext { get; set; }
+        public CrawlerConfigurationFormContext CrawlerConfigurationContext { get; set; } = new CrawlerConfigurationFormContext();
 
         #endregion
 

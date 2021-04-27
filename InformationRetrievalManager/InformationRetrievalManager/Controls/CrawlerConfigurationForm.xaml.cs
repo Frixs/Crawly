@@ -1,8 +1,6 @@
-﻿using InformationRetrievalManager.Core;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Input;
 
 namespace InformationRetrievalManager
 {
@@ -27,6 +25,8 @@ namespace InformationRetrievalManager
             if (DesignerProperties.GetIsInDesignMode(this))
             {
                 // Design-mode specific functionality
+
+                FormContext = new CrawlerConfigurationFormContext();
             }
         }
 

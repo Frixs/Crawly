@@ -17,6 +17,11 @@ namespace InformationRetrievalManager
         protected override Func<string, string> ValueCustomSetterProcess => (value) => string.IsNullOrWhiteSpace(value) ? string.Empty : value;
 
         /// <summary>
+        /// Placeholder in the input field
+        /// </summary>
+        public string Placeholder { get; set; } = "";
+
+        /// <summary>
         /// The maximal length of value
         /// </summary>
         public int MaxLength { get; set; } = 100; // Default value

@@ -11,7 +11,63 @@
     d:DesignHeight="450"
     d:DesignWidth="800"
     mc:Ignorable="d">
-    <Grid>
-        <local:TextEntry DataContext="{Binding FormContext.SiteAddress, ElementName=this, Mode=OneTime}" />
-    </Grid>
+    <StackPanel
+        MinWidth="385"
+        MaxWidth="385"
+        Orientation="Vertical">
+        <local:TextEntry DataContext="{Binding FormContext.SiteAddressEntry, ElementName=this, Mode=OneTime}" />
+        <local:TextEntry DataContext="{Binding FormContext.SiteSuffixEntry, ElementName=this, Mode=OneTime}" />
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="3*" />
+                <ColumnDefinition Width="3*" />
+                <ColumnDefinition Width="3*" />
+            </Grid.ColumnDefinitions>
+
+            <local:IntegerEntry
+                Grid.Column="0"
+                Margin="0,0,8,0"
+                DataContext="{Binding FormContext.StartPageNoEntry, ElementName=this, Mode=OneTime}" />
+            <local:IntegerEntry
+                Grid.Column="1"
+                Margin="8,0,8,0"
+                DataContext="{Binding FormContext.MaxPageNoEntry, ElementName=this, Mode=OneTime}" />
+            <local:IntegerEntry
+                Grid.Column="2"
+                Margin="8,0,0,0"
+                DataContext="{Binding FormContext.PageNoModifierEntry, ElementName=this, Mode=OneTime}" />
+        </Grid>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="3*" />
+                <ColumnDefinition Width="3*" />
+                <ColumnDefinition Width="3*" />
+            </Grid.ColumnDefinitions>
+
+            <local:IntegerEntry
+                Grid.Column="2"
+                Margin="8,0,0,0"
+                DataContext="{Binding FormContext.SearchIntervalEntry, ElementName=this, Mode=OneTime}" />
+        </Grid>
+        <local:TextEntry DataContext="{Binding FormContext.SiteUrlArticlesXPathEntry, ElementName=this, Mode=OneTime}" />
+        <local:TextEntry DataContext="{Binding FormContext.SiteArticleContentAreaXPathEntry, ElementName=this, Mode=OneTime}" />
+        <local:TextEntry DataContext="{Binding FormContext.SiteArticleTitleXPathEntry, ElementName=this, Mode=OneTime}" />
+        <local:TextEntry DataContext="{Binding FormContext.SiteArticleCategoryXPathEntry, ElementName=this, Mode=OneTime}" />
+        <local:TextEntry DataContext="{Binding FormContext.SiteArticleDateTimeXPathEntry, ElementName=this, Mode=OneTime}" />
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="6*" />
+                <ColumnDefinition Width="4*" />
+            </Grid.ColumnDefinitions>
+
+            <local:TextEntry
+                Grid.Column="0"
+                Margin="0,0,8,0"
+                DataContext="{Binding FormContext.SiteArticleDateTimeFormatEntry, ElementName=this, Mode=OneTime}" />
+            <local:TextEntry
+                Grid.Column="1"
+                Margin="8,0,0,0"
+                DataContext="{Binding FormContext.SiteArticleDateTimeCultureInfoEntry, ElementName=this, Mode=OneTime}" />
+        </Grid>
+    </StackPanel>
 </UserControl>

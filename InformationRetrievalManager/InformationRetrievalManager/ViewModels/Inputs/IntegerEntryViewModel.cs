@@ -13,6 +13,11 @@ namespace InformationRetrievalManager
         protected override Func<int, int> ValueCustomSetterProcess => null;
 
         /// <summary>
+        /// The increment
+        /// </summary>
+        public int Increment { get; set; } = 1; // Default value
+
+        /// <summary>
         /// The minimal value
         /// </summary>
         public int MinValue { get; set; } = 0; // Default value

@@ -18,7 +18,9 @@
         /// </summary>
         public TextEntryDesignModel()
         {
-
+            Label = "This is my input";
+            Description = "It makes it very difficult to debug unless design models exist and let this description be shown.";
+            Value = "random value";
         }
 
         #endregion

@@ -20,21 +20,21 @@ namespace InformationRetrievalManager.Relational
         public static readonly string SiteSuffix_CanContainRegex = @"";
         public static readonly string SiteSuffix_DefaultValue = "";
 
-        public static readonly double StartPageNo_MinValue = 0;
-        public static readonly double StartPageNo_MaxValue = int.MaxValue;
-        public static readonly double StartPageNo_DefaultValue = 1;
+        public static readonly int StartPageNo_MinValue = 0;
+        public static readonly int StartPageNo_MaxValue = int.MaxValue;
+        public static readonly int StartPageNo_DefaultValue = 1;
 
-        public static readonly double MaxPageNo_MinValue = 1;
-        public static readonly double MaxPageNo_MaxValue = int.MaxValue;
-        public static readonly double MaxPageNo_DefaultValue = 10;
+        public static readonly int MaxPageNo_MinValue = 1;
+        public static readonly int MaxPageNo_MaxValue = int.MaxValue;
+        public static readonly int MaxPageNo_DefaultValue = 10;
 
-        public static readonly double PageNoModifier_MinValue = 1;
-        public static readonly double PageNoModifier_MaxValue = int.MaxValue;
-        public static readonly double PageNoModifier_DefaultValue = PageNoModifier_MinValue;
+        public static readonly int PageNoModifier_MinValue = 1;
+        public static readonly int PageNoModifier_MaxValue = int.MaxValue;
+        public static readonly int PageNoModifier_DefaultValue = PageNoModifier_MinValue;
 
-        public static readonly double SearchInterval_MinValue = 500;
-        public static readonly double SearchInterval_MaxValue = 3_600_000; // 1 hour
-        public static readonly double SearchInterval_DefaultValue = 1000;
+        public static readonly int SearchInterval_MinValue = 500;
+        public static readonly int SearchInterval_MaxValue = 3_600_000; // 1 hour
+        public static readonly int SearchInterval_DefaultValue = 1000;
 
         public static readonly bool SiteUrlArticlesXPath_IsRequired = true;
         public static readonly short SiteUrlArticlesXPath_MaxLength = 255;

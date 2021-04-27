@@ -73,7 +73,44 @@
                     <ColumnDefinition Width="2*" />
                 </Grid.ColumnDefinitions>
 
-                <local:CrawlerConfigurationForm FormContext="{Binding CrawlerConfigurationContext, Mode=OneTime}" />
+                <!--  Crawler  -->
+                <Grid
+                    Grid.Column="0"
+                    Margin="0,0,10,0"
+                    HorizontalAlignment="Right">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <!--  Title  -->
+                    </Grid.RowDefinitions>
+                    <TextBlock
+                        Grid.Row="0"
+                        HorizontalAlignment="Center"
+                        Text="Crawler Configuration" />
+                    <!--  Configuration Form  -->
+                    <local:CrawlerConfigurationForm
+                        Grid.Row="1"
+                        HorizontalAlignment="Center"
+                        FormContext="{Binding CrawlerConfigurationContext, Mode=OneTime}" />
+                </Grid>
+
+                <!--  Processing  -->
+                <Grid
+                    Grid.Column="1"
+                    Margin="10,0,0,0"
+                    HorizontalAlignment="Left">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <!--  Title  -->
+                    <TextBlock
+                        Grid.Row="0"
+                        HorizontalAlignment="Center"
+                        Text="Processing Configuration" />
+                    <!--  Configuration Form  -->
+                    <local:ProcessingConfigurationForm Grid.Row="1" HorizontalAlignment="Center" />
+                </Grid>
             </Grid>
 
             <Grid Grid.Row="2" Margin="0,15,0,0">

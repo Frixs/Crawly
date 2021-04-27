@@ -10,6 +10,7 @@
     mc:Ignorable="d">
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="50" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
@@ -17,29 +18,28 @@
         <!--  Label  -->
         <TextBlock
             Name="Label"
-            Margin="10,7,0,7"
+            Grid.Row="0"
             HorizontalAlignment="Left"
             VerticalAlignment="Center"
-            FontFamily="{StaticResource DosisSemiBold}"
-            Text="{Binding Label}" />
+            FontFamily="{StaticResource DosisBold}"
+            FontSize="16"
+            Text="{Binding Label, Mode=OneWay}" />
 
         <!--  Value Input  -->
         <xctk:IntegerUpDown
-            Grid.Column="1"
+            Grid.Row="1"
             Width="Auto"
             Height="30"
-            Margin="10,7"
             Padding="2"
             VerticalAlignment="Center"
             FontSize="14"
             FormatString="N0"
-            Increment="1"
-            Maximum="{Binding MaxValue}"
-            Minimum="{Binding MinValue}"
-            Opacity="0"
+            Increment="{Binding Increment, Mode=OneWay}"
+            Maximum="{Binding MaxValue, Mode=OneWay}"
+            Minimum="{Binding MinValue, Mode=OneWay}"
             TextAlignment="Left">
             <xctk:IntegerUpDown.Resources>
-                <local:BindingProxy x:Key="TargetProxy" Data="{Binding Validation}" />
+                <local:BindingProxy x:Key="TargetProxy" Data="{Binding Validation, Mode=OneWay}" />
             </xctk:IntegerUpDown.Resources>
             <xctk:IntegerUpDown.Value>
                 <Binding Path="Value" UpdateSourceTrigger="PropertyChanged">
@@ -54,14 +54,14 @@
 
         <!--  Description  -->
         <TextBlock
-            Grid.Row="1"
+            Grid.Row="2"
             Margin="10,0,10,10"
             HorizontalAlignment="Left"
             FontSize="10"
             FontStyle="Italic"
             LineHeight="11"
             LineStackingStrategy="BlockLineHeight"
-            Text="{Binding Description}"
+            Text="{Binding Description, Mode=OneWay}"
             TextWrapping="Wrap">
             <TextBlock.Style>
                 <Style TargetType="TextBlock">
