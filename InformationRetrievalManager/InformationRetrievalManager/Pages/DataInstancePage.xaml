@@ -15,5 +15,10 @@
 
     <Grid>
         <TextBlock Text="Data Instance Page" />
+
+        <Button
+            VerticalAlignment="Bottom"
+            Command="{Binding GoToHomePageCommand}"
+            Content="GO BACK" />
     </Grid>
 </local:BasePage>

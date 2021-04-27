@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using System;
+using System.Windows.Input;
 
 namespace InformationRetrievalManager
 {
@@ -20,6 +21,11 @@ namespace InformationRetrievalManager
 
         #region Commands
 
+        /// <summary>
+        /// The command to go to the another page.
+        /// </summary>
+        public ICommand GoToHomePageCommand { get; set; }
+
         #endregion
 
         #region Constructor
@@ -29,7 +35,8 @@ namespace InformationRetrievalManager
         /// </summary>
         public CreateDataInstancePageViewModel()
         {
-
+            // Create commands.
+            GoToHomePageCommand = new RelayCommand(GoToHomePageCommandRoutine);
         }
 
         /// <summary>
@@ -44,6 +51,14 @@ namespace InformationRetrievalManager
         #endregion
 
         #region Command Methods
+
+        /// <summary>
+        /// Command Routine : Go To Page
+        /// </summary>
+        private void GoToHomePageCommandRoutine()
+        {
+            DI.ViewModelApplication.GoToPage(ApplicationPage.Home);
+        }
 
         #endregion
     }

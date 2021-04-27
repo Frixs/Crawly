@@ -1,5 +1,6 @@
 ﻿using InformationRetrievalManager.Core;
 using InformationRetrievalManager.Relational;
+using Ixs.DNA;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.ObjectModel;
@@ -100,6 +101,8 @@ namespace InformationRetrievalManager
         {
             // Create commands.
             GoToHowToPageCommand = new RelayCommand(GoToHowToPageCommandRoutine);
+            GoToDataInstanceCommand = new RelayParameterizedCommand((parameter) => GoToDataInstancePageCommandRoutine(parameter));
+            CreateNewDataInstanceCommand = new RelayCommand(GoToCreateDataInstancePageCommandRoutine);
             //StartCrawlerCommand = new RelayCommand(async () => await StartCrawlerCommandRoutineAsync());
             //CancelCrawlerCommand = new RelayCommand(async () => await CancelCrawlerCommandRoutineAsync());
             //StartProcessingCommand = new RelayCommand(async () => await StartProcessingCommandRoutineAsync());
@@ -109,7 +112,7 @@ namespace InformationRetrievalManager
         /// <summary>
         /// DI constructor
         /// </summary>
-        public HomePageViewModel(ILogger logger, IUnitOfWork uow, ITaskManager taskManager) 
+        public HomePageViewModel(ILogger logger, IUnitOfWork uow, ITaskManager taskManager)
             : this()
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -130,6 +133,24 @@ namespace InformationRetrievalManager
         private void GoToHowToPageCommandRoutine()
         {
             DI.ViewModelApplication.GoToPage(ApplicationPage.HowTo);
+        }
+
+        /// <summary>
+        /// Command Routine : Go To Page
+        /// </summary>
+        private void GoToDataInstancePageCommandRoutine(object parameter)
+        {
+            DI.ViewModelApplication.GoToPage(ApplicationPage.DataInstance,
+                Framework.Service<DataInstancePageViewModel>().Init(long.Parse(parameter.ToString()))
+                );
+        }
+
+        /// <summary>
+        /// Command Routine : Go To Page
+        /// </summary>
+        private void GoToCreateDataInstancePageCommandRoutine()
+        {
+            DI.ViewModelApplication.GoToPage(ApplicationPage.CreateDataInstance);
         }
 
         //private async Task StartCrawlerCommandRoutineAsync()
@@ -262,7 +283,7 @@ namespace InformationRetrievalManager
             DataInstances = new ObservableCollection<DataInstanceDataModel>(
                 _uow.DataInstances.Get(null, q => q.OrderBy(o => o.Name))
                 );
-            
+
             DataLoaded = true;
             await Task.Delay(1);
         }
