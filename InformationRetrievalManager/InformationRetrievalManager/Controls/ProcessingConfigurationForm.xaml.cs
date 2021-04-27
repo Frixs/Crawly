@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Windows;
 using System.Windows.Controls;
 
 namespace InformationRetrievalManager
@@ -24,7 +25,17 @@ namespace InformationRetrievalManager
             if (DesignerProperties.GetIsInDesignMode(this))
             {
                 // Design-mode specific functionality
+
+                FormContext = new ProcessingConfigurationFormContext();
             }
         }
+
+        public ProcessingConfigurationFormContext FormContext
+        {
+            get { return (ProcessingConfigurationFormContext)GetValue(FormContextProperty); }
+            set { SetValue(FormContextProperty, value); }
+        }
+        public static readonly DependencyProperty FormContextProperty =
+            DependencyProperty.Register(nameof(FormContext), typeof(ProcessingConfigurationFormContext), typeof(CrawlerConfigurationForm));
     }
 }

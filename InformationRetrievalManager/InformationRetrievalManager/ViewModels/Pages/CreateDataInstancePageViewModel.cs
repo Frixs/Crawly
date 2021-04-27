@@ -22,6 +22,11 @@ namespace InformationRetrievalManager
         /// </summary>
         public CrawlerConfigurationFormContext CrawlerConfigurationContext { get; set; } = new CrawlerConfigurationFormContext();
 
+        /// <summary>
+        /// Context of the <see cref="ProcessingConfigurationForm"/> control.
+        /// </summary>
+        public ProcessingConfigurationFormContext ProcessingConfigurationContext { get; set; } = new ProcessingConfigurationFormContext();
+
         #endregion
 
         #region Command Flags

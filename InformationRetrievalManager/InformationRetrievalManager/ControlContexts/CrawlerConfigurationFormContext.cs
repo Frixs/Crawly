@@ -1,6 +1,5 @@
 ﻿using InformationRetrievalManager.Core;
 using InformationRetrievalManager.Relational;
-using System;
 
 namespace InformationRetrievalManager
 {

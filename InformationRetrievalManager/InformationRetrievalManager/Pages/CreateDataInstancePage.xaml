@@ -8,8 +8,8 @@
     Title="CreateDataInstancePage"
     d:Background="{StaticResource BackgroundBrushKey}"
     d:DataContext="{x:Static local:CreateDataInstancePageDesignModel.Instance}"
-    d:DesignHeight="450"
-    d:DesignWidth="800"
+    d:DesignHeight="560"
+    d:DesignWidth="960"
     x:TypeArguments="local:CreateDataInstancePageViewModel"
     mc:Ignorable="d">
 
@@ -76,7 +76,7 @@
                 <!--  Crawler  -->
                 <Grid
                     Grid.Column="0"
-                    Margin="0,0,10,0"
+                    Margin="0,0,30,0"
                     HorizontalAlignment="Right">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
@@ -97,7 +97,7 @@
                 <!--  Processing  -->
                 <Grid
                     Grid.Column="1"
-                    Margin="10,0,0,0"
+                    Margin="30,0,0,0"
                     HorizontalAlignment="Left">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
@@ -109,7 +109,10 @@
                         HorizontalAlignment="Center"
                         Text="Processing Configuration" />
                     <!--  Configuration Form  -->
-                    <local:ProcessingConfigurationForm Grid.Row="1" HorizontalAlignment="Center" />
+                    <local:ProcessingConfigurationForm
+                        Grid.Row="1"
+                        HorizontalAlignment="Center"
+                        FormContext="{Binding ProcessingConfigurationContext, Mode=OneTime}" />
                 </Grid>
             </Grid>
 
