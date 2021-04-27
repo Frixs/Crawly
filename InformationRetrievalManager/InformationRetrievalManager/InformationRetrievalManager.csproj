@@ -413,6 +413,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Controls\Inputs\CheckboxEntry.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Controls\Inputs\ComboEntry.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -496,6 +500,9 @@
     <Compile Include="Controls\CrawlerConfigurationForm.xaml.cs">
       <DependentUpon>CrawlerConfigurationForm.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\Inputs\CheckboxEntry.xaml.cs">
+      <DependentUpon>CheckboxEntry.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Controls\Inputs\ComboEntry.xaml.cs">
       <DependentUpon>ComboEntry.xaml</DependentUpon>
     </Compile>
@@ -551,7 +558,9 @@
     <Compile Include="ViewModels\Base\BaseViewModel.cs" />
     <Compile Include="ViewModels\Base\RelayCommand.cs" />
     <Compile Include="ViewModels\Base\RelayParameterizedCommand.cs" />
+    <Compile Include="ViewModels\Inputs\CheckboxEntryViewModel.cs" />
     <Compile Include="ViewModels\Inputs\ComboEntryViewModel.cs" />
+    <Compile Include="ViewModels\Inputs\Design\CheckboxEntryDesignModel.cs" />
     <Compile Include="ViewModels\Inputs\Design\ComboEntryDesignModel.cs" />
     <Compile Include="ViewModels\Inputs\Design\IntegerEntryDesignModel.cs" />
     <Compile Include="ViewModels\Inputs\Design\TextEntryDesignModel.cs" />
