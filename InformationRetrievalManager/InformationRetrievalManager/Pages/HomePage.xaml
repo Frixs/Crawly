@@ -253,31 +253,10 @@
                             Text="Crawly" />
 
                         <!--  Instance Wrapper  -->
-                        <Grid Grid.Row="1">
-                            <!--  Load animation  -->
-                            <Grid.Style>
-                                <Style TargetType="{x:Type Grid}">
-                                    <Setter Property="Visibility" Value="Collapsed" />
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding DataLoaded}" Value="True">
-                                            <Setter Property="Opacity" Value="0" />
-                                            <Setter Property="Visibility" Value="Visible" />
-                                            <DataTrigger.EnterActions>
-                                                <BeginStoryboard>
-                                                    <Storyboard>
-                                                        <DoubleAnimation
-                                                            BeginTime="0:0:0.1"
-                                                            Storyboard.TargetProperty="(Grid.Opacity)"
-                                                            From="0"
-                                                            To="1"
-                                                            Duration="0:0:0.1" />
-                                                    </Storyboard>
-                                                </BeginStoryboard>
-                                            </DataTrigger.EnterActions>
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Grid.Style>
+                        <Grid
+                            Grid.Row="1"
+                            local:AnimateSlideInFromBottomProperty.Value="{Binding DataLoaded}"
+                            Visibility="Collapsed">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="*" />
                                 <RowDefinition Height="Auto" />
@@ -331,35 +310,9 @@
                         <Border
                             Grid.Row="1"
                             HorizontalAlignment="Center"
-                            VerticalAlignment="Top">
-                            <!--  Unload animation  -->
-                            <Border.Style>
-                                <Style TargetType="{x:Type Border}">
-                                    <Setter Property="Visibility" Value="Visible" />
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding DataLoaded}" Value="True">
-                                            <DataTrigger.EnterActions>
-                                                <BeginStoryboard>
-                                                    <Storyboard>
-                                                        <DoubleAnimation
-                                                            Storyboard.TargetProperty="(Grid.Opacity)"
-                                                            From="1"
-                                                            To="0"
-                                                            Duration="0:0:0.1" />
-                                                    </Storyboard>
-                                                </BeginStoryboard>
-                                                <BeginStoryboard>
-                                                    <Storyboard>
-                                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Visibility">
-                                                            <DiscreteObjectKeyFrame KeyTime="0:0:0.1" Value="{x:Static Visibility.Collapsed}" />
-                                                        </ObjectAnimationUsingKeyFrames>
-                                                    </Storyboard>
-                                                </BeginStoryboard>
-                                            </DataTrigger.EnterActions>
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Border.Style>
+                            VerticalAlignment="Top"
+                            local:AnimateSlideInFromTopProperty.Value="{Binding DataLoaded, Converter={local:BooleanInvertConverter}}"
+                            Visibility="Visible">
                             <!--  Spinner  -->
                             <TextBlock
                                 FontSize="28"

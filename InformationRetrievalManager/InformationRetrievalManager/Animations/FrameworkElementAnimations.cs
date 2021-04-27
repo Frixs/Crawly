@@ -68,8 +68,9 @@ namespace InformationRetrievalManager
         /// <param name="seconds">The time the animation will take</param>
         /// <param name="keepMargin">Whether to keep the element at the same width during animation</param>
         /// <param name="size">The animation width/height to animate to. If not specified the elements size is used</param>
+        /// <param name="hideOnly">It will not collapse the control, only hide (not recommended, it is mainly used for lazy-unload)</param>
         /// <returns></returns>
-        public static async Task SlideAndFadeOutAsync(this FrameworkElement element, AnimationSlideInDirection direction, float seconds = 0.3f, bool keepMargin = true, int size = 0)
+        public static async Task SlideAndFadeOutAsync(this FrameworkElement element, AnimationSlideInDirection direction, float seconds = 0.3f, bool keepMargin = true, int size = 0, bool hideOnly = false)
         {
             // Create the storyboard
             var sb = new Storyboard();
@@ -110,7 +111,7 @@ namespace InformationRetrievalManager
 
             // Make element invisible
             if (element.Opacity == 0)
-                element.Visibility = Visibility.Hidden;
+                element.Visibility = hideOnly ? Visibility.Hidden : Visibility.Collapsed;
         }
 
         #endregion
@@ -202,11 +203,12 @@ namespace InformationRetrievalManager
         /// </summary>
         /// <param name="element">The element to animate</param>
         /// <param name="seconds">The time the animation will take</param>
-        public static void FadeOutNoWait(this FrameworkElement element, float seconds = 0.3f)
+        /// <param name="hideOnly">It will not collapse the control, only hide (not recommended, it is mainly used for lazy-unload)</param>
+        public static void FadeOutNoWait(this FrameworkElement element, float seconds = 0.3f, bool hideOnly = false)
         {
             // Create the storyboard
             var sb = new Storyboard();
-            sb.Completed += (o, s) => { element.Visibility = Visibility.Collapsed; };
+            sb.Completed += (o, s) => { element.Visibility = hideOnly ? Visibility.Hidden : Visibility.Collapsed; };
 
             // Add fade in animation
             sb.AddFadeOut(seconds);

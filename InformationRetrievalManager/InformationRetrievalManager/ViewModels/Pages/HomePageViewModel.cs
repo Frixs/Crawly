@@ -36,6 +36,9 @@ namespace InformationRetrievalManager
 
         #region Public Properties
 
+        /// <summary>
+        /// Indicates if the data are already loaded into the VM (once the values changes to <see langword="true"/>).
+        /// </summary>
         public bool DataLoaded { get; set; }
 
         /// <summary>
@@ -260,8 +263,8 @@ namespace InformationRetrievalManager
                 _uow.DataInstances.Get(null, q => q.OrderBy(o => o.Name))
                 );
             
+            await Task.Delay(1000);
             DataLoaded = true;
-            await Task.Delay(1);
         }
 
         #endregion
