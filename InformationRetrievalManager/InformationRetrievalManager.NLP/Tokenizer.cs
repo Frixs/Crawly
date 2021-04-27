@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace InformationRetrievalManager.NLP
@@ -46,7 +45,8 @@ namespace InformationRetrievalManager.NLP
         /// <param name="regex">Custom regex that can be used by this tokenizer</param>
         public Tokenizer(string regex = null)
         {
-            _customRegex = regex;
+            if (!string.IsNullOrEmpty(regex))
+                _customRegex = regex;
         }
 
         #endregion
