@@ -15,6 +15,15 @@ namespace InformationRetrievalManager.Relational
         public long Id { get; set; }
 
         /// <summary>
+        /// Reference to crawler configuration
+        /// </summary>
+        /// <remarks>
+        ///     Keep track of all connectors in data models,
+        ///     to keep database design in proper functinality of cascade deletion.
+        /// </remarks>
+        public CrawlerConfigurationDataModel CrawlerConfiguration { get; set; }
+
+        /// <summary>
         /// Reference to index processing configuration
         /// </summary>
         /// <remarks>

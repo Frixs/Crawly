@@ -11,34 +11,12 @@ namespace InformationRetrievalManager.Relational
     {
         #region Limit Constants
 
-        /// <summary>
-        /// Limit property for this data model property
-        /// </summary>
         public static readonly double MainWindowSizeX_MinValue = 960;
-
-        /// <summary>
-        /// Limit property for this data model property
-        /// </summary>
         public static readonly double MainWindowSizeX_MaxValue = int.MaxValue;
-
-        /// <summary>
-        /// Limit property for this data model property
-        /// </summary>
         public static readonly double MainWindowSizeX_DefaultValue = MainWindowSizeX_MinValue;
 
-        /// <summary>
-        /// Limit property for this data model property
-        /// </summary>
         public static readonly double MainWindowSizeY_MinValue = 560;
-
-        /// <summary>
-        /// Limit property for this data model property
-        /// </summary>
         public static readonly double MainWindowSizeY_MaxValue = int.MaxValue;
-
-        /// <summary>
-        /// Limit property for this data model property
-        /// </summary>
         public static readonly double MainWindowSizeY_DefaultValue = MainWindowSizeY_MinValue;
 
         #endregion

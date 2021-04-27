@@ -35,6 +35,11 @@ namespace InformationRetrievalManager.Relational
         private IRepository<DataInstanceDataModel> _dataInstances;
 
         /// <summary>
+        /// Private reference of property <see cref="CrawlerConfigurations"/>
+        /// </summary>
+        private IRepository<CrawlerConfigurationDataModel> _crawlerConfigurations;
+
+        /// <summary>
         /// Private reference of property <see cref="IndexProcessingConfigurations"/>
         /// </summary>
         private IRepository<IndexProcessingConfigurationDataModel> _indexProcessingConfigurations;
@@ -57,6 +62,11 @@ namespace InformationRetrievalManager.Relational
         public IRepository<DataInstanceDataModel> DataInstances =>
             _dataInstances ??
                 (_dataInstances = new DataInstanceRepository(_dbContext));
+
+        /// <inheritdoc/>
+        public IRepository<CrawlerConfigurationDataModel> CrawlerConfigurations =>
+            _crawlerConfigurations ??
+                (_crawlerConfigurations = new CrawlerConfigurationRepository(_dbContext));
 
         /// <inheritdoc/>
         public IRepository<IndexProcessingConfigurationDataModel> IndexProcessingConfigurations =>

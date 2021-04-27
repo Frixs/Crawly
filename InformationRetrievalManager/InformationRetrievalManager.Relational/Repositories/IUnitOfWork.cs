@@ -18,6 +18,11 @@ namespace InformationRetrievalManager.Relational
         IRepository<DataInstanceDataModel> DataInstances { get; }
 
         /// <summary>
+        /// Crawler configuration repository
+        /// </summary>
+        IRepository<CrawlerConfigurationDataModel> CrawlerConfigurations { get; }
+
+        /// <summary>
         /// Index processing configuration repository
         /// </summary>
         IRepository<IndexProcessingConfigurationDataModel> IndexProcessingConfigurations { get; }
