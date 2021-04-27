@@ -94,10 +94,12 @@
                 <ScrollViewer
                     Grid.Row="1"
                     Padding="30,15,30,0"
+                    IsEnabled="{Binding FormProcessingFlag, Converter={local:BooleanInvertConverter}}"
                     VerticalScrollBarVisibility="Auto">
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="*" />
+                            <RowDefinition Height="Auto" />
                             <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
@@ -121,16 +123,41 @@
                             HorizontalAlignment="Left"
                             FormContext="{Binding ProcessingConfigurationContext, Mode=OneWay}" />
 
-                        <!--  Submit BTN  -->
-                        <Button
+                        <Border
                             Grid.Row="1"
                             Grid.ColumnSpan="2"
-                            MinWidth="125"
+                            Margin="0,30,0,0"
+                            Style="{StaticResource LineSeparator}" />
+
+                        <Grid
+                            Grid.Row="2"
+                            Grid.ColumnSpan="2"
                             Margin="0,30,0,30"
-                            HorizontalAlignment="Center"
-                            Command="{Binding CreateCommand, Mode=OneTime}"
-                            Content="CREATE"
-                            Style="{StaticResource RegularButton}" />
+                            HorizontalAlignment="Center">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+
+                            <!--  Name Input  -->
+                            <TextBox
+                                Grid.Row="0"
+                                MinWidth="190"
+                                Tag="Name Your Data Instance"
+                                Text="{Binding DataInstanceName}"
+                                TextAlignment="Center" />
+
+                            <!--  Submit BTN  -->
+                            <Button
+                                Grid.Row="1"
+                                MinWidth="125"
+                                Margin="0,15,0,0"
+                                HorizontalAlignment="Center"
+                                local:IsBusyProperty.Value="{Binding FormProcessingFlag}"
+                                Command="{Binding CreateCommand, Mode=OneTime}"
+                                Content="CREATE"
+                                Style="{StaticResource RegularButton}" />
+                        </Grid>
                     </Grid>
                 </ScrollViewer>
             </Grid>

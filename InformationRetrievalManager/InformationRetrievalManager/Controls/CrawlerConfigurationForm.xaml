@@ -54,7 +54,7 @@
         <local:TextEntry DataContext="{Binding FormContext.SiteArticleTitleXPathEntry, ElementName=this, Mode=OneWay}" />
         <local:TextEntry DataContext="{Binding FormContext.SiteArticleCategoryXPathEntry, ElementName=this, Mode=OneWay}" />
         <local:TextEntry DataContext="{Binding FormContext.SiteArticleDateTimeXPathEntry, ElementName=this, Mode=OneWay}" />
-        <Grid>
+        <Grid local:AnimateFadeInProperty.Value="{Binding FormContext.SiteArticleDateTimeXPathEntry.Value, Converter={local:StringEmptyConverter}, ConverterParameter=True, ElementName=this, Mode=OneWay}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="6*" />
                 <ColumnDefinition Width="4*" />

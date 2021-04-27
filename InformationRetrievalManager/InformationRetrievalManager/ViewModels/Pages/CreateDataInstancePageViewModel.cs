@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using System;
+using System.Threading.Tasks;
 using System.Windows.Input;
 
 namespace InformationRetrievalManager
@@ -27,9 +28,19 @@ namespace InformationRetrievalManager
         /// </summary>
         public ProcessingConfigurationFormContext ProcessingConfigurationContext { get; set; } = new ProcessingConfigurationFormContext();
 
+        /// <summary>
+        /// Property for input field to set data instance name.
+        /// </summary>
+        public string DataInstanceName { get; set; }
+
         #endregion
 
         #region Command Flags
+
+        /// <summary>
+        /// Flag to set the netire form into disabled mode if <see langword="true"/>.
+        /// </summary>
+        public bool FormProcessingFlag { get; set; }
 
         #endregion
 
@@ -56,6 +67,7 @@ namespace InformationRetrievalManager
         {
             // Create commands.
             GoToHomePageCommand = new RelayCommand(GoToHomePageCommandRoutine);
+            CreateCommand = new RelayCommand(async () => await CreateCommandRoutineAsync());
         }
 
         /// <summary>
@@ -77,6 +89,17 @@ namespace InformationRetrievalManager
         private void GoToHomePageCommandRoutine()
         {
             DI.ViewModelApplication.GoToPage(ApplicationPage.Home);
+        }
+
+        /// <summary>
+        /// Create data instance process
+        /// </summary>
+        private async Task CreateCommandRoutineAsync()
+        {
+            await RunCommandAsync(() => FormProcessingFlag, async () =>
+            {
+                await Task.Delay(1);
+            });
         }
 
         #endregion
