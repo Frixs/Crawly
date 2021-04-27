@@ -40,6 +40,11 @@ namespace InformationRetrievalManager
         /// </summary>
         public ICommand GoToHomePageCommand { get; set; }
 
+        /// <summary>
+        /// The command to create the data instance from form values
+        /// </summary>
+        public ICommand CreateCommand { get; set; }
+
         #endregion
 
         #region Constructor
