@@ -3,7 +3,7 @@
 namespace InformationRetrievalManager
 {
     /// <summary>
-    /// The view model for HowTo page
+    /// The view model for <see cref="HowToPage"/>
     /// </summary>
     public class HowToPageViewModel : BaseViewModel
     {

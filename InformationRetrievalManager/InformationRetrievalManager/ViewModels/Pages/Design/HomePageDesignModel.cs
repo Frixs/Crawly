@@ -54,6 +54,8 @@ namespace InformationRetrievalManager
                     Name = "lorem_ipsum"
                 },
             };
+
+            DataLoaded = true;
         }
 
         #endregion

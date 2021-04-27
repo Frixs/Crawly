@@ -25,5 +25,16 @@ namespace InformationRetrievalManager
 
         // ----------
 
+        /// <summary>
+        /// The data instance page
+        /// </summary>
+        [Description("Data Instance")]
+        DataInstance = 1000,
+
+        /// <summary>
+        /// The data instance create form
+        /// </summary>
+        [Description("Create Data Instance")]
+        CreateDataInstance = 1001,
     }
 }

@@ -394,6 +394,14 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Pages\CreateDataInstancePage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\DataInstancePage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Pages\HomePage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -454,6 +462,12 @@
     <Compile Include="DI\FrameworkConstructionExtensions.cs" />
     <Compile Include="Extensions\CrawlerExtensions.cs" />
     <Compile Include="Pages\Base\BasePage.cs" />
+    <Compile Include="Pages\CreateDataInstancePage.xaml.cs">
+      <DependentUpon>CreateDataInstancePage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\DataInstancePage.xaml.cs">
+      <DependentUpon>DataInstancePage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Pages\HomePage.xaml.cs">
       <DependentUpon>HomePage.xaml</DependentUpon>
     </Compile>
@@ -474,6 +488,10 @@
     <Compile Include="ViewModels\Base\BaseViewModel.cs" />
     <Compile Include="ViewModels\Base\RelayCommand.cs" />
     <Compile Include="ViewModels\Base\RelayParameterizedCommand.cs" />
+    <Compile Include="ViewModels\Pages\CreateDataInstancePageViewModel.cs" />
+    <Compile Include="ViewModels\Pages\DataInstancePageViewModel.cs" />
+    <Compile Include="ViewModels\Pages\Design\CreateDataInstancePageDesignModel.cs" />
+    <Compile Include="ViewModels\Pages\Design\DataInstancePageDesignModel.cs" />
     <Compile Include="ViewModels\Pages\Design\HowToPageDesignModel.cs" />
     <Compile Include="ViewModels\Pages\Design\HomePageDesignModel.cs" />
     <Compile Include="ViewModels\Pages\HowToPageViewModel.cs" />

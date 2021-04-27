@@ -10,7 +10,7 @@ using System.Windows.Input;
 namespace InformationRetrievalManager
 {
     /// <summary>
-    /// The view model for Home page
+    /// The view model for <see cref="HomePage"/>
     /// </summary>
     public class HomePageViewModel : BaseViewModel
     {
@@ -263,8 +263,8 @@ namespace InformationRetrievalManager
                 _uow.DataInstances.Get(null, q => q.OrderBy(o => o.Name))
                 );
             
-            await Task.Delay(1000);
             DataLoaded = true;
+            await Task.Delay(1);
         }
 
         #endregion

@@ -28,6 +28,8 @@ namespace InformationRetrievalManager
             // Bind page view models
             construction.Services.AddTransient<HomePageViewModel>();
             construction.Services.AddTransient<HowToPageViewModel>();
+            construction.Services.AddTransient<DataInstancePageViewModel>();
+            construction.Services.AddTransient<CreateDataInstancePageViewModel>();
 
             //// Bind settings view model
             //construction.Services.AddSingleton<SettingsViewModel>();

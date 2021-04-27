@@ -25,6 +25,12 @@ namespace InformationRetrievalManager
                 case ApplicationPage.HowTo:
                     return new HowToPage();
 
+                case ApplicationPage.DataInstance:
+                    return new DataInstancePage();
+
+                case ApplicationPage.CreateDataInstance:
+                    return new CreateDataInstancePage();
+
                 default:
                     // Log it.
                     FrameworkDI.Logger.LogErrorSource("A selected application page value is out of box!");
@@ -46,6 +52,12 @@ namespace InformationRetrievalManager
 
             if (page is HowToPage)
                 return ApplicationPage.HowTo;
+
+            if (page is DataInstancePage)
+                return ApplicationPage.DataInstance;
+
+            if (page is CreateDataInstancePage)
+                return ApplicationPage.CreateDataInstance;
 
             // Log it.
             FrameworkDI.Logger.LogErrorSource("A selected base page value is out of box!");
