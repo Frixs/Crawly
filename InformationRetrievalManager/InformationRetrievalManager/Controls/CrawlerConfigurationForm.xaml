@@ -15,8 +15,8 @@
         MinWidth="385"
         MaxWidth="385"
         Orientation="Vertical">
-        <local:TextEntry DataContext="{Binding FormContext.SiteAddressEntry, ElementName=this, Mode=OneTime}" />
-        <local:TextEntry DataContext="{Binding FormContext.SiteSuffixEntry, ElementName=this, Mode=OneTime}" />
+        <local:TextEntry DataContext="{Binding FormContext.SiteAddressEntry, ElementName=this, Mode=OneWay}" />
+        <local:TextEntry DataContext="{Binding FormContext.SiteSuffixEntry, ElementName=this, Mode=OneWay}" />
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="3*" />
@@ -27,15 +27,15 @@
             <local:IntegerEntry
                 Grid.Column="0"
                 Margin="0,0,8,0"
-                DataContext="{Binding FormContext.StartPageNoEntry, ElementName=this, Mode=OneTime}" />
+                DataContext="{Binding FormContext.StartPageNoEntry, ElementName=this, Mode=OneWay}" />
             <local:IntegerEntry
                 Grid.Column="1"
                 Margin="8,0,8,0"
-                DataContext="{Binding FormContext.MaxPageNoEntry, ElementName=this, Mode=OneTime}" />
+                DataContext="{Binding FormContext.MaxPageNoEntry, ElementName=this, Mode=OneWay}" />
             <local:IntegerEntry
                 Grid.Column="2"
                 Margin="8,0,0,0"
-                DataContext="{Binding FormContext.PageNoModifierEntry, ElementName=this, Mode=OneTime}" />
+                DataContext="{Binding FormContext.PageNoModifierEntry, ElementName=this, Mode=OneWay}" />
         </Grid>
         <Grid>
             <Grid.ColumnDefinitions>
@@ -47,13 +47,13 @@
             <local:IntegerEntry
                 Grid.Column="2"
                 Margin="8,0,0,0"
-                DataContext="{Binding FormContext.SearchIntervalEntry, ElementName=this, Mode=OneTime}" />
+                DataContext="{Binding FormContext.SearchIntervalEntry, ElementName=this, Mode=OneWay}" />
         </Grid>
-        <local:TextEntry DataContext="{Binding FormContext.SiteUrlArticlesXPathEntry, ElementName=this, Mode=OneTime}" />
-        <local:TextEntry DataContext="{Binding FormContext.SiteArticleContentAreaXPathEntry, ElementName=this, Mode=OneTime}" />
-        <local:TextEntry DataContext="{Binding FormContext.SiteArticleTitleXPathEntry, ElementName=this, Mode=OneTime}" />
-        <local:TextEntry DataContext="{Binding FormContext.SiteArticleCategoryXPathEntry, ElementName=this, Mode=OneTime}" />
-        <local:TextEntry DataContext="{Binding FormContext.SiteArticleDateTimeXPathEntry, ElementName=this, Mode=OneTime}" />
+        <local:TextEntry DataContext="{Binding FormContext.SiteUrlArticlesXPathEntry, ElementName=this, Mode=OneWay}" />
+        <local:TextEntry DataContext="{Binding FormContext.SiteArticleContentAreaXPathEntry, ElementName=this, Mode=OneWay}" />
+        <local:TextEntry DataContext="{Binding FormContext.SiteArticleTitleXPathEntry, ElementName=this, Mode=OneWay}" />
+        <local:TextEntry DataContext="{Binding FormContext.SiteArticleCategoryXPathEntry, ElementName=this, Mode=OneWay}" />
+        <local:TextEntry DataContext="{Binding FormContext.SiteArticleDateTimeXPathEntry, ElementName=this, Mode=OneWay}" />
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="6*" />
@@ -63,11 +63,11 @@
             <local:TextEntry
                 Grid.Column="0"
                 Margin="0,0,8,0"
-                DataContext="{Binding FormContext.SiteArticleDateTimeFormatEntry, ElementName=this, Mode=OneTime}" />
+                DataContext="{Binding FormContext.SiteArticleDateTimeFormatEntry, ElementName=this, Mode=OneWay}" />
             <local:TextEntry
                 Grid.Column="1"
                 Margin="8,0,0,0"
-                DataContext="{Binding FormContext.SiteArticleDateTimeCultureInfoEntry, ElementName=this, Mode=OneTime}" />
+                DataContext="{Binding FormContext.SiteArticleDateTimeCultureInfoEntry, ElementName=this, Mode=OneWay}" />
         </Grid>
     </StackPanel>
 </UserControl>

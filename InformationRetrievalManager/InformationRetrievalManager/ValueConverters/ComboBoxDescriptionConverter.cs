@@ -11,7 +11,7 @@ namespace InformationRetrievalManager
     {
         public override object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value.GetType() == typeof(Enum))
+            if (value.GetType().IsEnum)
                 return ((Enum)value).GetDescription();
             return value;
         }

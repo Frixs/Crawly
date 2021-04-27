@@ -7,7 +7,7 @@ namespace InformationRetrievalManager
     /// <summary>
     public class TextEntryViewModel : BaseEntryViewModel<string>
     {
-        #region Public Properties
+        #region Protected Members
 
         /// <inheritdoc/>
         /// <remarks>
@@ -15,6 +15,10 @@ namespace InformationRetrievalManager
         ///     if user does not enter anything.
         /// </remarks>
         protected override Func<string, string> ValueCustomSetterProcess => (value) => string.IsNullOrWhiteSpace(value) ? string.Empty : value;
+
+        #endregion
+
+        #region Public Properties
 
         /// <summary>
         /// Placeholder in the input field

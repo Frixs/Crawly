@@ -91,7 +91,7 @@
                     <local:CrawlerConfigurationForm
                         Grid.Row="1"
                         HorizontalAlignment="Center"
-                        FormContext="{Binding CrawlerConfigurationContext, Mode=OneTime}" />
+                        FormContext="{Binding CrawlerConfigurationContext, Mode=OneWay}" />
                 </Grid>
 
                 <!--  Processing  -->
@@ -112,7 +112,7 @@
                     <local:ProcessingConfigurationForm
                         Grid.Row="1"
                         HorizontalAlignment="Center"
-                        FormContext="{Binding ProcessingConfigurationContext, Mode=OneTime}" />
+                        FormContext="{Binding ProcessingConfigurationContext, Mode=OneWay}" />
                 </Grid>
             </Grid>
 

@@ -1,4 +1,6 @@
 ﻿
+using System.ComponentModel;
+
 namespace InformationRetrievalManager.Core
 {
     /// <summary>
@@ -6,10 +8,10 @@ namespace InformationRetrievalManager.Core
     /// </summary>
     public enum ProcessingLanguage
     {
-        // English
+        [Description("English")]
         EN = 0,
 
-        // Czech
+        [Description("Czech")]
         CZ = 1
     }
 }

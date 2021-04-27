@@ -5,6 +5,7 @@ namespace InformationRetrievalManager.Relational
     /// <summary>
     /// The data model representing processing configuration of indexation that is set in seach <<see cref="DataInstanceDataModel"/>.
     /// </summary>
+    [ValidableModel(typeof(IndexProcessingConfigurationDataModel))]
     public class IndexProcessingConfigurationDataModel : IndexProcessingConfiguration
     {
         #region Properties (Keys / Relations)
@@ -12,11 +13,13 @@ namespace InformationRetrievalManager.Relational
         /// <summary>
         /// Primary Key
         /// </summary>
+        [ValidateIgnore]
         public long Id { get; set; }
 
         /// <summary>
         /// Foreign Key for <see cref="DataInstance"/>
         /// </summary>
+        [ValidateIgnore]
         public long DataInstanceId { get; set; }
 
         /// <summary>
@@ -24,6 +27,7 @@ namespace InformationRetrievalManager.Relational
         /// </summary>
         [System.Text.Json.Serialization.JsonIgnore]
         [Newtonsoft.Json.JsonIgnore]
+        [ValidateIgnore]
         public DataInstanceDataModel DataInstance { get; set; }
 
         #endregion

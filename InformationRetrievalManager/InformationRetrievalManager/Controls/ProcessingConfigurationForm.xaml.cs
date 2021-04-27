@@ -36,6 +36,6 @@ namespace InformationRetrievalManager
             set { SetValue(FormContextProperty, value); }
         }
         public static readonly DependencyProperty FormContextProperty =
-            DependencyProperty.Register(nameof(FormContext), typeof(ProcessingConfigurationFormContext), typeof(CrawlerConfigurationForm));
+            DependencyProperty.Register(nameof(FormContext), typeof(ProcessingConfigurationFormContext), typeof(ProcessingConfigurationForm));
     }
 }
