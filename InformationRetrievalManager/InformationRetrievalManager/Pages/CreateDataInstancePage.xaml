@@ -102,9 +102,9 @@
                     VerticalScrollBarVisibility="Auto">
                     <Grid>
                         <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
                             <RowDefinition Height="*" />
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="2*" />
@@ -144,24 +144,24 @@
                             </Grid.RowDefinitions>
 
                             <!--  Name Input  -->
-                            <TextBox
+                            <local:TextEntry
                                 Grid.Row="0"
                                 MinWidth="190"
-                                Tag="Name Your Data Instance"
-                                Text="{Binding DataInstanceName}"
+                                DataContext="{Binding DataInstanceNameEntry}"
                                 TextAlignment="Center" />
 
                             <!--  Submit BTN  -->
                             <Button
                                 Grid.Row="1"
                                 MinWidth="125"
-                                FontSize="16"
-                                Padding="12,7,12,8"
                                 Margin="0,15,0,0"
+                                Padding="12,7,12,8"
                                 HorizontalAlignment="Center"
+                                VerticalAlignment="Top"
                                 local:IsBusyProperty.Value="{Binding FormProcessingFlag}"
                                 Command="{Binding CreateCommand, Mode=OneTime}"
                                 Content="CREATE"
+                                FontSize="16"
                                 Style="{StaticResource LightColorButton}" />
                         </Grid>
                     </Grid>

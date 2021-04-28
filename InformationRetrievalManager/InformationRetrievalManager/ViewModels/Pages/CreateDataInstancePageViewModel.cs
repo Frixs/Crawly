@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using InformationRetrievalManager.Core;
+using InformationRetrievalManager.Relational;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -31,7 +33,7 @@ namespace InformationRetrievalManager
         /// <summary>
         /// Property for input field to set data instance name.
         /// </summary>
-        public string DataInstanceName { get; set; }
+        public TextEntryViewModel DataInstanceNameEntry { get; set; } //; ctor
 
         #endregion
 
@@ -68,6 +70,16 @@ namespace InformationRetrievalManager
             // Create commands.
             GoToHomePageCommand = new RelayCommand(GoToHomePageCommandRoutine);
             CreateCommand = new RelayCommand(async () => await CreateCommandRoutineAsync());
+
+            DataInstanceNameEntry = new TextEntryViewModel
+            {
+                Label = null,
+                Description = null,
+                Validation = ValidationHelpers.GetPropertyValidateAttribute<DataInstanceDataModel, string, ValidateStringAttribute>(o => o.Name),
+                Value = DataInstanceDataModel.Name_DefaultValue,
+                Placeholder = "Name Your Data Instance",
+                MaxLength = DataInstanceDataModel.Name_MaxLength
+            };
         }
 
         /// <summary>

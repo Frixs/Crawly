@@ -5,6 +5,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:InformationRetrievalManager"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    x:Name="this"
     d:DataContext="{x:Static local:TextEntryDesignModel.Instance}"
     d:DesignWidth="200"
     mc:Ignorable="d">
@@ -19,21 +20,34 @@
         <TextBlock
             Name="Label"
             Grid.Row="0"
+            Margin="0,0,0,3"
             HorizontalAlignment="Left"
             VerticalAlignment="Center"
             FontFamily="{StaticResource DosisBold}"
             FontSize="15"
-            Text="{Binding Label, Mode=OneWay}" />
+            Text="{Binding Label, Mode=OneWay}">
+            <TextBlock.Style>
+                <Style TargetType="{x:Type TextBlock}">
+                    <Setter Property="Visibility" Value="Visible" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Label, Mode=OneWay}" Value="{x:Null}">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </TextBlock.Style>
+        </TextBlock>
 
         <!--  Value Input  -->
         <TextBox
             Grid.Row="1"
-            Margin="0,3"
+            Margin="0,0,0,3"
             Padding="10,8"
             VerticalAlignment="Center"
             FontSize="14"
             MaxLength="{Binding MaxLength, Mode=OneWay}"
-            Tag="{Binding Placeholder, Mode=OneWay}">
+            Tag="{Binding Placeholder, Mode=OneWay}"
+            TextAlignment="{Binding TextAlignment, ElementName=this, Mode=OneWay}">
             <TextBox.Resources>
                 <local:BindingProxy x:Key="TargetProxy" Data="{Binding Validation, Mode=OneWay}" />
             </TextBox.Resources>

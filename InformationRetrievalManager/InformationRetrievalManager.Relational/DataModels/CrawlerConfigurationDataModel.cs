@@ -12,12 +12,12 @@ namespace InformationRetrievalManager.Relational
 
         public static readonly bool SiteAddress_IsRequired = true;
         public static readonly short SiteAddress_MaxLength = 255;
-        public static readonly string SiteAddress_CanContainRegex = @"";
+        public static readonly string SiteAddress_CanContainRegex = @"https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)";
         public static readonly string SiteAddress_DefaultValue = "";
 
         public static readonly bool SiteSuffix_IsRequired = true;
         public static readonly short SiteSuffix_MaxLength = 999;
-        public static readonly string SiteSuffix_CanContainRegex = @"";
+        public static readonly string SiteSuffix_CanContainRegex = @"(\{0\})+";
         public static readonly string SiteSuffix_DefaultValue = "";
 
         public static readonly int StartPageNo_MinValue = 0;
