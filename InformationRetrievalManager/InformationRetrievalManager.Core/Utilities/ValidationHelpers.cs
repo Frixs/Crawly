@@ -27,12 +27,12 @@ namespace InformationRetrievalManager.Core
         /// <summary>
         /// Validates model according to assigned validate attributes.
         /// </summary>
-        /// <param name="modelType">Model type validation</param>
+        /// <typeparam name="TModel">Model type validation</typeparam>
         /// <param name="value">Model to validate</param>
         /// <returns>Validation results</returns>
-        public static ICollection<DataValidationError> ValidateModel(Type modelType, object value)
+        public static ICollection<DataValidationError> ValidateModel<TModel>(TModel value)
         {
-            return modelType.GetAttribute<ValidableModelAttribute>()
+            return typeof(TModel).GetAttribute<ValidableModelAttribute>()
                 .Validate(value, null);
         }
 

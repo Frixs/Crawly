@@ -15,6 +15,7 @@
 
     <Grid>
         <TextBlock Text="Data Instance Page" />
+        <TextBlock Margin="0,30,0,0" Text="{Binding DataInstanceId}" />
 
         <Button
             VerticalAlignment="Bottom"

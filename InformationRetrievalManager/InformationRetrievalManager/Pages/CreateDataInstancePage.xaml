@@ -74,12 +74,17 @@
 
                 <!--  Titles  -->
                 <Grid Grid.Row="0" Margin="0,0,0,15">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="2*" />
                         <ColumnDefinition Width="2*" />
                     </Grid.ColumnDefinitions>
 
                     <TextBlock
+                        Grid.Row="0"
                         Grid.Column="0"
                         HorizontalAlignment="Center"
                         FontFamily="{StaticResource DosisRegular}"
@@ -87,11 +92,34 @@
                         Text="Crawler Configuration" />
 
                     <TextBlock
+                        Grid.Row="0"
                         Grid.Column="1"
                         HorizontalAlignment="Center"
                         FontFamily="{StaticResource DosisRegular}"
                         FontSize="15"
                         Text="Processing Configuration" />
+
+                    <TextBlock
+                        Grid.Row="1"
+                        Grid.ColumnSpan="2"
+                        Margin="0,10,0,0"
+                        HorizontalAlignment="Center"
+                        FontFamily="{StaticResource DosisMedium}"
+                        FontSize="15"
+                        Foreground="{StaticResource LightColorShinyBrushKey}"
+                        Text="{Binding FormErrorString, Mode=OneWay}"
+                        TextAlignment="Center">
+                        <TextBlock.Style>
+                            <Style TargetType="{x:Type TextBlock}">
+                                <Setter Property="Visibility" Value="Visible" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Text, RelativeSource={RelativeSource Self}}" Value="{x:Null}">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
                 </Grid>
 
                 <!--  Content  -->

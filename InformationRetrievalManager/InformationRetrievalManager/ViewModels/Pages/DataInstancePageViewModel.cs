@@ -24,6 +24,12 @@ namespace InformationRetrievalManager
 
         #endregion
 
+        #region Public Properties
+
+        public string DataInstanceId => _dataInstanceId.ToString();
+
+        #endregion
+
         #region Command Flags
 
         #endregion

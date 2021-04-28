@@ -1,7 +1,11 @@
 ﻿using InformationRetrievalManager.Core;
 using InformationRetrievalManager.Relational;
+using Ixs.DNA;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
@@ -15,6 +19,7 @@ namespace InformationRetrievalManager
         #region Private Members (Injects)
 
         private readonly ILogger _logger;
+        private readonly IUnitOfWork _uow;
 
         #endregion
 
@@ -34,6 +39,11 @@ namespace InformationRetrievalManager
         /// Property for input field to set data instance name.
         /// </summary>
         public TextEntryViewModel DataInstanceNameEntry { get; set; } //; ctor
+
+        /// <summary>
+        /// Error string as a feedback to the user.
+        /// </summary>
+        public string FormErrorString { get; set; }
 
         #endregion
 
@@ -85,10 +95,11 @@ namespace InformationRetrievalManager
         /// <summary>
         /// DI constructor
         /// </summary>
-        public CreateDataInstancePageViewModel(ILogger logger)
+        public CreateDataInstancePageViewModel(ILogger logger, IUnitOfWork uow)
             : this()
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _uow = uow ?? throw new ArgumentNullException(nameof(uow));
         }
 
         #endregion
@@ -110,8 +121,94 @@ namespace InformationRetrievalManager
         {
             await RunCommandAsync(() => FormProcessingFlag, async () =>
             {
-                await Task.Delay(1000);
+                // Re-initialize state values
+                FormErrorString = null;
+
+                // Create data models
+                var crawlerConfiguration = new CrawlerConfigurationDataModel
+                {
+                    SiteAddress = CrawlerConfigurationContext.SiteAddressEntry.Value,
+                    SiteSuffix = CrawlerConfigurationContext.SiteSuffixEntry.Value,
+                    StartPageNo = CrawlerConfigurationContext.StartPageNoEntry.Value,
+                    MaxPageNo = CrawlerConfigurationContext.MaxPageNoEntry.Value,
+                    PageNoModifier = CrawlerConfigurationContext.PageNoModifierEntry.Value,
+                    SearchInterval = CrawlerConfigurationContext.SearchIntervalEntry.Value,
+                    SiteUrlArticlesXPath = CrawlerConfigurationContext.SiteUrlArticlesXPathEntry.Value,
+                    SiteArticleContentAreaXPath = CrawlerConfigurationContext.SiteArticleContentAreaXPathEntry.Value,
+                    SiteArticleTitleXPath = CrawlerConfigurationContext.SiteArticleTitleXPathEntry.Value,
+                    SiteArticleCategoryXPath = CrawlerConfigurationContext.SiteArticleCategoryXPathEntry.Value,
+                    SiteArticleDateTimeXPath = CrawlerConfigurationContext.SiteArticleDateTimeXPathEntry.Value,
+                    SiteArticleDateTimeFormat = CrawlerConfigurationContext.SiteArticleDateTimeFormatEntry.Value,
+                    SiteArticleDateTimeCultureInfo = CrawlerConfigurationContext.SiteArticleDateTimeCultureInfoEntry.Value
+                };
+                var processingConfiguration = new IndexProcessingConfigurationDataModel
+                {
+                    Language = ProcessingConfigurationContext.LanguageEntry.Value,
+                    CustomRegex = ProcessingConfigurationContext.CustomRegexEntry.Value,
+                    CustomStopWords = new HashSet<string>(ProcessingConfigurationContext.CustomStopWordsEntry.Value.Split(',')),
+                    ToLowerCase = ProcessingConfigurationContext.ToLowerCaseEntry.Value,
+                    RemoveAccentsBeforeStemming = ProcessingConfigurationContext.RemoveAccentsBeforeStemmingEntry.Value,
+                    RemoveAccentsAfterStemming = ProcessingConfigurationContext.RemoveAccentsAfterStemmingEntry.Value,
+                };
+                var dataInstance = new DataInstanceDataModel
+                {
+                    Name = DataInstanceNameEntry.Value,
+                    CrawlerConfiguration = crawlerConfiguration,
+                    IndexProcessingConfiguration = processingConfiguration
+                };
+
+                // Validate data
+                var validationResults = ValidationHelpers.ValidateModel(crawlerConfiguration);
+                validationResults.Concat(ValidationHelpers.ValidateModel(processingConfiguration));
+                validationResults.Concat(ValidationHelpers.ValidateModel(dataInstance));
+
+                // Additional validation steps
+                try
+                {
+                    _ = new CultureInfo(crawlerConfiguration.SiteArticleDateTimeCultureInfo);
+                }
+                catch
+                {
+                    validationResults.Add(new DataValidationError
+                    {
+                        Code = nameof(crawlerConfiguration.SiteArticleDateTimeCultureInfo),
+                        Description = "Invalid date-time culture."
+                    }); // TODO localization
+                }
+
+                // If any errors...
+                if (validationResults.Count > 0)
+                {
+                    FormErrorString = validationResults.AggregateErrors();
+                }
+                // Otherwise valid results...
+                else
+                {
+                    // Insert
+                    _uow.DataInstances.Insert(dataInstance);
+                    _uow.Commit();
+
+                    // Move to the newly created data instance's page
+                    GoToDataInstancePage(dataInstance.Id);
+                }
+
+                await Task.Delay(1);
             });
+        }
+
+        #endregion
+
+        #region Private Methods
+
+        /// <summary>
+        /// Go to Data instance page
+        /// </summary>
+        /// <param name="id">ID of the data instance.</param>
+        private void GoToDataInstancePage(long id)
+        {
+            DI.ViewModelApplication.GoToPage(ApplicationPage.DataInstance,
+                Framework.Service<DataInstancePageViewModel>().Init(id)
+                );
         }
 
         #endregion

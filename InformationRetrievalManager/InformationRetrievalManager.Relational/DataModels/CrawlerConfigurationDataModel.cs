@@ -58,11 +58,11 @@ namespace InformationRetrievalManager.Relational
 
         public static readonly bool SiteArticleDateTimeFormat_IsRequired = false;
         public static readonly short SiteArticleDateTimeFormat_MaxLength = 50;
-        public static readonly string SiteArticleDateTimeFormat_DefaultValue = "";
+        public static readonly string SiteArticleDateTimeFormat_DefaultValue = "yyyy-MM-dd HH:mm";
 
         public static readonly bool SiteArticleDateTimeCultureInfo_IsRequired = false;
         public static readonly short SiteArticleDateTimeCultureInfo_MaxLength = 10;
-        public static readonly string SiteArticleDateTimeCultureInfo_DefaultValue = "";
+        public static readonly string SiteArticleDateTimeCultureInfo_DefaultValue = "en-US";
 
         #endregion
 
