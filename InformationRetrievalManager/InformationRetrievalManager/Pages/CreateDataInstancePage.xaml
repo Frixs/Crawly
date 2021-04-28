@@ -155,8 +155,8 @@
                             <Button
                                 Grid.Row="1"
                                 MinWidth="125"
-                                FontSize="18"
-                                Padding="15,8,15,8"
+                                FontSize="16"
+                                Padding="12,7,12,8"
                                 Margin="0,15,0,0"
                                 HorizontalAlignment="Center"
                                 local:IsBusyProperty.Value="{Binding FormProcessingFlag}"
