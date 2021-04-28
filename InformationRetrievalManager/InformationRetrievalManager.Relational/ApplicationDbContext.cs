@@ -26,6 +26,11 @@ namespace InformationRetrievalManager.Relational
         public DbSet<DataInstanceDataModel> DataInstances { get; set; }
 
         /// <summary>
+        /// Crawler configuration data
+        /// </summary>
+        public DbSet<CrawlerConfigurationDataModel> CrawlerConfigurations { get; set; }
+
+        /// <summary>
         /// Processing configuration data
         /// </summary>
         public DbSet<IndexProcessingConfigurationDataModel> IndexProcessingConfigurations { get; set; }
@@ -71,6 +76,18 @@ namespace InformationRetrievalManager.Relational
             //
             // Set Id as primary key
             modelBuilder.Entity<DataInstanceDataModel>().HasKey(a => a.Id);
+
+            // Configure Crawler Configurations
+            // ------------------------------
+            //
+            // Set Id as primary key
+            modelBuilder.Entity<CrawlerConfigurationDataModel>().HasKey(a => a.Id);
+            // Set Foreign Key
+            modelBuilder.Entity<CrawlerConfigurationDataModel>()
+                .HasOne(o => o.DataInstance)
+                .WithOne(o => o.CrawlerConfiguration)
+                .HasForeignKey<CrawlerConfigurationDataModel>(o => o.DataInstanceId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             // Configure Index Processing Configurations
             // ------------------------------

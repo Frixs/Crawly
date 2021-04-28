@@ -163,7 +163,7 @@ namespace InformationRetrievalManager
                         await UnloadProcessAsync();
 
                     // Start the animation.
-                    await this.SlideAndFadeOutAsync(AnimationSlideInDirection.Bottom, SlideSeconds, size: SlideDistance);
+                    await this.SlideAndFadeOutAsync(AnimationSlideInDirection.Bottom, SlideSeconds, size: SlideDistance, hideOnly: true);
 
                     break;
             }

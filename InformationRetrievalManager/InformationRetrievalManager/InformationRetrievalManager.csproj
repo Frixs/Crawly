@@ -186,6 +186,7 @@
     <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.12.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
+    <Reference Include="PresentationFramework.Aero2" />
     <Reference Include="PropertyChanged, Version=3.3.2.0, Culture=neutral, PublicKeyToken=ee3ee20bcf148ddd, processorArchitecture=MSIL">
       <HintPath>..\packages\PropertyChanged.Fody.3.3.2\lib\net40\PropertyChanged.dll</HintPath>
     </Reference>
@@ -380,6 +381,21 @@
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
+    <Reference Include="Xceed.Wpf.AvalonDock, Version=4.0.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
+      <HintPath>..\packages\Extended.Wpf.Toolkit.4.0.2\lib\net40\Xceed.Wpf.AvalonDock.dll</HintPath>
+    </Reference>
+    <Reference Include="Xceed.Wpf.AvalonDock.Themes.Aero, Version=4.0.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
+      <HintPath>..\packages\Extended.Wpf.Toolkit.4.0.2\lib\net40\Xceed.Wpf.AvalonDock.Themes.Aero.dll</HintPath>
+    </Reference>
+    <Reference Include="Xceed.Wpf.AvalonDock.Themes.Metro, Version=4.0.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
+      <HintPath>..\packages\Extended.Wpf.Toolkit.4.0.2\lib\net40\Xceed.Wpf.AvalonDock.Themes.Metro.dll</HintPath>
+    </Reference>
+    <Reference Include="Xceed.Wpf.AvalonDock.Themes.VS2010, Version=4.0.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
+      <HintPath>..\packages\Extended.Wpf.Toolkit.4.0.2\lib\net40\Xceed.Wpf.AvalonDock.Themes.VS2010.dll</HintPath>
+    </Reference>
+    <Reference Include="Xceed.Wpf.Toolkit, Version=4.0.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
+      <HintPath>..\packages\Extended.Wpf.Toolkit.4.0.2\lib\net40\Xceed.Wpf.Toolkit.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">
@@ -390,6 +406,42 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Controls\CrawlerConfigurationForm.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\DataInstanceView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\Inputs\CheckEntry.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\Inputs\ComboEntry.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\Inputs\IntegerEntry.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\Inputs\TextEntry.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\ProcessingConfigurationForm.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\CreateDataInstancePage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\DataInstancePage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Pages\HomePage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -398,9 +450,29 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Styles\Inputs.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Styles\Texts.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Styles\Colors.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Styles\Buttons.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Styles\Fonts.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Styles\Scroll.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Styles\Windows.xaml">
       <SubType>Designer</SubType>
@@ -419,16 +491,49 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="AttachedProperties\Base\BaseAttachedProperty.cs" />
+    <Compile Include="AttachedProperties\ButtonAttachedProperties.cs" />
+    <Compile Include="AttachedProperties\DependencyObject\ValidationAttributeProperties.cs" />
     <Compile Include="AttachedProperties\FrameworkElementAnimationAttachedProperties.cs" />
     <Compile Include="AttachedProperties\NoFrameHistory.cs" />
+    <Compile Include="AttachedProperties\TextAttachedProperties.cs" />
+    <Compile Include="ControlContexts\CrawlerConfigurationFormContext.cs" />
+    <Compile Include="ControlContexts\ProcessingConfigurationFormContext.cs" />
+    <Compile Include="Controls\CrawlerConfigurationForm.xaml.cs">
+      <DependentUpon>CrawlerConfigurationForm.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\Inputs\CheckEntry.xaml.cs">
+      <DependentUpon>CheckEntry.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\Inputs\ComboEntry.xaml.cs">
+      <DependentUpon>ComboEntry.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\Inputs\IntegerEntry.xaml.cs">
+      <DependentUpon>IntegerEntry.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\Inputs\TextEntry.xaml.cs">
+      <DependentUpon>TextEntry.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\ProcessingConfigurationForm.xaml.cs">
+      <DependentUpon>ProcessingConfigurationForm.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\Structure\AlignableWrapPanel.cs" />
     <Compile Include="Controls\Base\PageHost.xaml.cs">
       <DependentUpon>PageHost.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\DataInstanceView.xaml.cs">
+      <DependentUpon>DataInstanceView.xaml</DependentUpon>
     </Compile>
     <Compile Include="DataTypes\ApplicationPage.cs" />
     <Compile Include="DI\DI.cs" />
     <Compile Include="DI\FrameworkConstructionExtensions.cs" />
     <Compile Include="Extensions\CrawlerExtensions.cs" />
     <Compile Include="Pages\Base\BasePage.cs" />
+    <Compile Include="Pages\CreateDataInstancePage.xaml.cs">
+      <DependentUpon>CreateDataInstancePage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\DataInstancePage.xaml.cs">
+      <DependentUpon>DataInstancePage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Pages\HomePage.xaml.cs">
       <DependentUpon>HomePage.xaml</DependentUpon>
     </Compile>
@@ -437,12 +542,36 @@
     </Compile>
     <Compile Include="UI\IUIManager.cs" />
     <Compile Include="UI\UIManager.cs" />
+    <Compile Include="ValidationRules\Base\BaseValidationRule.cs" />
+    <Compile Include="ValidationRules\DataIntegerValidationRule.cs" />
+    <Compile Include="ValidationRules\DataStringValidationRule.cs" />
     <Compile Include="ValueConverters\Base\ApplicationPageHelpers.cs" />
+    <Compile Include="ValueConverters\Base\BaseMultiValueConverter.cs" />
+    <Compile Include="ValueConverters\Base\BaseValueConverter.cs" />
+    <Compile Include="ValueConverters\StringEmptyConverter.cs" />
+    <Compile Include="ValueConverters\ComboBoxDescriptionConverter.cs" />
+    <Compile Include="ValueConverters\BooleanInvertConverter.cs" />
+    <Compile Include="ValueConverters\BooleanToVisibilityConverter.cs" />
+    <Compile Include="ValueConverters\BooleanToVisibilityGoneConverter.cs" />
+    <Compile Include="ValueConverters\CollectionHasAnyItemsConverter.cs" />
     <Compile Include="ViewModelsWPF\ViewModelLocator.cs" />
     <Compile Include="ViewModels\ApplicationViewModel.cs" />
+    <Compile Include="ViewModels\Base\BaseEntryViewModel.cs" />
     <Compile Include="ViewModels\Base\BaseViewModel.cs" />
     <Compile Include="ViewModels\Base\RelayCommand.cs" />
     <Compile Include="ViewModels\Base\RelayParameterizedCommand.cs" />
+    <Compile Include="ViewModels\Inputs\CheckEntryViewModel.cs" />
+    <Compile Include="ViewModels\Inputs\ComboEntryViewModel.cs" />
+    <Compile Include="ViewModels\Inputs\Design\CheckEntryDesignModel.cs" />
+    <Compile Include="ViewModels\Inputs\Design\ComboEntryDesignModel.cs" />
+    <Compile Include="ViewModels\Inputs\Design\IntegerEntryDesignModel.cs" />
+    <Compile Include="ViewModels\Inputs\Design\TextEntryDesignModel.cs" />
+    <Compile Include="ViewModels\Inputs\IntegerEntryViewModel.cs" />
+    <Compile Include="ViewModels\Inputs\TextEntryViewModel.cs" />
+    <Compile Include="ViewModels\Pages\CreateDataInstancePageViewModel.cs" />
+    <Compile Include="ViewModels\Pages\DataInstancePageViewModel.cs" />
+    <Compile Include="ViewModels\Pages\Design\CreateDataInstancePageDesignModel.cs" />
+    <Compile Include="ViewModels\Pages\Design\DataInstancePageDesignModel.cs" />
     <Compile Include="ViewModels\Pages\Design\HowToPageDesignModel.cs" />
     <Compile Include="ViewModels\Pages\Design\HomePageDesignModel.cs" />
     <Compile Include="ViewModels\Pages\HowToPageViewModel.cs" />
@@ -478,6 +607,17 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
+    <Resource Include="Resources\Fonts\Dosis\Bold\Dosis-Bold.ttf" />
+    <Resource Include="Resources\Fonts\Pacifico\Pacifico-Regular.ttf" />
+    <Resource Include="Resources\Fonts\Dosis\ExtraBold\Dosis-ExtraBold.ttf" />
+    <Resource Include="Resources\Fonts\Dosis\ExtraLight\Dosis-ExtraLight.ttf" />
+    <Resource Include="Resources\Fonts\Dosis\Light\Dosis-Light.ttf" />
+    <Resource Include="Resources\Fonts\Dosis\Medium\Dosis-Medium.ttf" />
+    <Resource Include="Resources\Fonts\Dosis\Dosis-Regular.ttf" />
+    <Resource Include="Resources\Fonts\Dosis\SemiBold\Dosis-SemiBold.ttf" />
+    <Resource Include="Resources\Fonts\FontAwesome\fa-brands-400.ttf" />
+    <Resource Include="Resources\Fonts\FontAwesome\fa-regular-400.ttf" />
+    <Resource Include="Resources\Fonts\FontAwesome\fa-solid-900.ttf" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -512,6 +652,15 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Images\logo_crawly_bold.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Images\texture_data_seamless.png" />
+  </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\Fody.6.3.0\build\Fody.targets" Condition="Exists('..\packages\Fody.6.3.0\build\Fody.targets')" />
@@ -528,4 +677,28 @@
   </Target>
   <Import Project="..\packages\Microsoft.ML.1.5.5\build\netstandard2.0\Microsoft.ML.targets" Condition="Exists('..\packages\Microsoft.ML.1.5.5\build\netstandard2.0\Microsoft.ML.targets')" />
   <Import Project="..\packages\SQLitePCLRaw.lib.e_sqlite3.2.0.2\build\net461\SQLitePCLRaw.lib.e_sqlite3.targets" Condition="Exists('..\packages\SQLitePCLRaw.lib.e_sqlite3.2.0.2\build\net461\SQLitePCLRaw.lib.e_sqlite3.targets')" />
+  <PropertyGroup>
+    <PostBuildEvent>DEL /F /Q Xceed.Wpf.AvalonDock*
+RD /S /Q "$(TargetDir)cs\"
+RD /S /Q "$(TargetDir)da\"
+RD /S /Q "$(TargetDir)de\"
+RD /S /Q "$(TargetDir)es\"
+RD /S /Q "$(TargetDir)fa\"
+RD /S /Q "$(TargetDir)fi\"
+RD /S /Q "$(TargetDir)fr\"
+RD /S /Q "$(TargetDir)hu\"
+RD /S /Q "$(TargetDir)it\"
+RD /S /Q "$(TargetDir)pt-BR\"
+RD /S /Q "$(TargetDir)ko\"
+RD /S /Q "$(TargetDir)mk\"
+RD /S /Q "$(TargetDir)nl\"
+RD /S /Q "$(TargetDir)pl\"
+RD /S /Q "$(TargetDir)pt\"
+RD /S /Q "$(TargetDir)ro\"
+RD /S /Q "$(TargetDir)ru\"
+RD /S /Q "$(TargetDir)sv\"
+RD /S /Q "$(TargetDir)tr\"
+RD /S /Q "$(TargetDir)zh-CN\"
+RD /S /Q "$(TargetDir)zh-Hans\"</PostBuildEvent>
+  </PropertyGroup>
 </Project>

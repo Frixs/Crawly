@@ -6,20 +6,26 @@
     xmlns:local="clr-namespace:InformationRetrievalManager"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     Title="HowToPage"
+    d:Background="{StaticResource BackgroundBrushKey}"
     d:DataContext="{x:Static local:HowToPageDesignModel.Instance}"
     d:DesignHeight="450"
-    d:DesignStyle="{StaticResource WindowBackgroundControlStyle}"
     d:DesignWidth="800"
     x:TypeArguments="local:HowToPageViewModel"
     mc:Ignorable="d">
 
     <Grid>
+        <TextBlock
+            Margin="0,-100,0,0"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            Text="Nothing's here yet." />
+
         <Button
             Height="25"
             Padding="10,0,10,0"
             HorizontalAlignment="Center"
             VerticalAlignment="Center"
             Command="{Binding GoToHomePageCommand}"
-            Content="GO HOME" />
+            Content="GO BACK" />
     </Grid>
 </local:BasePage>

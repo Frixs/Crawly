@@ -1,11 +1,8 @@
-﻿using InformationRetrievalManager.Core;
-using InformationRetrievalManager.Crawler;
-using InformationRetrievalManager.Relational;
+﻿using InformationRetrievalManager.Relational;
 using Ixs.DNA;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -93,23 +90,6 @@ namespace InformationRetrievalManager
 
             // Ensure the database is set up
             await Framework.Service<IUnitOfWork>().EnsureDatabaseCreatedAsync();
-
-            // HECK: crawler creation
-            // Add crawlers
-            var crawler = new CrawlerEngine("bdo-naeu");
-            crawler.SetControls(
-                siteAddress: "https://www.naeu.playblackdesert.com",
-                siteSuffix: "/en-US/News/Notice?boardType=0&Page={0}",
-                startPageNo: 1, maxPageNo: 8, pageNoModifier: 1,
-                searchInterval: 1000,
-                siteUrlArticlesXPath: "//article[@class='content']//ul[@class='thumb_nail_list']//a",
-                siteArticleContentAreaXPath: "//div[@class='view_detail_area']//div[contains(@class, 'contents_area')]",
-                siteArticleTitleXPath: "//div[@class='view_detail_area']//div[@class='title_area']//strong[@class='title']",
-                siteArticleCategoryXPath: "//div[@class='view_detail_area']//div[@class='title_area']//span[contains(@class, 'tag_label')]",
-                siteArticleDateTimeXPath: "//div[@class='view_detail_area']//div[@class='title_area']//span[@class='date']",
-                siteArticleDateTimeParseData: new DatetimeParseData("MMM d, yyyy, HH:mm (UTC)", CultureInfo.CreateSpecificCulture("en-US"))
-                );
-            await Framework.Service<ICrawlerManager>().AddCrawlerAsync(crawler);
         }
 
         /// <summary>

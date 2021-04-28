@@ -10,13 +10,171 @@
     <Color x:Key="DisabledBackground">#88BDBDC3</Color>
     <SolidColorBrush x:Key="DisabledBackgroundBrushKey" Color="{StaticResource DisabledBackground}" />
 
-    <Color x:Key="Background">#f7f7fc</Color>
+    <Color x:Key="DarkColor">#121517</Color>
+    <SolidColorBrush x:Key="DarkColorBrushKey" Color="{StaticResource DarkColor}" />
+
+    <Color x:Key="DarkInvColor">#D3E1E9</Color>
+    <SolidColorBrush x:Key="DarkInvColorBrushKey" Color="{StaticResource DarkInvColor}" />
+
+    <Color x:Key="LightColor">#421E33</Color>
+    <SolidColorBrush x:Key="LightColorBrushKey" Color="{StaticResource LightColor}" />
+
+    <Color x:Key="LightColorAlt">#F1E2EF</Color>
+    <SolidColorBrush x:Key="LightColorAltBrushKey" Color="{StaticResource LightColorAlt}" />
+
+    <Color x:Key="LightColorAlt2">#BBB1BA</Color>
+    <SolidColorBrush x:Key="LightColorAlt2BrushKey" Color="{StaticResource LightColorAlt2}" />
+
+    <Color x:Key="LightColorDry">#543848</Color>
+    <SolidColorBrush x:Key="LightColorDryBrushKey" Color="{StaticResource LightColorDry}" />
+
+    <Color x:Key="LightColorDark">#210b18</Color>
+    <SolidColorBrush x:Key="LightColorDarkBrushKey" Color="{StaticResource LightColorDark}" />
+
+    <Color x:Key="LightColorLight">#AA143F</Color>
+    <SolidColorBrush x:Key="LightColorLightBrushKey" Color="{StaticResource LightColorLight}" />
+
+    <Color x:Key="LightColorShiny">#ec3052</Color>
+    <SolidColorBrush x:Key="LightColorShinyBrushKey" Color="{StaticResource LightColorShiny}" />
+
+
+
+    <Color x:Key="Background">#ECECF7</Color>
     <SolidColorBrush x:Key="BackgroundBrushKey" Color="{StaticResource Background}" />
+    <Color x:Key="BackgroundAlt">#ECDDEA</Color>
+    <SolidColorBrush x:Key="BackgroundAltBrushKey" Color="{StaticResource BackgroundAlt}" />
 
-    <SolidColorBrush x:Key="ForegroundBrushKey" Color="{StaticResource ChameleonDark}" />
+    <SolidColorBrush x:Key="ForegroundBrushKey" Color="{StaticResource DarkColor}" />
+    <SolidColorBrush x:Key="ForegroundInvBrushKey" Color="{StaticResource DarkInvColor}" />
+    <SolidColorBrush x:Key="ForegroundInvAltBrushKey" Color="{StaticResource LightColorAlt}" />
 
-    <SolidColorBrush x:Key="ForegroundInvBrushKey" Color="{StaticResource ChameleonPureLight}" />
+    <!--#endregion-->
 
+    <!--#region Inputs-->
+    <Color x:Key="InputPlaceholderForeground">#BBB1BA</Color>
+    <SolidColorBrush x:Key="InputPlaceholderForegroundBrushKey" Color="{StaticResource InputPlaceholderForeground}" />
+
+    <Color x:Key="InputForeground">#DD121517</Color>
+    <SolidColorBrush x:Key="InputForegroundBrushKey" Color="{StaticResource InputForeground}" />
+
+    <Color x:Key="InputBackground">#40BBB1BA</Color>
+    <SolidColorBrush x:Key="InputBackgroundBrushKey" Color="{StaticResource InputBackground}" />
+    <Color x:Key="InputBackgroundSolid">#ECECF7</Color>
+    <SolidColorBrush x:Key="InputBackgroundSolidBrushKey" Color="{StaticResource InputBackgroundSolid}" />
+
+    <Color x:Key="InputBorderBackground">#CBCBD4</Color>
+    <SolidColorBrush x:Key="InputBorderBackgroundBrushKey" Color="{StaticResource InputBorderBackground}" />
+
+    <Color x:Key="InputFocusForeground">#121517</Color>
+    <SolidColorBrush x:Key="InputFocusForegroundBrushKey" Color="{StaticResource InputFocusForeground}" />
+
+    <Color x:Key="InputFocusBorderBackground">#543848</Color>
+    <SolidColorBrush x:Key="InputFocusBorderBackgroundBrushKey" Color="{StaticResource InputFocusBorderBackground}" />
+
+    <Color x:Key="InputPressBorderBackground">#AA143F</Color>
+    <SolidColorBrush x:Key="InputPressBorderBackgroundBrushKey" Color="{StaticResource InputPressBorderBackground}" />
+
+    <Color x:Key="InputErrorBorderBackground">#ec3052</Color>
+    <SolidColorBrush x:Key="InputErrorBorderBackgroundBrushKey" Color="{StaticResource InputErrorBorderBackground}" />
+
+    <Color x:Key="InputDisabledForeground">#A3989A</Color>
+    <SolidColorBrush x:Key="InputDisabledForegroundBrushKey" Color="{StaticResource InputDisabledForeground}" />
+
+    <Color x:Key="InputDisabledBackground">#CBCBD4</Color>
+    <SolidColorBrush x:Key="InputDisabledBackgroundBrushKey" Color="{StaticResource InputDisabledBackground}" />
+    <!--#endregion-->
+
+    <!--#region RegularButton-->
+    <Color x:Key="RegularButtonForeground">#CBCBD4</Color>
+    <SolidColorBrush x:Key="RegularButtonForegroundBrushKey" Color="{StaticResource RegularButtonForeground}" />
+
+    <Color x:Key="RegularButtonBackground">#63626D</Color>
+    <SolidColorBrush x:Key="RegularButtonBackgroundBrushKey" Color="{StaticResource RegularButtonBackground}" />
+
+    <Color x:Key="RegularButtonHoverForeground">#CBCBD4</Color>
+    <SolidColorBrush x:Key="RegularButtonHoverForegroundBrushKey" Color="{StaticResource RegularButtonHoverForeground}" />
+
+    <Color x:Key="RegularButtonHoverBackground">#3A3849</Color>
+    <SolidColorBrush x:Key="RegularButtonHoverBackgroundBrushKey" Color="{StaticResource RegularButtonHoverBackground}" />
+
+    <Color x:Key="RegularButtonActionForeground">#070516</Color>
+    <SolidColorBrush x:Key="RegularButtonActionForegroundBrushKey" Color="{StaticResource RegularButtonActionForeground}" />
+
+    <Color x:Key="RegularButtonActionBackground">#FDB154</Color>
+    <SolidColorBrush x:Key="RegularButtonActionBackgroundBrushKey" Color="{StaticResource RegularButtonActionBackground}" />
+    <!--#endregion-->
+
+    <!--#region DarkDarkButton-->
+    <Color x:Key="DarkDarkButtonForeground">#BBB1BA</Color>
+    <SolidColorBrush x:Key="DarkDarkButtonForegroundBrushKey" Color="{StaticResource DarkDarkButtonForeground}" />
+
+    <Color x:Key="DarkDarkButtonBackground">#65543848</Color>
+    <SolidColorBrush x:Key="DarkDarkButtonBackgroundBrushKey" Color="{StaticResource DarkDarkButtonBackground}" />
+    <Color x:Key="DarkDarkButtonBorder">#45543848</Color>
+    <SolidColorBrush x:Key="DarkDarkButtonBorderBrushKey" Color="{StaticResource DarkDarkButtonBorder}" />
+
+    <Color x:Key="DarkDarkButtonHoverForeground">#F1E2EF</Color>
+    <SolidColorBrush x:Key="DarkDarkButtonHoverForegroundBrushKey" Color="{StaticResource DarkDarkButtonHoverForeground}" />
+
+    <Color x:Key="DarkDarkButtonHoverBackground">#65AA143F</Color>
+    <SolidColorBrush x:Key="DarkDarkButtonHoverBackgroundBrushKey" Color="{StaticResource DarkDarkButtonHoverBackground}" />
+
+    <Color x:Key="DarkDarkButtonActionForeground">#F1E2EF</Color>
+    <SolidColorBrush x:Key="DarkDarkButtonActionForegroundBrushKey" Color="{StaticResource DarkDarkButtonActionForeground}" />
+
+    <Color x:Key="DarkDarkButtonActionBackground">#75CB0F45</Color>
+    <SolidColorBrush x:Key="DarkDarkButtonActionBackgroundBrushKey" Color="{StaticResource DarkDarkButtonActionBackground}" />
+    <!--#endregion-->
+
+    <!--#region DarkLightButton-->
+    <Color x:Key="DarkLightButtonForeground">#BBB1BA</Color>
+    <SolidColorBrush x:Key="DarkLightButtonForegroundBrushKey" Color="{StaticResource DarkLightButtonForeground}" />
+
+    <Color x:Key="DarkLightButtonBackground">#40BBB1BA</Color>
+    <SolidColorBrush x:Key="DarkLightButtonBackgroundBrushKey" Color="{StaticResource DarkLightButtonBackground}" />
+
+    <Color x:Key="DarkLightButtonHoverForeground">#F1E2EF</Color>
+    <SolidColorBrush x:Key="DarkLightButtonHoverForegroundBrushKey" Color="{StaticResource DarkLightButtonHoverForeground}" />
+
+    <Color x:Key="DarkLightButtonHoverBackground">#65AA143F</Color>
+    <SolidColorBrush x:Key="DarkLightButtonHoverBackgroundBrushKey" Color="{StaticResource DarkLightButtonHoverBackground}" />
+
+    <Color x:Key="DarkLightButtonActionForeground">#F1E2EF</Color>
+    <SolidColorBrush x:Key="DarkLightButtonActionForegroundBrushKey" Color="{StaticResource DarkLightButtonActionForeground}" />
+
+    <Color x:Key="DarkLightButtonActionBackground">#75CB0F45</Color>
+    <SolidColorBrush x:Key="DarkLightButtonActionBackgroundBrushKey" Color="{StaticResource DarkLightButtonActionBackground}" />
+    <!--#endregion-->
+
+    <!--#region LightColorButton-->
+    <Color x:Key="LightColorButtonForeground">#F1E2EF</Color>
+    <SolidColorBrush x:Key="LightColorButtonForegroundBrushKey" Color="{StaticResource LightColorButtonForeground}" />
+
+    <Color x:Key="LightColorButtonBackground">#AA143F</Color>
+    <SolidColorBrush x:Key="LightColorButtonBackgroundBrushKey" Color="{StaticResource LightColorButtonBackground}" />
+
+    <Color x:Key="LightColorButtonHoverForeground">#F1E2EF</Color>
+    <SolidColorBrush x:Key="LightColorButtonHoverForegroundBrushKey" Color="{StaticResource LightColorButtonHoverForeground}" />
+
+    <Color x:Key="LightColorButtonHoverBackground">#8D1738</Color>
+    <SolidColorBrush x:Key="LightColorButtonHoverBackgroundBrushKey" Color="{StaticResource LightColorButtonHoverBackground}" />
+
+    <Color x:Key="LightColorButtonActionForeground">#F1E2EF</Color>
+    <SolidColorBrush x:Key="LightColorButtonActionForegroundBrushKey" Color="{StaticResource LightColorButtonActionForeground}" />
+
+    <Color x:Key="LightColorButtonActionBackground">#ec3052</Color>
+    <SolidColorBrush x:Key="LightColorButtonActionBackgroundBrushKey" Color="{StaticResource LightColorButtonActionBackground}" />
+    <!--#endregion-->
+
+    <!--#region LightDarkTextButton-->
+    <Color x:Key="LightDarkTextButtonForeground">#121517</Color>
+    <SolidColorBrush x:Key="LightDarkTextButtonForegroundBrushKey" Color="{StaticResource LightDarkTextButtonForeground}" />
+
+    <Color x:Key="LightDarkTextButtonHoverForeground">#AA143F</Color>
+    <SolidColorBrush x:Key="LightDarkTextButtonHoverForegroundBrushKey" Color="{StaticResource LightDarkTextButtonHoverForeground}" />
+
+    <Color x:Key="LightDarkTextButtonActionForeground">#210b18</Color>
+    <SolidColorBrush x:Key="LightDarkTextButtonActionForegroundBrushKey" Color="{StaticResource LightDarkTextButtonActionForeground}" />
     <!--#endregion-->
 
 </ResourceDictionary>
