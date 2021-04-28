@@ -69,7 +69,7 @@ namespace InformationRetrievalManager.Relational
         public override IEnumerable<ApplicationStateDataModel> Get(
             Expression<Func<ApplicationStateDataModel, bool>> filter = null,
             Func<IQueryable<ApplicationStateDataModel>, IOrderedQueryable<ApplicationStateDataModel>> orderBy = null,
-            string includeProperties = "")
+            params string[] includeProperties)
             => throw new NotSupportedException();
 
         /// <summary>

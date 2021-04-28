@@ -34,13 +34,16 @@ namespace InformationRetrievalManager.Relational
         IEnumerable<TEntity> Get(
             Expression<Func<TEntity, bool>> filter = null, 
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null, 
-            string includeProperties = "");
+            params string[] includeProperties);
 
         /// <summary>
         /// Get an entity by ID
         /// </summary>
         /// <param name="id">The ID</param>
         /// <returns>The entity</returns>
+        /// <remarks>
+        ///     Does not return includes (relations).
+        /// </remarks>
         TEntity GetByID(object id);
 
         /// <summary>
