@@ -98,7 +98,7 @@ namespace InformationRetrievalManager
         {
             await RunCommandAsync(() => FormProcessingFlag, async () =>
             {
-                await Task.Delay(1);
+                await Task.Delay(1000);
             });
         }
 

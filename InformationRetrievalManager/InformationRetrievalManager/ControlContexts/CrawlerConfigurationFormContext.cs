@@ -81,7 +81,7 @@ namespace InformationRetrievalManager
             SearchIntervalEntry = new IntegerEntryViewModel
             {
                 Label = "Search Interval",
-                Description = "The delay between each crawler searches to lighten the load on the searched site.",
+                Description = "The delay (stated in milliseconds) between each crawler searches to lighten the load on the searched site.",
                 Validation = ValidationHelpers.GetPropertyValidateAttribute<CrawlerConfigurationDataModel, int, ValidateIntegerAttribute>(o => o.SearchInterval),
                 Value = CrawlerConfigurationDataModel.SearchInterval_DefaultValue,
                 MinValue = CrawlerConfigurationDataModel.SearchInterval_MinValue,

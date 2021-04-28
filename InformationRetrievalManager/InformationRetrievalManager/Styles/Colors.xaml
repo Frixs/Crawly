@@ -59,6 +59,8 @@
 
     <Color x:Key="InputBackground">#40BBB1BA</Color>
     <SolidColorBrush x:Key="InputBackgroundBrushKey" Color="{StaticResource InputBackground}" />
+    <Color x:Key="InputBackgroundSolid">#ECECF7</Color>
+    <SolidColorBrush x:Key="InputBackgroundSolidBrushKey" Color="{StaticResource InputBackgroundSolid}" />
 
     <Color x:Key="InputBorderBackground">#CBCBD4</Color>
     <SolidColorBrush x:Key="InputBorderBackgroundBrushKey" Color="{StaticResource InputBorderBackground}" />
