@@ -547,7 +547,7 @@
     <Compile Include="ValueConverters\Base\ApplicationPageHelpers.cs" />
     <Compile Include="ValueConverters\Base\BaseMultiValueConverter.cs" />
     <Compile Include="ValueConverters\Base\BaseValueConverter.cs" />
-    <Compile Include="ValueConverters\BooleanInvertConverter - Copy.cs" />
+    <Compile Include="ValueConverters\StringEmptyConverter.cs" />
     <Compile Include="ValueConverters\ComboBoxDescriptionConverter.cs" />
     <Compile Include="ValueConverters\BooleanInvertConverter.cs" />
     <Compile Include="ValueConverters\BooleanToVisibilityConverter.cs" />

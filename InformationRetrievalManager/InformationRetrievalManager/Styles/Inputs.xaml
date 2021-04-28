@@ -14,7 +14,7 @@
         <Setter Property="Background" Value="{StaticResource InputBackgroundBrushKey}" />
         <Setter Property="Foreground" Value="{StaticResource InputForegroundBrushKey}" />
         <Setter Property="BorderBrush" Value="{StaticResource InputBorderBackgroundBrushKey}" />
-        <Setter Property="BorderThickness" Value="2,0,0,2" />
+        <Setter Property="BorderThickness" Value="0,0,0,2" />
 
         <Setter Property="Template">
             <Setter.Value>
@@ -84,6 +84,7 @@
                         <!--  Focus  -->
                         <Trigger Property="IsKeyboardFocused" Value="True">
                             <Setter TargetName="border" Property="BorderBrush" Value="{StaticResource InputFocusBorderBackgroundBrushKey}" />
+                            <Setter Property="Foreground" Value="{StaticResource InputFocusForegroundBrushKey}" />
                         </Trigger>
                         <!--  Has Error  -->
                         <Trigger Property="Validation.HasError" Value="True">

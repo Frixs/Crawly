@@ -36,7 +36,7 @@ namespace InformationRetrievalManager
             SiteAddressEntry = new TextEntryViewModel
             {
                 Label = "Site Address",
-                Description = "",
+                Description = "TODO here so logn text lorem ipsum nevim neco dalsiho pisu je to jedno ale dlouho ale je potřeba jeste delsi adz do nevidim",
                 Validation = ValidationHelpers.GetPropertyValidateAttribute<CrawlerConfigurationDataModel, string, ValidateStringAttribute>(o => o.SiteAddress),
                 Value = CrawlerConfigurationDataModel.SiteAddress_DefaultValue,
                 Placeholder = "E.g.: https://www.google.com",

@@ -23,11 +23,14 @@
     <!--  Set default font for these elements  -->
     <Style x:Key="BaseStyle" TargetType="{x:Type Control}">
         <Setter Property="FontFamily" Value="{StaticResource DosisRegular}" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="Foreground" Value="{StaticResource DarkColorBrushKey}" />
     </Style>
 
     <Style x:Key="BaseTextBlockStyle" TargetType="{x:Type TextBlock}">
         <Setter Property="FontFamily" Value="{StaticResource DosisRegular}" />
         <Setter Property="FontSize" Value="14" />
+        <Setter Property="Foreground" Value="{StaticResource DarkColorBrushKey}" />
     </Style>
 
     <Style BasedOn="{StaticResource BaseStyle}" TargetType="{x:Type Button}" />

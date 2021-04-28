@@ -50,6 +50,8 @@
                                 VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
                                 Focusable="False"
                                 FontFamily="{TemplateBinding FontFamily}"
+                                FontSize="{TemplateBinding FontSize}"
+                                Foreground="{TemplateBinding Foreground}"
                                 SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
                                 Text="{TemplateBinding Content}"
                                 Visibility="{TemplateBinding local:IsBusyProperty.Value,
@@ -57,6 +59,7 @@
                             <TextBlock
                                 HorizontalAlignment="Center"
                                 VerticalAlignment="Center"
+                                Foreground="{TemplateBinding Foreground}"
                                 Style="{StaticResource SpinningText}"
                                 Visibility="{TemplateBinding local:IsBusyProperty.Value,
                                                              Converter={local:BooleanToVisibilityConverter},
@@ -149,6 +152,7 @@
                                 Focusable="False"
                                 FontFamily="{TemplateBinding FontFamily}"
                                 FontSize="{TemplateBinding FontSize}"
+                                Foreground="{TemplateBinding Foreground}"
                                 SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
                                 Text="{TemplateBinding Content}"
                                 Visibility="{TemplateBinding local:IsBusyProperty.Value,
@@ -156,6 +160,7 @@
                             <TextBlock
                                 HorizontalAlignment="Center"
                                 VerticalAlignment="Center"
+                                Foreground="{TemplateBinding Foreground}"
                                 Style="{StaticResource SpinningText}"
                                 Visibility="{TemplateBinding local:IsBusyProperty.Value,
                                                              Converter={local:BooleanToVisibilityConverter},
@@ -248,6 +253,7 @@
                                 Focusable="False"
                                 FontFamily="{TemplateBinding FontFamily}"
                                 FontSize="{TemplateBinding FontSize}"
+                                Foreground="{TemplateBinding Foreground}"
                                 SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
                                 Text="{TemplateBinding Content}"
                                 Visibility="{TemplateBinding local:IsBusyProperty.Value,
@@ -255,6 +261,7 @@
                             <TextBlock
                                 HorizontalAlignment="Center"
                                 VerticalAlignment="Center"
+                                Foreground="{TemplateBinding Foreground}"
                                 Style="{StaticResource SpinningText}"
                                 Visibility="{TemplateBinding local:IsBusyProperty.Value,
                                                              Converter={local:BooleanToVisibilityConverter},
@@ -346,6 +353,7 @@
                                 Focusable="False"
                                 FontFamily="{TemplateBinding FontFamily}"
                                 FontSize="{TemplateBinding FontSize}"
+                                Foreground="{TemplateBinding Foreground}"
                                 SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
                                 Text="{TemplateBinding Content}"
                                 Visibility="{TemplateBinding local:IsBusyProperty.Value,
@@ -353,6 +361,7 @@
                             <TextBlock
                                 HorizontalAlignment="Center"
                                 VerticalAlignment="Center"
+                                Foreground="{TemplateBinding Foreground}"
                                 Style="{StaticResource SpinningText}"
                                 Visibility="{TemplateBinding local:IsBusyProperty.Value,
                                                              Converter={local:BooleanToVisibilityConverter},

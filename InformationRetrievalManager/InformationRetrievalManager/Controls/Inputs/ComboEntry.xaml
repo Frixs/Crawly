@@ -8,10 +8,10 @@
     d:DataContext="{x:Static local:ComboEntryDesignModel.Instance}"
     d:DesignWidth="200"
     mc:Ignorable="d">
-    <Grid>
+    <Grid Margin="0,0,0,5">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="50" />
+            <RowDefinition Height="42" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
@@ -22,7 +22,7 @@
             HorizontalAlignment="Left"
             VerticalAlignment="Center"
             FontFamily="{StaticResource DosisBold}"
-            FontSize="16"
+            FontSize="15"
             Text="{Binding Label, Mode=OneWay}" />
 
         <!--  Value Input  -->

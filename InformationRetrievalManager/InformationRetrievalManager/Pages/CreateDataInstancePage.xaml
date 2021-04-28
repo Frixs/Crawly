@@ -82,11 +82,15 @@
                     <TextBlock
                         Grid.Column="0"
                         HorizontalAlignment="Center"
+                        FontFamily="{StaticResource DosisRegular}"
+                        FontSize="15"
                         Text="Crawler Configuration" />
 
                     <TextBlock
                         Grid.Column="1"
                         HorizontalAlignment="Center"
+                        FontFamily="{StaticResource DosisRegular}"
+                        FontSize="15"
                         Text="Processing Configuration" />
                 </Grid>
 

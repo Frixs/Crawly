@@ -9,10 +9,10 @@
     d:DataContext="{x:Static local:IntegerEntryDesignModel.Instance}"
     d:DesignWidth="200"
     mc:Ignorable="d">
-    <Grid>
+    <Grid Margin="0,0,0,5">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="50" />
+            <RowDefinition Height="42" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
@@ -23,7 +23,7 @@
             HorizontalAlignment="Left"
             VerticalAlignment="Center"
             FontFamily="{StaticResource DosisBold}"
-            FontSize="16"
+            FontSize="15"
             Text="{Binding Label, Mode=OneWay}" />
 
         <!--  Value Input  -->
@@ -31,7 +31,8 @@
             Grid.Row="1"
             Width="Auto"
             Height="30"
-            Padding="2"
+            Margin="0,3"
+            Padding="10,8"
             VerticalAlignment="Center"
             FontSize="14"
             FormatString="N0"

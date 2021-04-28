@@ -50,22 +50,33 @@
 
     <!--#endregion-->
 
-    <!--#region Forms-->
-    <SolidColorBrush x:Key="InputPlaceholderForegroundBrushKey" Color="{StaticResource LightColorAlt2}" />
+    <!--#region Inputs-->
+    <Color x:Key="InputPlaceholderForeground">#BBB1BA</Color>
+    <SolidColorBrush x:Key="InputPlaceholderForegroundBrushKey" Color="{StaticResource InputPlaceholderForeground}" />
 
-    <SolidColorBrush x:Key="InputForegroundBrushKey" Color="{StaticResource DarkColor}" />
+    <Color x:Key="InputForeground">#DD121517</Color>
+    <SolidColorBrush x:Key="InputForegroundBrushKey" Color="{StaticResource InputForeground}" />
 
-    <SolidColorBrush x:Key="InputBackgroundBrushKey" Color="{StaticResource LightColorAlt}" />
+    <Color x:Key="InputBackground">#40BBB1BA</Color>
+    <SolidColorBrush x:Key="InputBackgroundBrushKey" Color="{StaticResource InputBackground}" />
 
-    <SolidColorBrush x:Key="InputBorderBackgroundBrushKey" Color="{StaticResource LightColorDry}" />
+    <Color x:Key="InputBorderBackground">#CBCBD4</Color>
+    <SolidColorBrush x:Key="InputBorderBackgroundBrushKey" Color="{StaticResource InputBorderBackground}" />
 
-    <SolidColorBrush x:Key="InputFocusBorderBackgroundBrushKey" Color="{StaticResource LightColor}" />
+    <Color x:Key="InputFocusForeground">#121517</Color>
+    <SolidColorBrush x:Key="InputFocusForegroundBrushKey" Color="{StaticResource InputFocusForeground}" />
 
-    <SolidColorBrush x:Key="InputErrorBorderBackgroundBrushKey" Color="{StaticResource LightColorLight}" />
+    <Color x:Key="InputFocusBorderBackground">#543848</Color>
+    <SolidColorBrush x:Key="InputFocusBorderBackgroundBrushKey" Color="{StaticResource InputFocusBorderBackground}" />
 
-    <SolidColorBrush x:Key="InputDisabledForegroundBrushKey" Color="{StaticResource LightColorAlt2}" />
+    <Color x:Key="InputErrorBorderBackground">#ec3052</Color>
+    <SolidColorBrush x:Key="InputErrorBorderBackgroundBrushKey" Color="{StaticResource InputErrorBorderBackground}" />
 
-    <SolidColorBrush x:Key="InputDisabledBackgroundBrushKey" Color="{StaticResource DisabledBackground}" />
+    <Color x:Key="InputDisabledForeground">#A3989A</Color>
+    <SolidColorBrush x:Key="InputDisabledForegroundBrushKey" Color="{StaticResource InputDisabledForeground}" />
+
+    <Color x:Key="InputDisabledBackground">#CBCBD4</Color>
+    <SolidColorBrush x:Key="InputDisabledBackgroundBrushKey" Color="{StaticResource InputDisabledBackground}" />
     <!--#endregion-->
 
     <!--#region RegularButton-->

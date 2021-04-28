@@ -8,6 +8,15 @@ namespace InformationRetrievalManager
     /// </summary>
     public abstract class BaseEntryViewModel : BaseViewModel
     {
+        #region Private Members
+
+        /// <summary>
+        /// Short description about the input
+        /// </summary>
+        public string _description;
+
+        #endregion
+
         #region Public Properties
 
         /// <summary>
@@ -16,9 +25,13 @@ namespace InformationRetrievalManager
         public string Label { get; set; }
 
         /// <summary>
-        /// Short description about the input
+        /// Property for <see cref="_description"/>
         /// </summary>
-        public string Description { get; set; }
+        public string Description
+        {
+            get => _description;
+            set => _description = string.IsNullOrWhiteSpace(value) ? null : value;
+        }
 
         #endregion
 
