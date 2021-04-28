@@ -33,6 +33,7 @@ namespace InformationRetrievalManager
         /// </summary>
         public CrawlerConfigurationFormContext()
         {
+            // TODO localization
             SiteAddressEntry = new TextEntryViewModel
             {
                 Label = "Site Address",

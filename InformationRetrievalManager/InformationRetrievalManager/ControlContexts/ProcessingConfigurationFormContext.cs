@@ -28,6 +28,7 @@ namespace InformationRetrievalManager
         /// </summary>
         public ProcessingConfigurationFormContext()
         {
+            // TODO localization
             LanguageEntry = new ComboEntryViewModel<ProcessingLanguage>()
             {
                 Label = "Language",
