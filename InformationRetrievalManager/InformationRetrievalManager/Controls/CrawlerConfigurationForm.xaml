@@ -19,9 +19,8 @@
         <local:TextEntry DataContext="{Binding FormContext.SiteSuffixEntry, ElementName=this, Mode=OneWay}" />
         <Grid>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="3*" />
-                <ColumnDefinition Width="3*" />
-                <ColumnDefinition Width="3*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
             </Grid.ColumnDefinitions>
 
             <local:IntegerEntry
@@ -30,22 +29,22 @@
                 DataContext="{Binding FormContext.StartPageNoEntry, ElementName=this, Mode=OneWay}" />
             <local:IntegerEntry
                 Grid.Column="1"
-                Margin="8,0,8,0"
-                DataContext="{Binding FormContext.MaxPageNoEntry, ElementName=this, Mode=OneWay}" />
-            <local:IntegerEntry
-                Grid.Column="2"
                 Margin="8,0,0,0"
-                DataContext="{Binding FormContext.PageNoModifierEntry, ElementName=this, Mode=OneWay}" />
+                DataContext="{Binding FormContext.MaxPageNoEntry, ElementName=this, Mode=OneWay}" />
         </Grid>
         <Grid>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="3*" />
-                <ColumnDefinition Width="3*" />
-                <ColumnDefinition Width="3*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
             </Grid.ColumnDefinitions>
 
             <local:IntegerEntry
-                Grid.Column="2"
+                Grid.Column="0"
+                Margin="0,0,8,0"
+                DataContext="{Binding FormContext.PageNoModifierEntry, ElementName=this, Mode=OneWay}" />
+
+            <local:IntegerEntry
+                Grid.Column="1"
                 Margin="8,0,0,0"
                 DataContext="{Binding FormContext.SearchIntervalEntry, ElementName=this, Mode=OneWay}" />
         </Grid>

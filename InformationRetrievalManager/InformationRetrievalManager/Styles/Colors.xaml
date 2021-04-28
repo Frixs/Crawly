@@ -117,7 +117,7 @@
     <Color x:Key="DarkDarkButtonActionForeground">#F1E2EF</Color>
     <SolidColorBrush x:Key="DarkDarkButtonActionForegroundBrushKey" Color="{StaticResource DarkDarkButtonActionForeground}" />
 
-    <Color x:Key="DarkDarkButtonActionBackground">#65BB1242</Color>
+    <Color x:Key="DarkDarkButtonActionBackground">#75CB0F45</Color>
     <SolidColorBrush x:Key="DarkDarkButtonActionBackgroundBrushKey" Color="{StaticResource DarkDarkButtonActionBackground}" />
     <!--#endregion-->
 
@@ -137,7 +137,7 @@
     <Color x:Key="DarkLightButtonActionForeground">#F1E2EF</Color>
     <SolidColorBrush x:Key="DarkLightButtonActionForegroundBrushKey" Color="{StaticResource DarkLightButtonActionForeground}" />
 
-    <Color x:Key="DarkLightButtonActionBackground">#65BB1242</Color>
+    <Color x:Key="DarkLightButtonActionBackground">#75CB0F45</Color>
     <SolidColorBrush x:Key="DarkLightButtonActionBackgroundBrushKey" Color="{StaticResource DarkLightButtonActionBackground}" />
     <!--#endregion-->
 

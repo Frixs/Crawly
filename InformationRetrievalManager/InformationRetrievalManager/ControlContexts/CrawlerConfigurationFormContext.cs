@@ -71,8 +71,8 @@ namespace InformationRetrievalManager
             };
             PageNoModifierEntry = new IntegerEntryViewModel
             {
-                Label = "Page Number Modifier",
-                Description = "",
+                Label = "Page Number Step",
+                Description = "Incremental step between page numbers.",
                 Validation = ValidationHelpers.GetPropertyValidateAttribute<CrawlerConfigurationDataModel, int, ValidateIntegerAttribute>(o => o.PageNoModifier),
                 Value = CrawlerConfigurationDataModel.PageNoModifier_DefaultValue,
                 MinValue = CrawlerConfigurationDataModel.PageNoModifier_MinValue,
@@ -81,7 +81,7 @@ namespace InformationRetrievalManager
             SearchIntervalEntry = new IntegerEntryViewModel
             {
                 Label = "Search Interval",
-                Description = "milliseconds",
+                Description = "The delay between each crawler searches to lighten the load on the searched site.",
                 Validation = ValidationHelpers.GetPropertyValidateAttribute<CrawlerConfigurationDataModel, int, ValidateIntegerAttribute>(o => o.SearchInterval),
                 Value = CrawlerConfigurationDataModel.SearchInterval_DefaultValue,
                 MinValue = CrawlerConfigurationDataModel.SearchInterval_MinValue,
