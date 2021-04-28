@@ -8,7 +8,7 @@
     Title="CreateDataInstancePage"
     d:Background="{StaticResource BackgroundBrushKey}"
     d:DataContext="{x:Static local:CreateDataInstancePageDesignModel.Instance}"
-    d:DesignHeight="900"
+    d:DesignHeight="1200"
     d:DesignWidth="1200"
     x:TypeArguments="local:CreateDataInstancePageViewModel"
     mc:Ignorable="d">
@@ -155,12 +155,14 @@
                             <Button
                                 Grid.Row="1"
                                 MinWidth="125"
+                                FontSize="18"
+                                Padding="15,8,15,8"
                                 Margin="0,15,0,0"
                                 HorizontalAlignment="Center"
                                 local:IsBusyProperty.Value="{Binding FormProcessingFlag}"
                                 Command="{Binding CreateCommand, Mode=OneTime}"
                                 Content="CREATE"
-                                Style="{StaticResource RegularButton}" />
+                                Style="{StaticResource LightColorButton}" />
                         </Grid>
                     </Grid>
                 </ScrollViewer>

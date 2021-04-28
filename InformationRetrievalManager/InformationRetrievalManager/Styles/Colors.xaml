@@ -146,6 +146,26 @@
     <SolidColorBrush x:Key="DarkLightButtonActionBackgroundBrushKey" Color="{StaticResource DarkLightButtonActionBackground}" />
     <!--#endregion-->
 
+    <!--#region LightColorButton-->
+    <Color x:Key="LightColorButtonForeground">#F1E2EF</Color>
+    <SolidColorBrush x:Key="LightColorButtonForegroundBrushKey" Color="{StaticResource LightColorButtonForeground}" />
+
+    <Color x:Key="LightColorButtonBackground">#AA143F</Color>
+    <SolidColorBrush x:Key="LightColorButtonBackgroundBrushKey" Color="{StaticResource LightColorButtonBackground}" />
+
+    <Color x:Key="LightColorButtonHoverForeground">#F1E2EF</Color>
+    <SolidColorBrush x:Key="LightColorButtonHoverForegroundBrushKey" Color="{StaticResource LightColorButtonHoverForeground}" />
+
+    <Color x:Key="LightColorButtonHoverBackground">#8D1738</Color>
+    <SolidColorBrush x:Key="LightColorButtonHoverBackgroundBrushKey" Color="{StaticResource LightColorButtonHoverBackground}" />
+
+    <Color x:Key="LightColorButtonActionForeground">#F1E2EF</Color>
+    <SolidColorBrush x:Key="LightColorButtonActionForegroundBrushKey" Color="{StaticResource LightColorButtonActionForeground}" />
+
+    <Color x:Key="LightColorButtonActionBackground">#ec3052</Color>
+    <SolidColorBrush x:Key="LightColorButtonActionBackgroundBrushKey" Color="{StaticResource LightColorButtonActionBackground}" />
+    <!--#endregion-->
+
     <!--#region LightDarkTextButton-->
     <Color x:Key="LightDarkTextButtonForeground">#121517</Color>
     <SolidColorBrush x:Key="LightDarkTextButtonForegroundBrushKey" Color="{StaticResource LightDarkTextButtonForeground}" />

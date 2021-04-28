@@ -19,107 +19,6 @@
         </Setter>
     </Style>
 
-    <!--#region RegularButton-->
-    <Style
-        x:Key="RegularButton"
-        BasedOn="{StaticResource Hoverless}"
-        TargetType="{x:Type Button}">
-        <Setter Property="Background" Value="{StaticResource RegularButtonBackgroundBrushKey}" />
-        <Setter Property="Foreground" Value="{StaticResource RegularButtonForegroundBrushKey}" />
-        <Setter Property="FontFamily" Value="{StaticResource DosisRegular}" />
-        <Setter Property="FontSize" Value="14" />
-        <Setter Property="Padding" Value="10,5,10,5" />
-        <Setter Property="Cursor" Value="Hand" />
-
-        <Setter Property="local:IsBusyProperty.Value" Value="False" />
-
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="{x:Type ButtonBase}">
-                    <Border
-                        x:Name="border"
-                        Background="{TemplateBinding Background}"
-                        BorderBrush="{TemplateBinding BorderBrush}"
-                        BorderThickness="{TemplateBinding BorderThickness}"
-                        CornerRadius="0"
-                        SnapsToDevicePixels="True">
-                        <Grid>
-                            <TextBlock
-                                Margin="{TemplateBinding Padding}"
-                                HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                Focusable="False"
-                                FontFamily="{TemplateBinding FontFamily}"
-                                FontSize="{TemplateBinding FontSize}"
-                                Foreground="{TemplateBinding Foreground}"
-                                SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
-                                Text="{TemplateBinding Content}"
-                                Visibility="{TemplateBinding local:IsBusyProperty.Value,
-                                                             Converter={local:BooleanToVisibilityConverter}}" />
-                            <TextBlock
-                                HorizontalAlignment="Center"
-                                VerticalAlignment="Center"
-                                Foreground="{TemplateBinding Foreground}"
-                                Style="{StaticResource SpinningText}"
-                                Visibility="{TemplateBinding local:IsBusyProperty.Value,
-                                                             Converter={local:BooleanToVisibilityConverter},
-                                                             ConverterParameter=True}">
-                                <TextBlock.RenderTransform>
-                                    <RotateTransform />
-                                </TextBlock.RenderTransform>
-                            </TextBlock>
-                        </Grid>
-                    </Border>
-                    <ControlTemplate.Triggers>
-                        <!--  Hover On  -->
-                        <EventTrigger RoutedEvent="MouseEnter">
-                            <BeginStoryboard>
-                                <Storyboard>
-                                    <ColorAnimation
-                                        Storyboard.TargetName="border"
-                                        Storyboard.TargetProperty="Background.Color"
-                                        To="{StaticResource RegularButtonHoverBackground}"
-                                        Duration="0:0:0.1" />
-                                    <ColorAnimation
-                                        Storyboard.TargetProperty="Foreground.Color"
-                                        To="{StaticResource RegularButtonHoverForeground}"
-                                        Duration="0:0:0.1" />
-                                </Storyboard>
-                            </BeginStoryboard>
-                        </EventTrigger>
-                        <!--  Hover Off  -->
-                        <EventTrigger RoutedEvent="MouseLeave">
-                            <BeginStoryboard>
-                                <Storyboard>
-                                    <ColorAnimation
-                                        Storyboard.TargetName="border"
-                                        Storyboard.TargetProperty="Background.Color"
-                                        To="{StaticResource RegularButtonBackground}"
-                                        Duration="0:0:0.1" />
-                                    <ColorAnimation
-                                        Storyboard.TargetProperty="Foreground.Color"
-                                        To="{StaticResource RegularButtonForeground}"
-                                        Duration="0:0:0.1" />
-                                </Storyboard>
-                            </BeginStoryboard>
-                        </EventTrigger>
-                        <!--  IsPressed - Action  -->
-                        <Trigger Property="IsPressed" Value="True">
-                            <Setter Property="Foreground" Value="{StaticResource RegularButtonActionForegroundBrushKey}" />
-                            <Setter TargetName="border" Property="Background" Value="{StaticResource RegularButtonActionBackgroundBrushKey}" />
-                        </Trigger>
-                        <!--  IsEnabled  -->
-                        <Trigger Property="IsEnabled" Value="False">
-                            <Setter TargetName="border" Property="Background" Value="{StaticResource RegularButtonHoverBackgroundBrushKey}" />
-                            <Setter Property="Opacity" Value="0.6" />
-                        </Trigger>
-                    </ControlTemplate.Triggers>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-    </Style>
-    <!--#endregion-->
-
     <!--#region DarkDarkButton-->
     <Style
         x:Key="DarkDarkButton"
@@ -402,6 +301,107 @@
                         <!--  IsEnabled  -->
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter Property="Foreground" Value="{StaticResource LightDarkTextButtonHoverForegroundBrushKey}" />
+                            <Setter Property="Opacity" Value="0.6" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <!--#endregion-->
+
+    <!--#region LightColorButton-->
+    <Style
+        x:Key="LightColorButton"
+        BasedOn="{StaticResource Hoverless}"
+        TargetType="{x:Type Button}">
+        <Setter Property="Background" Value="{StaticResource LightColorButtonBackgroundBrushKey}" />
+        <Setter Property="Foreground" Value="{StaticResource LightColorButtonForegroundBrushKey}" />
+        <Setter Property="FontFamily" Value="{StaticResource DosisBold}" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="Padding" Value="10,5,10,5" />
+        <Setter Property="Cursor" Value="Hand" />
+
+        <Setter Property="local:IsBusyProperty.Value" Value="False" />
+
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ButtonBase}">
+                    <Border
+                        x:Name="border"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="0"
+                        SnapsToDevicePixels="True">
+                        <Grid>
+                            <TextBlock
+                                Margin="{TemplateBinding Padding}"
+                                HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                Focusable="False"
+                                FontFamily="{TemplateBinding FontFamily}"
+                                FontSize="{TemplateBinding FontSize}"
+                                Foreground="{TemplateBinding Foreground}"
+                                SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
+                                Text="{TemplateBinding Content}"
+                                Visibility="{TemplateBinding local:IsBusyProperty.Value,
+                                                             Converter={local:BooleanToVisibilityConverter}}" />
+                            <TextBlock
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Foreground="{TemplateBinding Foreground}"
+                                Style="{StaticResource SpinningText}"
+                                Visibility="{TemplateBinding local:IsBusyProperty.Value,
+                                                             Converter={local:BooleanToVisibilityConverter},
+                                                             ConverterParameter=True}">
+                                <TextBlock.RenderTransform>
+                                    <RotateTransform />
+                                </TextBlock.RenderTransform>
+                            </TextBlock>
+                        </Grid>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <!--  Hover On  -->
+                        <EventTrigger RoutedEvent="MouseEnter">
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <ColorAnimation
+                                        Storyboard.TargetName="border"
+                                        Storyboard.TargetProperty="Background.Color"
+                                        To="{StaticResource LightColorButtonHoverBackground}"
+                                        Duration="0:0:0.1" />
+                                    <ColorAnimation
+                                        Storyboard.TargetProperty="Foreground.Color"
+                                        To="{StaticResource LightColorButtonHoverForeground}"
+                                        Duration="0:0:0.1" />
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
+                        <!--  Hover Off  -->
+                        <EventTrigger RoutedEvent="MouseLeave">
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <ColorAnimation
+                                        Storyboard.TargetName="border"
+                                        Storyboard.TargetProperty="Background.Color"
+                                        To="{StaticResource LightColorButtonBackground}"
+                                        Duration="0:0:0.1" />
+                                    <ColorAnimation
+                                        Storyboard.TargetProperty="Foreground.Color"
+                                        To="{StaticResource LightColorButtonForeground}"
+                                        Duration="0:0:0.1" />
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
+                        <!--  IsPressed - Action  -->
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter Property="Foreground" Value="{StaticResource LightColorButtonActionForegroundBrushKey}" />
+                            <Setter TargetName="border" Property="Background" Value="{StaticResource LightColorButtonActionBackgroundBrushKey}" />
+                        </Trigger>
+                        <!--  IsEnabled  -->
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="border" Property="Background" Value="{StaticResource LightColorButtonHoverBackgroundBrushKey}" />
                             <Setter Property="Opacity" Value="0.6" />
                         </Trigger>
                     </ControlTemplate.Triggers>
