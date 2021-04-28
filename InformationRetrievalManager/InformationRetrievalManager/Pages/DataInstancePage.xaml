@@ -59,7 +59,7 @@
                         VerticalAlignment="Center"
                         FontFamily="{StaticResource DosisBold}"
                         FontSize="18"
-                        Text="DATA INSTANCE" />
+                        Text="{Binding DataInstance.Name, Mode=OneWay}" />
                 </Grid>
                 <Grid HorizontalAlignment="Left" VerticalAlignment="Center">
                     <Button

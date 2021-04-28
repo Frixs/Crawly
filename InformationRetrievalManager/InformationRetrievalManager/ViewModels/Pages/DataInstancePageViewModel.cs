@@ -1,5 +1,9 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using InformationRetrievalManager.Core;
+using InformationRetrievalManager.Crawler;
+using InformationRetrievalManager.Relational;
+using Microsoft.Extensions.Logging;
 using System;
+using System.Linq;
 using System.Windows.Input;
 
 namespace InformationRetrievalManager
@@ -12,21 +16,35 @@ namespace InformationRetrievalManager
         #region Private Members (Injects)
 
         private readonly ILogger _logger;
+        private readonly IUnitOfWork _uow;
 
         #endregion
 
         #region Private Members
 
         /// <summary>
-        /// ID of data instance that is managed by this view model
+        /// Data instance managed by this view model.
         /// </summary>
-        private long _dataInstanceId = -1;
+        private DataInstanceDataModel _dataInstance; //;
+
+        /// <summary>
+        /// Crawler engined currently used.
+        /// </summary>
+        private ICrawlerEngine _crawlerEngine = null;
 
         #endregion
 
         #region Public Properties
 
-        public string DataInstanceId => _dataInstanceId.ToString();
+        /// <summary>
+        /// Indicates if the data are already loaded into the VM (once the values changes to <see langword="true"/>).
+        /// </summary>
+        public bool DataLoaded { get; set; }
+
+        /// <summary>
+        /// Property for <see cref="_dataInstance"/>.
+        /// </summary>
+        public DataInstanceDataModel DataInstance => _dataInstance;
 
         #endregion
 
@@ -57,10 +75,11 @@ namespace InformationRetrievalManager
         /// <summary>
         /// DI constructor
         /// </summary>
-        public DataInstancePageViewModel(ILogger logger)
+        public DataInstancePageViewModel(ILogger logger, IUnitOfWork uow)
             : this()
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _uow = uow ?? throw new ArgumentNullException(nameof(uow));
         }
 
         /// <summary>
@@ -69,18 +88,18 @@ namespace InformationRetrievalManager
         /// <param name="id">The ID</param>
         /// <returns>Returns self for chaining.</returns>
         /// <exception cref="ArgumentException">Invalid ID range.</exception>
-        /// <exception cref="InvalidOperationException">If the ID is already set.</exception>
+        /// <exception cref="InvalidOperationException">If the data instance is already set.</exception>
         public DataInstancePageViewModel Init(long id)
         {
             if (id < 0)
                 throw new ArgumentException(nameof(id));
 
             // If the value is not set yet...
-            if (_dataInstanceId < 0)
-                _dataInstanceId = id;
+            if (_dataInstance == null)
+                Load(id);
             // Otherwise, it is already set...
             else
-                throw new InvalidOperationException(nameof(_dataInstanceId));
+                throw new InvalidOperationException(nameof(_dataInstance));
 
             return this;
         }
@@ -95,6 +114,30 @@ namespace InformationRetrievalManager
         private void GoToHomePageCommandRoutine()
         {
             DI.ViewModelApplication.GoToPage(ApplicationPage.Home);
+        }
+
+        #endregion
+
+        #region Private Methods
+
+        /// <summary>
+        /// Loads necessary data structures according to data instance <paramref name="id"/>.
+        /// </summary>
+        /// <param name="id">The ID</param>
+        private void Load(long id)
+        {
+            // Load data instance
+            _dataInstance = _uow.DataInstances.Get(o =>o.Id == id, 
+                includeProperties: new string[] { nameof(DataInstanceDataModel.CrawlerConfiguration), nameof(DataInstanceDataModel.IndexProcessingConfiguration) })
+                .FirstOrDefault();
+
+            // If the data instance does not exist...
+            if (_dataInstance == null)
+                // Move the user back...
+                GoToHomePageCommandRoutine();
+
+            // Flag up data load
+            DataLoaded = true;
         }
 
         #endregion
