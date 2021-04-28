@@ -26,7 +26,7 @@ namespace InformationRetrievalManager
                     return new HowToPage();
 
                 case ApplicationPage.DataInstance:
-                    return new DataInstancePage();
+                    return new DataInstancePage(viewModel as DataInstancePageViewModel);
 
                 case ApplicationPage.CreateDataInstance:
                     return new CreateDataInstancePage();

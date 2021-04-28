@@ -9,5 +9,10 @@
         {
             InitializeComponent();
         }
+
+        public DataInstancePage(DataInstancePageViewModel specificViewModel) : base(specificViewModel)
+        {
+            InitializeComponent();
+        }
     }
 }
