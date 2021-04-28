@@ -30,40 +30,43 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
-                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
             <!--  Title Wrapper  -->
-            <Grid
-                Grid.Row="0"
-                Margin="0,0,0,15"
-                HorizontalAlignment="Center"
-                VerticalAlignment="Top">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
-                <!--  Logo  -->
-                <Image
-                    Grid.Column="0"
-                    Height="46"
-                    Source="/Resources/Images/logo_crawly_bold.png" />
-                <!--  Spacer  -->
-                <TextBlock
-                    Grid.Column="1"
-                    Margin="5,0,8,0"
-                    VerticalAlignment="Center"
-                    FontFamily="{StaticResource DosisMedium}"
-                    FontSize="36"
-                    Text="|" />
-                <!--  Title  -->
-                <TextBlock
-                    Grid.Column="2"
-                    VerticalAlignment="Center"
-                    FontFamily="{StaticResource DosisBold}"
-                    FontSize="18"
-                    Text="CREATE NEW DATA INSTANCE" />
+            <Grid Grid.Row="0" Margin="0,0,0,15">
+                <Grid HorizontalAlignment="Center">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <!--  Logo  -->
+                    <Image
+                        Grid.Column="0"
+                        Height="46"
+                        Source="/Resources/Images/logo_crawly_bold.png" />
+                    <!--  Spacer  -->
+                    <TextBlock
+                        Grid.Column="1"
+                        Margin="5,0,8,0"
+                        VerticalAlignment="Center"
+                        FontFamily="{StaticResource DosisMedium}"
+                        FontSize="36"
+                        Text="|" />
+                    <!--  Title  -->
+                    <TextBlock
+                        Grid.Column="2"
+                        VerticalAlignment="Center"
+                        FontFamily="{StaticResource DosisBold}"
+                        FontSize="18"
+                        Text="CREATE NEW DATA INSTANCE" />
+                </Grid>
+                <Grid HorizontalAlignment="Left" VerticalAlignment="Center">
+                    <Button
+                        Command="{Binding GoToHomePageCommand, Mode=OneTime}"
+                        Content="GO BACK"
+                        Style="{StaticResource DarkLightButton}" />
+                </Grid>
             </Grid>
 
             <Grid Grid.Row="1" HorizontalAlignment="Center">
@@ -113,7 +116,7 @@
                             <Style TargetType="{x:Type TextBlock}">
                                 <Setter Property="Visibility" Value="Visible" />
                                 <Style.Triggers>
-                                    <DataTrigger Binding="{Binding Text, RelativeSource={RelativeSource Self}}" Value="{x:Null}">
+                                    <DataTrigger Binding="{Binding FormErrorString, Mode=OneWay}" Value="{x:Null}">
                                         <Setter Property="Visibility" Value="Collapsed" />
                                     </DataTrigger>
                                 </Style.Triggers>
@@ -194,15 +197,6 @@
                         </Grid>
                     </Grid>
                 </ScrollViewer>
-            </Grid>
-
-            <Grid Grid.Row="2" Margin="0,15,0,0">
-                <Button
-                    HorizontalAlignment="Center"
-                    VerticalAlignment="Bottom"
-                    Command="{Binding GoToHomePageCommand, Mode=OneTime}"
-                    Content="GO BACK"
-                    Style="{StaticResource DarkLightButton}" />
             </Grid>
         </Grid>
     </Border>
