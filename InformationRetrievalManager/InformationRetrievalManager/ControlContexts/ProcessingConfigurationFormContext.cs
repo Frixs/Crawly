@@ -63,14 +63,14 @@ namespace InformationRetrievalManager
             };
             RemoveAccentsBeforeStemmingEntry = new CheckEntryViewModel
             {
-                Label = "Remove Accents (before stemming)",
+                Label = "Before Stemming",
                 Description = "",
                 Validation = null,
                 Value = IndexProcessingConfigurationDataModel.RemoveAccentsBeforeStemming_DefaultValue
             };
             RemoveAccentsAfterStemmingEntry = new CheckEntryViewModel
             {
-                Label = "Remove Accents (after stemming)",
+                Label = "After Stemming",
                 Description = "",
                 Validation = null,
                 Value = IndexProcessingConfigurationDataModel.RemoveAccentsAfterStemming_DefaultValue

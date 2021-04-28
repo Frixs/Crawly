@@ -69,6 +69,9 @@
     <Color x:Key="InputFocusBorderBackground">#543848</Color>
     <SolidColorBrush x:Key="InputFocusBorderBackgroundBrushKey" Color="{StaticResource InputFocusBorderBackground}" />
 
+    <Color x:Key="InputPressBorderBackground">#AA143F</Color>
+    <SolidColorBrush x:Key="InputPressBorderBackgroundBrushKey" Color="{StaticResource InputPressBorderBackground}" />
+
     <Color x:Key="InputErrorBorderBackground">#ec3052</Color>
     <SolidColorBrush x:Key="InputErrorBorderBackgroundBrushKey" Color="{StaticResource InputErrorBorderBackground}" />
 

@@ -30,23 +30,25 @@
                 DataContext="{Binding FormContext.CustomRegexEntry, ElementName=this}" />
         </Grid>
         <local:TextEntry DataContext="{Binding FormContext.CustomStopWordsEntry, ElementName=this}" />
+        <local:CheckEntry DataContext="{Binding FormContext.ToLowerCaseEntry, ElementName=this}" />
+        <TextBlock
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            FontFamily="{StaticResource DosisBold}"
+            FontSize="15"
+            Text="Remove Accents" />
         <Grid>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="3*" />
-                <ColumnDefinition Width="3*" />
-                <ColumnDefinition Width="3*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
             </Grid.ColumnDefinitions>
 
             <local:CheckEntry
                 Grid.Column="0"
                 Margin="0,0,8,0"
-                DataContext="{Binding FormContext.ToLowerCaseEntry, ElementName=this}" />
-            <local:CheckEntry
-                Grid.Column="1"
-                Margin="8,0,8,0"
                 DataContext="{Binding FormContext.RemoveAccentsBeforeStemmingEntry, ElementName=this}" />
             <local:CheckEntry
-                Grid.Column="2"
+                Grid.Column="1"
                 Margin="8,0,0,0"
                 DataContext="{Binding FormContext.RemoveAccentsAfterStemmingEntry, ElementName=this}" />
         </Grid>

@@ -107,6 +107,20 @@
     </Style>
 
     <!--  Checkbox Input  -->
+    <Style x:Key="OptionMarkFocusVisual">
+        <Setter Property="Control.Template">
+            <Setter.Value>
+                <ControlTemplate>
+                    <Rectangle
+                        Margin="14,0,0,0"
+                        SnapsToDevicePixels="true"
+                        Stroke="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"
+                        StrokeDashArray="1 2"
+                        StrokeThickness="1" />
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
     <Style BasedOn="{StaticResource BaseStyle}" TargetType="{x:Type CheckBox}">
         <Setter Property="FontSize" Value="14" />
         <Setter Property="FontFamily" Value="{StaticResource DosisMedium}" />
@@ -115,7 +129,87 @@
         <Setter Property="Background" Value="{StaticResource InputBackgroundBrushKey}" />
         <Setter Property="Foreground" Value="{StaticResource InputForegroundBrushKey}" />
         <Setter Property="BorderBrush" Value="{StaticResource InputBorderBackgroundBrushKey}" />
-        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="BorderThickness" Value="2" />
+
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type CheckBox}">
+                    <Grid
+                        x:Name="templateRoot"
+                        Background="Transparent"
+                        SnapsToDevicePixels="True">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Border
+                            x:Name="checkBoxBorder"
+                            Margin="1"
+                            HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                            VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}">
+                            <Grid x:Name="markGrid">
+                                <Path
+                                    x:Name="optionMark"
+                                    Margin="1"
+                                    Data="F1 M 9.97498,1.22334L 4.6983,9.09834L 4.52164,9.09834L 0,5.19331L 1.27664,3.52165L 4.255,6.08833L 8.33331,1.52588e-005L 9.97498,1.22334 Z "
+                                    Fill="{StaticResource InputForegroundBrushKey}"
+                                    Opacity="0"
+                                    Stretch="None" />
+                                <Rectangle
+                                    x:Name="indeterminateMark"
+                                    Margin="2"
+                                    Fill="{StaticResource InputForegroundBrushKey}"
+                                    Opacity="0" />
+                            </Grid>
+                        </Border>
+                        <ContentPresenter
+                            x:Name="contentPresenter"
+                            Grid.Column="1"
+                            Margin="{TemplateBinding Padding}"
+                            HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                            VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                            Focusable="False"
+                            RecognizesAccessKey="True"
+                            SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="HasContent" Value="true">
+                            <Setter Property="FocusVisualStyle" Value="{StaticResource OptionMarkFocusVisual}" />
+                            <Setter Property="Padding" Value="4,-1,0,0" />
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="true">
+                            <!--<Setter TargetName="checkBoxBorder" Property="Background" Value="{StaticResource OptionMark.MouseOver.Background}" />-->
+                            <Setter TargetName="checkBoxBorder" Property="BorderBrush" Value="{StaticResource InputFocusBorderBackgroundBrushKey}" />
+                            <Setter TargetName="optionMark" Property="Fill" Value="{StaticResource InputForegroundBrushKey}" />
+                            <Setter TargetName="indeterminateMark" Property="Fill" Value="{StaticResource InputForegroundBrushKey}" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="false">
+                            <Setter TargetName="checkBoxBorder" Property="Background" Value="{StaticResource InputDisabledBackgroundBrushKey}" />
+                            <Setter TargetName="checkBoxBorder" Property="BorderBrush" Value="{StaticResource InputBorderBackgroundBrushKey}" />
+                            <Setter TargetName="optionMark" Property="Fill" Value="{StaticResource InputDisabledForegroundBrushKey}" />
+                            <Setter TargetName="indeterminateMark" Property="Fill" Value="{StaticResource InputDisabledForegroundBrushKey}" />
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="true">
+                            <!--<Setter TargetName="checkBoxBorder" Property="Background" Value="{StaticResource OptionMark.Pressed.Background}" />-->
+                            <Setter TargetName="checkBoxBorder" Property="BorderBrush" Value="{StaticResource InputPressBorderBackgroundBrushKey}" />
+                            <Setter TargetName="optionMark" Property="Fill" Value="{StaticResource InputFocusForegroundBrushKey}" />
+                            <Setter TargetName="indeterminateMark" Property="Fill" Value="{StaticResource InputFocusForegroundBrushKey}" />
+                        </Trigger>
+                        <Trigger Property="IsChecked" Value="true">
+                            <Setter TargetName="optionMark" Property="Opacity" Value="1" />
+                            <Setter TargetName="indeterminateMark" Property="Opacity" Value="0" />
+                        </Trigger>
+                        <Trigger Property="IsChecked" Value="{x:Null}">
+                            <Setter TargetName="optionMark" Property="Opacity" Value="0" />
+                            <Setter TargetName="indeterminateMark" Property="Opacity" Value="1" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
 
         <!--  Delete default error template  -->
         <Setter Property="Validation.ErrorTemplate">
@@ -123,6 +217,17 @@
                 <ControlTemplate />
             </Setter.Value>
         </Setter>
+
+        <Style.Resources>
+            <Style TargetType="Border">
+                <Setter Property="Width" Value="22" />
+                <Setter Property="Height" Value="22" />
+            </Style>
+            <Style TargetType="Grid">
+                <Setter Property="HorizontalAlignment" Value="Center" />
+                <Setter Property="VerticalAlignment" Value="Center" />
+            </Style>
+        </Style.Resources>
 
         <Style.Triggers>
             <Trigger Property="IsKeyboardFocusWithin" Value="True">
@@ -133,24 +238,6 @@
                 <Setter Property="BorderBrush" Value="{StaticResource InputErrorBorderBackgroundBrushKey}" />
             </Trigger>
         </Style.Triggers>
-    </Style>
-
-    <!--  CheckBox - Medium  -->
-    <Style
-        x:Key="CheckBoxMedium"
-        BasedOn="{StaticResource BaseStyle}"
-        TargetType="{x:Type CheckBox}">
-
-        <Style.Resources>
-            <Style TargetType="Border">
-                <Setter Property="Width" Value="18" />
-                <Setter Property="Height" Value="18" />
-            </Style>
-            <Style TargetType="Grid">
-                <Setter Property="HorizontalAlignment" Value="Center" />
-                <Setter Property="VerticalAlignment" Value="Center" />
-            </Style>
-        </Style.Resources>
     </Style>
 
     <!--  Radio Input  -->

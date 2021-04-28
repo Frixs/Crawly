@@ -20,7 +20,7 @@
         <TextBlock
             Name="Label"
             Grid.Row="0"
-            HorizontalAlignment="Left"
+            HorizontalAlignment="Center"
             VerticalAlignment="Center"
             FontFamily="{StaticResource DosisBold}"
             FontSize="15"
@@ -37,7 +37,7 @@
         <TextBlock
             Grid.Row="2"
             Margin="10,0,10,10"
-            HorizontalAlignment="Left"
+            HorizontalAlignment="Center"
             FontSize="10"
             FontStyle="Italic"
             LineHeight="11"
