@@ -248,7 +248,31 @@
                                 </Grid.RowDefinitions>
 
                                 <!--  Crawled Data Selection  -->
-                                <Grid Grid.Row="0" />
+                                <Grid Grid.Row="0">
+                                    <!-- Open Raw BTN -->
+                                    <Button
+                                        Height="36"
+                                        Margin="0,23.5,258,0"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Top"
+                                        Content="{StaticResource FontAwesomeCodeIcon}"
+                                        FontFamily="{StaticResource FontAwesomeSolid}"
+                                        Style="{StaticResource DarkLightButton}" />
+                                    <!-- Data File Entry -->
+                                    <local:ComboEntry
+                                        Width="205"
+                                        VerticalAlignment="Center"
+                                        DataContext="{Binding DataFileEntry, Mode=OneWay}" />
+                                    <!-- Delete BTN -->
+                                    <Button
+                                        Height="36"
+                                        Margin="258,23.5,0,0"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Top"
+                                        Content="{StaticResource FontAwesomeTrashAltIcon}"
+                                        FontFamily="{StaticResource FontAwesomeSolid}"
+                                        Style="{StaticResource DarkLightButton}" />
+                                </Grid>
 
                                 <!--  Start Index Processing BTN  -->
                                 <Button

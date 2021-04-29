@@ -524,6 +524,7 @@
       <DependentUpon>DataInstanceView.xaml</DependentUpon>
     </Compile>
     <Compile Include="DataTypes\ApplicationPage.cs" />
+    <Compile Include="DataTypes\CrawlerFileInfo.cs" />
     <Compile Include="DI\DI.cs" />
     <Compile Include="DI\FrameworkConstructionExtensions.cs" />
     <Compile Include="Extensions\CrawlerExtensions.cs" />

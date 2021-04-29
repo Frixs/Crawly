@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.ObjectModel;
+using System.Collections.Generic;
 
 namespace InformationRetrievalManager
 {
@@ -17,7 +17,7 @@ namespace InformationRetrievalManager
         /// <summary>
         /// List of possible values in combo box
         /// </summary>
-        public ObservableCollection<T> ValueList { get; set; } = new ObservableCollection<T>();
+        public List<T> ValueList { get; set; } = new List<T>();
 
         /// <summary>
         /// If <see cref="T"/> is object and we need to display its property, this nameof property specify that

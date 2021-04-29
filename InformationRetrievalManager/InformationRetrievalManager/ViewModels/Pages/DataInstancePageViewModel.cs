@@ -2,6 +2,8 @@
 using InformationRetrievalManager.Relational;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
 
@@ -31,6 +33,11 @@ namespace InformationRetrievalManager
         /// </summary>
         private ICrawlerEngine _crawlerEngine = null;
 
+        /// <summary>
+        /// Collection of available data files for indexation.
+        /// </summary>
+        private List<CrawlerFileInfo> _dataFileSelection; //; ctor
+
         #endregion
 
         #region Public Properties
@@ -44,6 +51,11 @@ namespace InformationRetrievalManager
         /// Property for <see cref="_dataInstance"/>.
         /// </summary>
         public DataInstanceDataModel DataInstance => _dataInstance;
+
+        /// <summary>
+        /// Entry selection of available data files.
+        /// </summary>
+        public ComboEntryViewModel<CrawlerFileInfo> DataFileEntry { get; set; }
 
         /// <summary>
         /// Error string as a feedback to the user.
@@ -84,6 +96,18 @@ namespace InformationRetrievalManager
         {
             // Create commands.
             GoToHomePageCommand = new RelayCommand(GoToHomePageCommandRoutine);
+
+            // Create data selection with its entry.
+            _dataFileSelection = new List<CrawlerFileInfo>() { new CrawlerFileInfo("Select Data File", null) };
+            DataFileEntry = new ComboEntryViewModel<CrawlerFileInfo>
+            {
+                Label = null,
+                Description = "Please, select data for index processing from the selection of crawled data.",
+                Validation = null,
+                Value = _dataFileSelection[0],
+                ValueList = _dataFileSelection,
+                DisplayMemberPath = nameof(CrawlerFileInfo.Label)
+            };
         }
 
         /// <summary>
@@ -152,6 +176,32 @@ namespace InformationRetrievalManager
 
             // Flag up data load is done
             DataLoaded = true;
+        }
+
+        /// <summary>
+        /// Update data file selection and its entry.
+        /// </summary>
+        /// <param name="data">New data selection list (<see langword="null"/> clears just the list).</param>
+        /// <remarks>
+        ///     Method expects to already have 1 item (first) that represents default selected item in <see cref="_dataFileSelection"/>.
+        /// </remarks>
+        private void UpdateDataFileSelection(List<CrawlerFileInfo> data)
+        {
+            var newData = new List<CrawlerFileInfo>();
+            newData.Add(_dataFileSelection[0]);
+
+            // Clear previous data selection
+            _dataFileSelection.Clear();
+
+            if (data != null)
+                newData.AddRange(data);
+
+            // Update the file selection
+            _dataFileSelection = newData;
+
+            // Update the file selection entry
+            DataFileEntry.ValueList = _dataFileSelection;
+            DataFileEntry.Value = _dataFileSelection[0]; // Default selected value
         }
 
         #endregion
