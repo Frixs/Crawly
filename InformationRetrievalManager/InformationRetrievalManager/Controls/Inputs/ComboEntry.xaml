@@ -19,6 +19,7 @@
         <TextBlock
             Name="Label"
             Grid.Row="0"
+            Margin="0,0,0,3"
             HorizontalAlignment="Left"
             VerticalAlignment="Center"
             FontFamily="{StaticResource DosisBold}"
@@ -29,6 +30,7 @@
         <ComboBox
             Grid.Row="1"
             Height="36"
+            Margin="0,0,0,3"
             Padding="10,8"
             VerticalAlignment="Center"
             DisplayMemberPath="{Binding DisplayMemberPath, Mode=OneWay}"
