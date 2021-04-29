@@ -186,7 +186,7 @@
                                 Grid.Row="1"
                                 MinWidth="125"
                                 Margin="0,15,0,0"
-                                Padding="12,7,12,8"
+                                Padding="12,7,12,7"
                                 HorizontalAlignment="Center"
                                 VerticalAlignment="Top"
                                 local:IsBusyProperty.Value="{Binding FormProcessingFlag}"

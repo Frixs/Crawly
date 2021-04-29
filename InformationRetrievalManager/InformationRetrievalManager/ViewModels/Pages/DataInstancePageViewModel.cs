@@ -1,5 +1,4 @@
-﻿using InformationRetrievalManager.Core;
-using InformationRetrievalManager.Crawler;
+﻿using InformationRetrievalManager.Crawler;
 using InformationRetrievalManager.Relational;
 using Microsoft.Extensions.Logging;
 using System;
@@ -46,9 +45,24 @@ namespace InformationRetrievalManager
         /// </summary>
         public DataInstanceDataModel DataInstance => _dataInstance;
 
+        /// <summary>
+        /// Error string as a feedback to the user.
+        /// </summary>
+        public string FormErrorString { get; set; }
+
         #endregion
 
         #region Command Flags
+
+        /// <summary>
+        /// Indicates if crawler is currently processing
+        /// </summary>
+        public bool CrawlerInWorkFlag { get; set; }
+
+        /// <summary>
+        /// Indicates if index processing is currently in work
+        /// </summary>
+        public bool IndexProcessingInWorkFlag { get; set; }
 
         #endregion
 
@@ -136,7 +150,7 @@ namespace InformationRetrievalManager
                 // Move the user back...
                 GoToHomePageCommandRoutine();
 
-            // Flag up data load
+            // Flag up data load is done
             DataLoaded = true;
         }
 

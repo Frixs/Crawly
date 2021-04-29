@@ -8,8 +8,8 @@
     Title="DataInstancePage"
     d:Background="{StaticResource BackgroundBrushKey}"
     d:DataContext="{x:Static local:DataInstancePageDesignModel.Instance}"
-    d:DesignHeight="450"
-    d:DesignWidth="800"
+    d:DesignHeight="800"
+    d:DesignWidth="960"
     x:TypeArguments="local:DataInstancePageViewModel"
     mc:Ignorable="d">
 
@@ -57,6 +57,7 @@
                     <TextBlock
                         Grid.Column="2"
                         VerticalAlignment="Center"
+                        d:Text="MyDataInstance"
                         FontFamily="{StaticResource DosisBold}"
                         FontSize="18"
                         Text="{Binding DataInstance.Name, Mode=OneWay}" />
@@ -67,6 +68,237 @@
                         Content="GO BACK"
                         Style="{StaticResource DarkLightButton}" />
                 </Grid>
+            </Grid>
+
+            <!--  Main Content Wrapper  -->
+            <Grid Grid.Row="1" HorizontalAlignment="Center">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <!--  Titles  -->
+                <Grid Grid.Row="0" Margin="0,0,0,15">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="2*" />
+                        <ColumnDefinition Width="2*" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock
+                        Grid.Row="0"
+                        Grid.Column="0"
+                        HorizontalAlignment="Center"
+                        FontFamily="{StaticResource DosisRegular}"
+                        FontSize="15"
+                        Text="Configuration" />
+
+                    <TextBlock
+                        Grid.Row="0"
+                        Grid.Column="1"
+                        HorizontalAlignment="Center"
+                        FontFamily="{StaticResource DosisRegular}"
+                        FontSize="15"
+                        Text="Query" />
+
+                    <TextBlock
+                        Grid.Row="1"
+                        Grid.ColumnSpan="2"
+                        Margin="0,10,0,0"
+                        HorizontalAlignment="Center"
+                        FontFamily="{StaticResource DosisMedium}"
+                        FontSize="15"
+                        Foreground="{StaticResource LightColorShinyBrushKey}"
+                        Text="{Binding FormErrorString, Mode=OneWay}"
+                        TextAlignment="Center">
+                        <TextBlock.Style>
+                            <Style TargetType="{x:Type TextBlock}">
+                                <Setter Property="Visibility" Value="Visible" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding FormErrorString, Mode=OneWay}" Value="{x:Null}">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                </Grid>
+
+                <!--  Content  -->
+                <ScrollViewer
+                    Grid.Row="1"
+                    Padding="30,15,30,0"
+                    VerticalScrollBarVisibility="Auto">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*" />
+                            <ColumnDefinition Width="2*" />
+                        </Grid.ColumnDefinitions>
+
+                        <!--  Configuration  -->
+                        <Grid
+                            Grid.Column="0"
+                            MinWidth="385"
+                            MaxWidth="385"
+                            Margin="0,0,30,0"
+                            HorizontalAlignment="Right">
+
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+
+                            <!--  Crawler  -->
+                            <Grid Grid.Row="0">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+
+                                <!--  Start Crawler BTN  -->
+                                <Button
+                                    Grid.Row="0"
+                                    MinWidth="205"
+                                    Padding="15,7,15,7"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Top"
+                                    local:IsBusyProperty.Value="{Binding CrawlerInWorkFlag}"
+                                    Content="START CRAWLER"
+                                    FontSize="16"
+                                    Style="{StaticResource LightColorButton}" />
+
+                                <!--  Progress Wrapper  -->
+                                <Grid Grid.Row="1">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+
+                                    <!--  Cancel BTN  -->
+                                    <Border
+                                        Grid.Row="0"
+                                        Width="205"
+                                        Margin="0,2,0,0"
+                                        VerticalAlignment="Top">
+                                        <Button
+                                            HorizontalAlignment="Right"
+                                            Content="CANCEL"
+                                            FontSize="12"
+                                            Style="{StaticResource LightDarkTextButton}" />
+                                    </Border>
+
+                                    <!--  Progress (bar) Status  -->
+                                    <TextBlock
+                                        Grid.Row="0"
+                                        Margin="0,5,0,0"
+                                        HorizontalAlignment="Center"
+                                        FontFamily="{StaticResource DosisExtraBold}"
+                                        FontSize="15"
+                                        Text="52%" />
+
+                                    <!--  Progress Verbose  -->
+                                    <StackPanel
+                                        Grid.Row="1"
+                                        Margin="0,5,0,0"
+                                        HorizontalAlignment="Center"
+                                        Orientation="Vertical">
+                                        <StackPanel.Resources>
+                                            <Style TargetType="{x:Type TextBlock}">
+                                                <Setter Property="HorizontalAlignment" Value="Center" />
+                                                <Setter Property="FontSize" Value="12" />
+                                                <Setter Property="FontFamily" Value="{StaticResource DosisMedium}" />
+                                            </Style>
+                                        </StackPanel.Resources>
+                                        <TextBlock Opacity="1.0" Text="Processing URL ... fewf fewfe" />
+                                        <TextBlock Opacity="0.9" Text="Failed to process URL ... tzujtzt jtz" />
+                                        <TextBlock Opacity="0.75" Text="Processing URL ... ffwf f wj" />
+                                        <TextBlock Opacity="0.5" Text="Processing URL ... ffwfg ggej" />
+                                        <TextBlock Opacity="0.25" Text="Processing URL ... qwrre teej" />
+                                    </StackPanel>
+                                </Grid>
+
+                                <!--  View Configuration BTN  -->
+                                <Button
+                                    Grid.Row="2"
+                                    Margin="0,15,0,0"
+                                    HorizontalAlignment="Center"
+                                    Content="&gt;&gt; View Crawler Configuration &lt;&lt;"
+                                    FontFamily="{StaticResource DosisLight}"
+                                    FontSize="13"
+                                    Style="{StaticResource LightDarkTextButton}" />
+                            </Grid>
+
+                            <Border
+                                Grid.Row="1"
+                                Margin="0,30,0,30"
+                                Style="{StaticResource LineSeparator}" />
+
+                            <!--  Index Processing  -->
+                            <Grid Grid.Row="2">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+
+                                <!--  Crawled Data Selection  -->
+                                <Grid Grid.Row="0" />
+
+                                <!--  Start Index Processing BTN  -->
+                                <Button
+                                    Grid.Row="1"
+                                    MinWidth="205"
+                                    Padding="15,7,15,7"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Top"
+                                    local:IsBusyProperty.Value="{Binding IndexProcessingInWorkFlag}"
+                                    Content="START INDEX PROCESSING"
+                                    FontSize="16"
+                                    Style="{StaticResource LightColorButton}" />
+
+                                <!--  Progress Wrapper  -->
+                                <Grid Grid.Row="2">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+
+                                    <!--  Progress (bar) Status  -->
+                                    <TextBlock
+                                        Grid.Row="0"
+                                        Margin="0,5,0,0"
+                                        HorizontalAlignment="Center"
+                                        FontFamily="{StaticResource DosisExtraBold}"
+                                        FontSize="15"
+                                        Text="Done!" />
+                                </Grid>
+
+                                <!--  View Configuration BTN  -->
+                                <Button
+                                    Grid.Row="3"
+                                    Margin="0,15,0,0"
+                                    HorizontalAlignment="Center"
+                                    Content="&gt;&gt; View Processing Configuration &lt;&lt;"
+                                    FontFamily="{StaticResource DosisLight}"
+                                    FontSize="13"
+                                    Style="{StaticResource LightDarkTextButton}" />
+                            </Grid>
+                        </Grid>
+
+                        <!--  Query  -->
+                        <Grid
+                            Grid.Column="1"
+                            MinWidth="385"
+                            MaxWidth="385"
+                            Margin="30,0,0,0"
+                            HorizontalAlignment="Left" />
+                    </Grid>
+                </ScrollViewer>
             </Grid>
         </Grid>
     </Border>
