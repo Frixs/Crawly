@@ -163,6 +163,7 @@ namespace InformationRetrievalManager
                 validationResults.Concat(ValidationHelpers.ValidateModel(dataInstance));
 
                 // Additional validation steps
+                // Culture info must be valid...
                 try
                 {
                     _ = new CultureInfo(crawlerConfiguration.SiteArticleDateTimeCultureInfo);
@@ -173,6 +174,15 @@ namespace InformationRetrievalManager
                     {
                         Code = nameof(crawlerConfiguration.SiteArticleDateTimeCultureInfo),
                         Description = "Invalid date-time culture."
+                    }); // TODO localization
+                }
+                // Data instance name must be unique...
+                if (_uow.DataInstances.Get(o => o.Name.Equals(dataInstance.Name)).Any())
+                {
+                    validationResults.Add(new DataValidationError
+                    {
+                        Code = nameof(dataInstance.Name),
+                        Description = "Data Instance Name already exists."
                     }); // TODO localization
                 }
 
