@@ -3,7 +3,6 @@ using InformationRetrievalManager.Relational;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
 
@@ -38,6 +37,11 @@ namespace InformationRetrievalManager
         /// </summary>
         private List<CrawlerFileInfo> _dataFileSelection; //; ctor
 
+        /// <summary>
+        /// Collection of available index files.
+        /// </summary>
+        private List<CrawlerFileInfo> _indexFileSelection; //; ctor
+
         #endregion
 
         #region Public Properties
@@ -58,6 +62,16 @@ namespace InformationRetrievalManager
         public ComboEntryViewModel<CrawlerFileInfo> DataFileEntry { get; set; }
 
         /// <summary>
+        /// Entry selection of available indexed data files.
+        /// </summary>
+        public ComboEntryViewModel<CrawlerFileInfo> IndexFileEntry { get; set; }
+
+        /// <summary>
+        /// Entry for query
+        /// </summary>
+        public TextEntryViewModel QueryEntry { get; set; }
+
+        /// <summary>
         /// Error string as a feedback to the user.
         /// </summary>
         public string FormErrorString { get; set; }
@@ -75,6 +89,11 @@ namespace InformationRetrievalManager
         /// Indicates if index processing is currently in work
         /// </summary>
         public bool IndexProcessingInWorkFlag { get; set; }
+
+        /// <summary>
+        /// Indicates if query is currently searcheing
+        /// </summary>
+        public bool QueryInWorkFlag { get; set; }
 
         #endregion
 
@@ -107,6 +126,29 @@ namespace InformationRetrievalManager
                 Value = _dataFileSelection[0],
                 ValueList = _dataFileSelection,
                 DisplayMemberPath = nameof(CrawlerFileInfo.Label)
+            };
+
+            // Create index selection with its entry
+            _indexFileSelection = new List<CrawlerFileInfo>() { new CrawlerFileInfo("< Select Index File >", null) };
+            IndexFileEntry = new ComboEntryViewModel<CrawlerFileInfo>
+            {
+                Label = null,
+                Description = "Please, select an index for querying from the selection of indexed data.",
+                Validation = null,
+                Value = _indexFileSelection[0],
+                ValueList = _indexFileSelection,
+                DisplayMemberPath = nameof(CrawlerFileInfo.Label)
+            };
+
+            // Create query entry
+            QueryEntry = new TextEntryViewModel
+            {
+                Label = null,
+                Description = null,
+                Validation = null,
+                Value = null,
+                Placeholder = "Ask Me Here",
+                MaxLength = 155
             };
         }
 

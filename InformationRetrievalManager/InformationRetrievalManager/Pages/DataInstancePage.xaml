@@ -163,8 +163,9 @@
                                 <!--  Start Crawler BTN  -->
                                 <Button
                                     Grid.Row="0"
+                                    Height="36"
                                     MinWidth="205"
-                                    Padding="15,7,15,7"
+                                    Padding="15,0,15,0"
                                     HorizontalAlignment="Center"
                                     VerticalAlignment="Top"
                                     local:IsBusyProperty.Value="{Binding CrawlerInWorkFlag}"
@@ -253,7 +254,7 @@
                                     <Button
                                         Width="34"
                                         Height="34"
-                                        Margin="0,23.5,258,0"
+                                        Margin="0,0,258,0"
                                         HorizontalAlignment="Center"
                                         VerticalAlignment="Top"
                                         Content="{StaticResource FontAwesomeCodeIcon}"
@@ -269,7 +270,7 @@
                                     <Button
                                         Width="34"
                                         Height="34"
-                                        Margin="258,23.5,0,0"
+                                        Margin="258,0,0,0"
                                         HorizontalAlignment="Center"
                                         VerticalAlignment="Top"
                                         Content="{StaticResource FontAwesomeTrashAltIcon}"
@@ -281,8 +282,9 @@
                                 <!--  Start Index Processing BTN  -->
                                 <Button
                                     Grid.Row="1"
+                                    Height="36"
                                     MinWidth="205"
-                                    Padding="15,7,15,7"
+                                    Padding="15,0,15,0"
                                     HorizontalAlignment="Center"
                                     VerticalAlignment="Top"
                                     local:IsBusyProperty.Value="{Binding IndexProcessingInWorkFlag}"
@@ -324,7 +326,61 @@
                             MinWidth="385"
                             MaxWidth="385"
                             Margin="30,0,0,0"
-                            HorizontalAlignment="Left" />
+                            HorizontalAlignment="Left">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+
+                            <Grid Grid.Row="0">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+
+                                <!--  Index Selection  -->
+                                <Grid Grid.Row="0" Margin="0,0,0,10">
+                                    <!--  Index File Entry  -->
+                                    <local:ComboEntry
+                                        Width="205"
+                                        VerticalAlignment="Top"
+                                        DataContext="{Binding IndexFileEntry, Mode=OneWay}" />
+                                    <!--  Delete BTN  -->
+                                    <Button
+                                        Width="34"
+                                        Height="34"
+                                        Margin="258,0,0,0"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Top"
+                                        Content="{StaticResource FontAwesomeTrashAltIcon}"
+                                        FontFamily="{StaticResource FontAwesomeSolid}"
+                                        Style="{StaticResource DarkLightButton}"
+                                        ToolTip="Delete Data" />
+                                </Grid>
+
+                                <!--  Index File Entry  -->
+                                <local:TextEntry
+                                    Grid.Row="1"
+                                    Width="385"
+                                    VerticalAlignment="Center"
+                                    DataContext="{Binding QueryEntry, Mode=OneWay}"
+                                    TextAlignment="Center" />
+
+                                <!--  Search BTN  -->
+                                <Button
+                                    Grid.Row="2"
+                                    Height="36"
+                                    MinWidth="102"
+                                    Padding="15,0,15,0"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Top"
+                                    local:IsBusyProperty.Value="{Binding QueryInWorkFlag}"
+                                    Content="SEARCH"
+                                    FontSize="16"
+                                    Style="{StaticResource LightColorButton}" />
+                            </Grid>
+                        </Grid>
                     </Grid>
                 </ScrollViewer>
             </Grid>
