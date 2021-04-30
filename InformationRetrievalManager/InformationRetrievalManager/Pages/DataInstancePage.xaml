@@ -201,13 +201,14 @@
                                     Padding="15,0,15,0"
                                     HorizontalAlignment="Center"
                                     VerticalAlignment="Top"
-                                    local:IsBusyProperty.Value="{Binding CrawlerInWorkFlag}"
+                                    local:IsBusyProperty.Value="{Binding CrawlerInWork}"
+                                    Command="{Binding StartCrawlerCommand, Mode=OneWay}"
                                     Content="START CRAWLER"
                                     FontSize="16"
                                     Style="{StaticResource LightColorButton}" />
 
                                 <!--  Progress Wrapper  -->
-                                <Grid Grid.Row="1">
+                                <Grid Grid.Row="1" local:AnimateFadeInProperty.Value="{Binding CrawlerInWork, Mode=OneWay}">
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="Auto" />
                                         <RowDefinition Height="Auto" />
@@ -221,6 +222,7 @@
                                         VerticalAlignment="Top">
                                         <Button
                                             HorizontalAlignment="Right"
+                                            Command="{Binding CancelCrawlerCommand, Mode=OneWay}"
                                             Content="CANCEL"
                                             FontSize="12"
                                             Style="{StaticResource LightDarkTextButton}" />
@@ -233,14 +235,15 @@
                                         HorizontalAlignment="Center"
                                         FontFamily="{StaticResource DosisExtraBold}"
                                         FontSize="15"
-                                        Text="52%" />
+                                        Text="{Binding CrawlerProgress}" />
 
                                     <!--  Progress Verbose  -->
                                     <StackPanel
                                         Grid.Row="1"
                                         Margin="0,5,0,0"
                                         HorizontalAlignment="Center"
-                                        Orientation="Vertical">
+                                        Orientation="Vertical"
+                                        Visibility="Collapsed">
                                         <StackPanel.Resources>
                                             <Style TargetType="{x:Type TextBlock}">
                                                 <Setter Property="HorizontalAlignment" Value="Center" />

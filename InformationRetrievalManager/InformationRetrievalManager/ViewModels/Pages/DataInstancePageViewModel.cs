@@ -4,8 +4,10 @@ using InformationRetrievalManager.Relational;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 
 namespace InformationRetrievalManager
@@ -76,6 +78,11 @@ namespace InformationRetrievalManager
         public TextEntryViewModel QueryEntry { get; protected set; }
 
         /// <summary>
+        /// Crawler processing progress feedback message to user.
+        /// </summary>
+        public string CrawlerProgress { get; protected set; }
+
+        /// <summary>
         /// Error string as a feedback to the user.
         /// </summary>
         public string FormErrorString { get; protected set; }
@@ -87,7 +94,16 @@ namespace InformationRetrievalManager
         /// <summary>
         /// Indicates if crawler is currently processing
         /// </summary>
-        public bool CrawlerInWorkFlag { get; set; }
+        public bool CrawlerInWork
+        {
+            get => CrawlerInWorkFlag || _crawlerEngine != null || (_crawlerEngine != null && _crawlerEngine.IsCurrentlyCrawling);
+            set => CrawlerInWorkFlag = value;
+        }
+
+        /// <summary>
+        /// Command flag for crawler controls
+        /// </summary>
+        private bool CrawlerInWorkFlag { get; set; }
 
         /// <summary>
         /// Indicates if index processing is currently in work
@@ -108,6 +124,16 @@ namespace InformationRetrievalManager
         /// </summary>
         public ICommand GoToHomePageCommand { get; set; }
 
+        /// <summary>
+        /// The command to start crawler processing.
+        /// </summary>
+        public ICommand StartCrawlerCommand { get; set; }
+
+        /// <summary>
+        /// The command to start crawler cancel.
+        /// </summary>
+        public ICommand CancelCrawlerCommand { get; set; }
+
         #endregion
 
         #region Constructor
@@ -119,6 +145,8 @@ namespace InformationRetrievalManager
         {
             // Create commands.
             GoToHomePageCommand = new RelayCommand(GoToHomePageCommandRoutine);
+            StartCrawlerCommand = new RelayCommand(async () => await StartCrawlerCommandRoutineAsync());
+            CancelCrawlerCommand = new RelayCommand(async () => await CancelCrawlerCommandRoutineAsync());
 
             // Create data selection with its entry.
             _dataFileSelection = new List<CrawlerFileInfo>() { new CrawlerFileInfo("< Select Data File >", null) };
@@ -202,6 +230,61 @@ namespace InformationRetrievalManager
             DI.ViewModelApplication.GoToPage(ApplicationPage.Home);
         }
 
+        /// <summary>
+        /// Command Routine : Start crawler processing
+        /// </summary>
+        private async Task StartCrawlerCommandRoutineAsync()
+        {
+            if (_crawlerEngine != null)
+                return;
+
+            await RunCommandAsync(() => CrawlerInWorkFlag, async () =>
+            {
+                // Initialize the crawler
+                _crawlerEngine = new CrawlerEngine(_dataInstance.Id.ToString());
+                _crawlerEngine.SetControls(
+                    _dataInstance.CrawlerConfiguration.SiteAddress,
+                    _dataInstance.CrawlerConfiguration.SiteSuffix,
+                    _dataInstance.CrawlerConfiguration.StartPageNo,
+                    _dataInstance.CrawlerConfiguration.MaxPageNo,
+                    _dataInstance.CrawlerConfiguration.PageNoModifier,
+                    _dataInstance.CrawlerConfiguration.SearchInterval,
+                    _dataInstance.CrawlerConfiguration.SiteUrlArticlesXPath,
+                    _dataInstance.CrawlerConfiguration.SiteArticleContentAreaXPath,
+                    _dataInstance.CrawlerConfiguration.SiteArticleTitleXPath,
+                    _dataInstance.CrawlerConfiguration.SiteArticleCategoryXPath,
+                    _dataInstance.CrawlerConfiguration.SiteArticleDateTimeXPath,
+                    new DatetimeParseData(
+                        _dataInstance.CrawlerConfiguration.SiteArticleDateTimeFormat,
+                        new CultureInfo(_dataInstance.CrawlerConfiguration.SiteArticleDateTimeCultureInfo))
+                    );
+                CrawlerProgress = string.Empty;
+                UpdateCrawlerEvents(_crawlerEngine);
+
+                // Start the crawler
+                _crawlerEngine.Start();
+
+                OnPropertyChanged(nameof(CrawlerInWork));
+                await Task.Delay(1);
+            });
+        }
+
+        /// <summary>
+        /// Command Routine : Cancel crawler processing
+        /// </summary>
+        private async Task CancelCrawlerCommandRoutineAsync()
+        {
+            if (_crawlerEngine == null)
+                return;
+
+            await RunCommandAsync(() => CrawlerInWorkFlag, async () =>
+            {
+                _crawlerEngine.Cancel();
+                
+                await Task.Delay(1);
+            });
+        }
+
         #endregion
 
         #region Private Methods
@@ -213,7 +296,7 @@ namespace InformationRetrievalManager
         private async Task LoadAsync(long id)
         {
             // Load data instance
-            _dataInstance = _uow.DataInstances.Get(o =>o.Id == id, 
+            _dataInstance = _uow.DataInstances.Get(o => o.Id == id,
                 includeProperties: new string[] { nameof(DataInstanceDataModel.CrawlerConfiguration), nameof(DataInstanceDataModel.IndexProcessingConfiguration) })
                 .FirstOrDefault();
 
@@ -225,10 +308,41 @@ namespace InformationRetrievalManager
 
             // Get crawler engine (if there is running one)
             _crawlerEngine = await _crawlerManager.GetCrawlerAsync(_dataInstance.Id.ToString());
+            if (_crawlerEngine != null)
+                UpdateCrawlerEvents(_crawlerEngine);
 
-            await Task.Delay(1000);
             // Flag up data load is done
             DataLoaded = true;
+        }
+
+        /// <summary>
+        /// Update crawler events in this view model.
+        /// </summary>
+        /// <param name="crawler">The crawler</param>
+        private void UpdateCrawlerEvents(ICrawlerEngine crawler)
+        {
+            crawler.OnStartProcessEvent += (s, e) =>
+            {
+                CrawlerProgress = "Starting...";
+                Application.Current.Dispatcher.Invoke(() => OnPropertyChanged(nameof(CrawlerProgress)));
+            };
+            crawler.OnProcessProgressEvent += (s, e) =>
+            {
+                CrawlerProgress = $"{e.CrawlingProgressPct}%";
+                Application.Current.Dispatcher.Invoke(() => OnPropertyChanged(nameof(CrawlerProgress)));
+            };
+            crawler.OnFinishProcessEvent += (s, e) =>
+            {
+                CrawlerProgress = "Done!";
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    OnPropertyChanged(nameof(CrawlerProgress));
+
+                    _crawlerEngine = null;
+
+                    OnPropertyChanged(nameof(CrawlerInWork));
+                });
+            };
         }
 
         /// <summary>
