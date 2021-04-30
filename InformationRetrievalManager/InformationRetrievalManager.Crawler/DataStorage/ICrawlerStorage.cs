@@ -38,6 +38,16 @@ namespace InformationRetrievalManager.Crawler
         /// </remarks>
         string[] GetDataFiles(string cid);
 
+        /// <summary>
+        /// Delete files according to crawler identifier and file timestmap.
+        /// </summary>
+        /// <param name="cid">The crawler identifier.</param>
+        /// <param name="fileTimestamp">The file timestamp.</param>
+        /// <remarks>
+        ///     Make sure to check the crawler is not crawling at the moment of deleting data files.
+        /// </remarks>
+        void DeleteDataFiles(string cid, DateTime fileTimestamp);
+
         #endregion
     }
 }

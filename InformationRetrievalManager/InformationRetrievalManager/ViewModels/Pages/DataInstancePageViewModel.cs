@@ -129,9 +129,9 @@ namespace InformationRetrievalManager
         public bool QueryInWorkFlag { get; set; }
 
         /// <summary>
-        /// Command flag for opening process for opening web pages
+        /// Command flag for opening process (e.g. files or for opening web pages)
         /// </summary>
-        private bool OpenWebpageFlag { get; set; }
+        private bool ProcessFlag { get; set; }
 
         #endregion
 
@@ -158,6 +158,16 @@ namespace InformationRetrievalManager
         public ICommand CancelCrawlerCommand { get; set; }
 
         /// <summary>
+        /// The command to open raw file data.
+        /// </summary>
+        public ICommand OpenRawDataCommand { get; set; }
+
+        /// <summary>
+        /// The command to open raw file data.
+        /// </summary>
+        public ICommand DeleteDataFileCommand { get; set; }
+
+        /// <summary>
         /// The command to start index processing.
         /// </summary>
         public ICommand StartIndexProcessingCommand { get; set; }
@@ -176,6 +186,8 @@ namespace InformationRetrievalManager
             OpenUrlCommand = new RelayParameterizedCommand(async (parameter) => await OpenUrlCommandRoutineAsync(parameter));
             StartCrawlerCommand = new RelayCommand(async () => await StartCrawlerCommandRoutineAsync());
             CancelCrawlerCommand = new RelayCommand(async () => await CancelCrawlerCommandRoutineAsync());
+            OpenRawDataCommand = new RelayParameterizedCommand(async (parameter) => await OpenRawDataCommandRoutineAsync(parameter));
+            DeleteDataFileCommand = new RelayParameterizedCommand(async (parameter) => await DeleteDataFileCommandRoutineAsync(parameter));
             StartIndexProcessingCommand = new RelayCommand(async () => await StartIndexProcessingCommandRoutineAsync());
 
             // Create data selection with its entry.
@@ -267,7 +279,7 @@ namespace InformationRetrievalManager
         /// <param name="parameter">The URL</param>
         private async Task OpenUrlCommandRoutineAsync(object parameter)
         {
-            await RunCommandAsync(() => OpenWebpageFlag, async () =>
+            await RunCommandAsync(() => ProcessFlag, async () =>
             {
                 string url = parameter as string;
 
@@ -334,6 +346,43 @@ namespace InformationRetrievalManager
         }
 
         /// <summary>
+        /// Command Routine : Open raw file data
+        /// </summary>
+        /// <param name="parameter"><see cref="DataFileInfo"/></param>
+        private async Task OpenRawDataCommandRoutineAsync(object parameter)
+        {
+            await RunCommandAsync(() => ProcessFlag, async () =>
+            {
+                var fileInfo = parameter as DataFileInfo;
+
+                if (fileInfo != null && fileInfo.FilePath != null && File.Exists(fileInfo.FilePath))
+                    System.Diagnostics.Process.Start(fileInfo.FilePath);
+
+                await Task.Delay(1);
+            });
+        }
+
+        /// <summary>
+        /// Command Routine : Delete data (crawler) file
+        /// </summary>
+        /// <param name="parameter"><see cref="DataFileInfo"/></param>
+        private async Task DeleteDataFileCommandRoutineAsync(object parameter)
+        {
+            await RunCommandAsync(() => ProcessFlag, async () =>
+            {
+                var fileInfo = parameter as DataFileInfo;
+
+                if (fileInfo != null && fileInfo.FilePath != null && File.Exists(fileInfo.FilePath))
+                {
+                    _crawlerStorage.DeleteDataFiles(_dataInstance.Id.ToString(), fileInfo.CreatedAt);
+                    LoadDataFiles();
+                }
+
+                await Task.Delay(1);
+            });
+        }
+
+        /// <summary>
         /// Command Routine : Start index processing.
         /// </summary>
         /// <returns></returns>
@@ -351,6 +400,7 @@ namespace InformationRetrievalManager
         /// </summary>
         public void LoadDataFiles()
         {
+            ushort fileLimit = 50;
             string startsWith = "data_";
             string endsWith = ".json";
 
@@ -376,6 +426,8 @@ namespace InformationRetrievalManager
                 }
 
                 data.Sort((x, y) => DateTime.Compare(y.CreatedAt, x.CreatedAt));
+                if (data.Count > fileLimit)
+                    data = data.Take(fileLimit).ToList();
                 UpdateDataFileSelection(data);
             }
         }

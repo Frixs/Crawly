@@ -331,6 +331,8 @@
                                         Margin="0,0,258,0"
                                         HorizontalAlignment="Center"
                                         VerticalAlignment="Top"
+                                        Command="{Binding OpenRawDataCommand, Mode=OneWay}"
+                                        CommandParameter="{Binding DataFileEntry.Value, Mode=OneWay}"
                                         Content="{StaticResource FontAwesomeCodeIcon}"
                                         FontFamily="{StaticResource FontAwesomeSolid}"
                                         ToolTip="Open Raw Data">
@@ -357,6 +359,8 @@
                                         Margin="258,0,0,0"
                                         HorizontalAlignment="Center"
                                         VerticalAlignment="Top"
+                                        Command="{Binding DeleteDataFileCommand, Mode=OneWay}"
+                                        CommandParameter="{Binding DataFileEntry.Value, Mode=OneWay}"
                                         Content="{StaticResource FontAwesomeTrashAltIcon}"
                                         FontFamily="{StaticResource FontAwesomeSolid}"
                                         ToolTip="Delete Data">
