@@ -248,30 +248,34 @@
                                 </Grid.RowDefinitions>
 
                                 <!--  Crawled Data Selection  -->
-                                <Grid Grid.Row="0">
-                                    <!-- Open Raw BTN -->
+                                <Grid Grid.Row="0" Margin="0,0,0,10">
+                                    <!--  Open Raw BTN  -->
                                     <Button
-                                        Height="36"
+                                        Width="34"
+                                        Height="34"
                                         Margin="0,23.5,258,0"
                                         HorizontalAlignment="Center"
                                         VerticalAlignment="Top"
                                         Content="{StaticResource FontAwesomeCodeIcon}"
                                         FontFamily="{StaticResource FontAwesomeSolid}"
-                                        Style="{StaticResource DarkLightButton}" />
-                                    <!-- Data File Entry -->
+                                        Style="{StaticResource DarkLightButton}"
+                                        ToolTip="Open Raw Data" />
+                                    <!--  Data File Entry  -->
                                     <local:ComboEntry
                                         Width="205"
                                         VerticalAlignment="Center"
                                         DataContext="{Binding DataFileEntry, Mode=OneWay}" />
-                                    <!-- Delete BTN -->
+                                    <!--  Delete BTN  -->
                                     <Button
-                                        Height="36"
+                                        Width="34"
+                                        Height="34"
                                         Margin="258,23.5,0,0"
                                         HorizontalAlignment="Center"
                                         VerticalAlignment="Top"
                                         Content="{StaticResource FontAwesomeTrashAltIcon}"
                                         FontFamily="{StaticResource FontAwesomeSolid}"
-                                        Style="{StaticResource DarkLightButton}" />
+                                        Style="{StaticResource DarkLightButton}"
+                                        ToolTip="Delete Data" />
                                 </Grid>
 
                                 <!--  Start Index Processing BTN  -->

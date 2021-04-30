@@ -98,7 +98,7 @@ namespace InformationRetrievalManager
             GoToHomePageCommand = new RelayCommand(GoToHomePageCommandRoutine);
 
             // Create data selection with its entry.
-            _dataFileSelection = new List<CrawlerFileInfo>() { new CrawlerFileInfo("Select Data File", null) };
+            _dataFileSelection = new List<CrawlerFileInfo>() { new CrawlerFileInfo("< Select Data File >", null) };
             DataFileEntry = new ComboEntryViewModel<CrawlerFileInfo>
             {
                 Label = null,

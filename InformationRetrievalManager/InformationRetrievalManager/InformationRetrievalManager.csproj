@@ -700,6 +700,8 @@ RD /S /Q "$(TargetDir)ru\"
 RD /S /Q "$(TargetDir)sv\"
 RD /S /Q "$(TargetDir)tr\"
 RD /S /Q "$(TargetDir)zh-CN\"
-RD /S /Q "$(TargetDir)zh-Hans\"</PostBuildEvent>
+RD /S /Q "$(TargetDir)zh-Hans\"
+RD /S /Q "$(TargetDir)ja-JP\"
+RD /S /Q "$(TargetDir)cs-CZ\"</PostBuildEvent>
   </PropertyGroup>
 </Project>
