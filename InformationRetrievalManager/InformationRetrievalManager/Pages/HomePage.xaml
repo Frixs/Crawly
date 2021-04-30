@@ -311,7 +311,7 @@
                             Grid.Row="1"
                             HorizontalAlignment="Center"
                             VerticalAlignment="Top"
-                            local:AnimateSlideInFromTopProperty.Value="{Binding DataLoaded, Converter={local:BooleanInvertConverter}}"
+                            local:AnimateSlideInFromTopGoneProperty.Value="{Binding DataLoaded, Converter={local:BooleanInvertConverter}}"
                             Visibility="Visible">
                             <!--  Spinner  -->
                             <TextBlock

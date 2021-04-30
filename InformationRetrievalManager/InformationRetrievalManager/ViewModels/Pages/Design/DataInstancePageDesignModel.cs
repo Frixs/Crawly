@@ -18,6 +18,7 @@
         /// </summary>
         public DataInstancePageDesignModel()
         {
+            DataLoaded = true;
         }
 
         #endregion

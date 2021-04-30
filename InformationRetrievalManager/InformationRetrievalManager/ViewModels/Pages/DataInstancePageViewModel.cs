@@ -1,9 +1,11 @@
-﻿using InformationRetrievalManager.Crawler;
+﻿using InformationRetrievalManager.Core;
+using InformationRetrievalManager.Crawler;
 using InformationRetrievalManager.Relational;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Input;
 
 namespace InformationRetrievalManager
@@ -16,6 +18,7 @@ namespace InformationRetrievalManager
         #region Private Members (Injects)
 
         private readonly ILogger _logger;
+        private readonly ITaskManager _taskManager;
         private readonly IUnitOfWork _uow;
         private readonly ICrawlerManager _crawlerManager;
 
@@ -50,7 +53,7 @@ namespace InformationRetrievalManager
         /// <summary>
         /// Indicates if the data are already loaded into the VM (once the values changes to <see langword="true"/>).
         /// </summary>
-        public bool DataLoaded { get; set; }
+        public bool DataLoaded { get; protected set; }
 
         /// <summary>
         /// Property for <see cref="_dataInstance"/>.
@@ -60,22 +63,22 @@ namespace InformationRetrievalManager
         /// <summary>
         /// Entry selection of available data files.
         /// </summary>
-        public ComboEntryViewModel<CrawlerFileInfo> DataFileEntry { get; set; }
+        public ComboEntryViewModel<CrawlerFileInfo> DataFileEntry { get; protected set; }
 
         /// <summary>
         /// Entry selection of available indexed data files.
         /// </summary>
-        public ComboEntryViewModel<CrawlerFileInfo> IndexFileEntry { get; set; }
+        public ComboEntryViewModel<CrawlerFileInfo> IndexFileEntry { get; protected set; }
 
         /// <summary>
         /// Entry for query
         /// </summary>
-        public TextEntryViewModel QueryEntry { get; set; }
+        public TextEntryViewModel QueryEntry { get; protected set; }
 
         /// <summary>
         /// Error string as a feedback to the user.
         /// </summary>
-        public string FormErrorString { get; set; }
+        public string FormErrorString { get; protected set; }
 
         #endregion
 
@@ -156,10 +159,11 @@ namespace InformationRetrievalManager
         /// <summary>
         /// DI constructor
         /// </summary>
-        public DataInstancePageViewModel(ILogger logger, IUnitOfWork uow, ICrawlerManager crawlerManager)
+        public DataInstancePageViewModel(ILogger logger, ITaskManager taskManager, IUnitOfWork uow, ICrawlerManager crawlerManager)
             : this()
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _taskManager = taskManager ?? throw new ArgumentNullException(nameof(taskManager));
             _uow = uow ?? throw new ArgumentNullException(nameof(uow));
             _crawlerManager = crawlerManager ?? throw new ArgumentNullException(nameof(crawlerManager));
         }
@@ -178,7 +182,7 @@ namespace InformationRetrievalManager
 
             // If the value is not set yet...
             if (_dataInstance == null)
-                Load(id);
+                _taskManager.RunAndForget(() => LoadAsync(id));
             // Otherwise, it is already set...
             else
                 throw new InvalidOperationException(nameof(_dataInstance));
@@ -206,7 +210,7 @@ namespace InformationRetrievalManager
         /// Loads necessary data structures according to data instance <paramref name="id"/>.
         /// </summary>
         /// <param name="id">The ID</param>
-        private void Load(long id)
+        private async Task LoadAsync(long id)
         {
             // Load data instance
             _dataInstance = _uow.DataInstances.Get(o =>o.Id == id, 
@@ -217,10 +221,12 @@ namespace InformationRetrievalManager
             if (_dataInstance == null)
                 // Move the user back...
                 GoToHomePageCommandRoutine();
+            OnPropertyChanged(nameof(DataInstance));
 
             // Get crawler engine (if there is running one)
-            _crawlerEngine = _crawlerManager.GetCrawlerAsync(_dataInstance.Id.ToString()).Result;
+            _crawlerEngine = await _crawlerManager.GetCrawlerAsync(_dataInstance.Id.ToString());
 
+            await Task.Delay(1000);
             // Flag up data load is done
             DataLoaded = true;
         }
