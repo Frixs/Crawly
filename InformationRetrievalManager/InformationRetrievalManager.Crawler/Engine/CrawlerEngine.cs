@@ -38,6 +38,24 @@ namespace InformationRetrievalManager.Crawler
         /// </summary>
         private short _crawlingProgressPct; //; ctor
 
+        /// <summary>
+        /// Crawling progress feedback message reference from the currently performing processing. 
+        /// The value is taken into work during set of <see cref="CrawlingProgressPct"/>.
+        /// </summary>
+        /// <remarks>
+        ///     Empty string during no processing.
+        /// </remarks>
+        private string _crawlingProgressMsg = "";
+
+        /// <summary>
+        /// Crawling progress web page URL reference from the currently performing processing.
+        /// The value is taken into work during set of <see cref="CrawlingProgressPct"/>.
+        /// </summary>
+        /// <remarks>
+        ///     Empty string during no processing.
+        /// </remarks>
+        private string _crawlingProgressUrl = "";
+
         #endregion
 
         #region Interface Properties
@@ -56,7 +74,12 @@ namespace InformationRetrievalManager.Crawler
             {
                 _crawlingProgressPct = value;
                 if (value > 0)
-                    OnProcessProgressEvent?.Invoke(this, new CrawlerEngineEventArgs { CrawlingProgressPct = CrawlingProgressPct });
+                    OnProcessProgressEvent?.Invoke(this, new CrawlerEngineEventArgs
+                    {
+                        CrawlingProgressPct = CrawlingProgressPct,
+                        CrawlingProgressMsg = _crawlingProgressMsg,
+                        CrawlingProgressUrl = _crawlingProgressUrl
+                    });
             }
         }
 
@@ -192,6 +215,9 @@ namespace InformationRetrievalManager.Crawler
             string siteArticleDateTimeXPath, DatetimeParseData siteArticleDateTimeParseData
             )
         {
+            if (IsCurrentlyCrawling)
+                return false;
+
             // TODO: validate data
             SiteAddress = siteAddress;
             SiteSuffix = siteSuffix;
@@ -221,6 +247,8 @@ namespace InformationRetrievalManager.Crawler
             // Turn off the flag once the crawling is finished
             IsCurrentlyCrawling = false;
             CrawlingProgressPct = -1;
+            _crawlingProgressMsg = string.Empty;
+            _crawlingProgressUrl = string.Empty;
             CrawlingTimestamp = default;
             _cancelationFlag = false;
 
@@ -302,6 +330,7 @@ namespace InformationRetrievalManager.Crawler
                 foreach (var line in _fileManager.ReadLines(urlsFilePath))
                     result.Add(line);
 
+                UpdateProgressMessageData("Article page URL scanning loaded from cache!");
                 // Calculaate progress pct
                 CrawlingProgressPct = processPctValue;
 
@@ -324,6 +353,7 @@ namespace InformationRetrievalManager.Crawler
                     _logger.LogTraceSource($"Crawler '{NameIdentifier}' is currently scanning '{web.ResponseUri}'.");
 
                     // Go through the specific page...
+                    int linkCount = 0;
                     foreach (var item in doc.DocumentNode.SelectNodes(SiteUrlArticlesXPath))
                     {
                         // Check for cancelation
@@ -334,9 +364,11 @@ namespace InformationRetrievalManager.Crawler
                         {
                             string link = item.GetAttributeValue(hrefKeyword, defaultArticleLink);
                             result.Add(link);
+                            linkCount++;
                         }
                     }
 
+                    UpdateProgressMessageData(linkCount > 0 ? "Successful page scanning!" : "No articles found during page scanning.", web.ResponseUri.ToString());
                     // Calculate progress pct
                     CrawlingProgressPct = Convert.ToInt16(
                         (((i - StartPageNo) / PageNoModifier) + 1) / (double)((MaxPageNo - StartPageNo + PageNoModifier) / PageNoModifier) * processPctValue
@@ -347,6 +379,8 @@ namespace InformationRetrievalManager.Crawler
 
                 // Save it to the file
                 await _fileManager.WriteLinesToFileAsync(result.ToList(), urlsFilePath, false);
+
+                UpdateProgressMessageData("Article page URL scanning done!", invoke: true);
 
                 // If invalid links are present...
                 if (anyInvalidLinks)
@@ -389,6 +423,9 @@ namespace InformationRetrievalManager.Crawler
                 {
                     // Load the document
                     HtmlDocument doc = web.Load(url);
+
+                    string progressMsg = string.Empty;
+
                     // Log it
                     _logger.LogDebugSource($"Crawler '{NameIdentifier}' is currently processing URL '{web.ResponseUri}'.");
 
@@ -419,10 +456,16 @@ namespace InformationRetrievalManager.Crawler
                                 contentTextMin: MinifyText(content.InnerText),
                                 contentText: TidyfyText(content.InnerText)
                                 );
+
+                            // Record progress message
+                            progressMsg = "Successful page processing!";
                         }
                         else
                         {
                             _logger.LogTraceSource($"Crawler '{NameIdentifier}' cannot parse the article's datetime according to attached formatting!");
+
+                            // Record progress message
+                            progressMsg = "Failed to parse datetime via set format!";
 
                             if (InterruptOnError)
                                 break;
@@ -434,10 +477,14 @@ namespace InformationRetrievalManager.Crawler
                         string invalidNodeNames = $"{(title == null ? $" {nameof(title)}" : "")}{(category == null ? $" {nameof(category)}" : "")}{(datetime == null ? $" {nameof(datetime)}" : "")}{(content == null ? $" {nameof(content)}" : "")}";
                         _logger.LogTraceSource($"Crawler '{NameIdentifier}' cannot find html node(s):{invalidNodeNames}");
 
+                        // Record progress message
+                        progressMsg = $"Failed to parse html node(s): {invalidNodeNames}";
+
                         if (InterruptOnError)
                             break;
                     }
 
+                    UpdateProgressMessageData(progressMsg, web.ResponseUri.ToString());
                     // Calculate progress pct
                     currentPctProgress = Convert.ToInt16(Math.Round(i / (double)(urls.Count / 100.0) * (processPctValue / 100.0)));
                     CrawlingProgressPct += (short)(currentPctProgress - previousPctProgress);
@@ -455,6 +502,8 @@ namespace InformationRetrievalManager.Crawler
 
                 ++i;
             }
+
+            UpdateProgressMessageData("URL processing done!", invoke: true);
         }
 
         /// <summary>
@@ -475,6 +524,24 @@ namespace InformationRetrievalManager.Crawler
         private string TidyfyText(string text)
         {
             return Regex.Replace(Regex.Replace(text.Trim(), @"(^\p{Zs}*\r\n){2,}", "\r\n", RegexOptions.Multiline), @" +", " ");
+        }
+
+        /// <summary>
+        /// Update progress of the crawling process.
+        /// </summary>
+        /// <param name="msg">State message feedback of the current progress.</param>
+        /// <param name="url">URL that is processed (if nay) of the current progress.</param>
+        /// <param name="invoke">Indicates if the update should be invoked by <see cref="CrawlingProgressPct"/> or not.</param>
+        private void UpdateProgressMessageData(string msg, string url = null, bool invoke = false)
+        {
+            // Record progress message
+            _crawlingProgressMsg = msg;
+            // Record progress url
+            _crawlingProgressUrl = url;
+
+            // Invoke the update
+            if (invoke)
+                CrawlingProgressPct = CrawlingProgressPct;
         }
 
         #endregion

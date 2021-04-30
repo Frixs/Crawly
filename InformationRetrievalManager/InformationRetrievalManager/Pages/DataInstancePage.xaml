@@ -238,25 +238,63 @@
                                         Text="{Binding CrawlerProgress}" />
 
                                     <!--  Progress Verbose  -->
-                                    <StackPanel
+                                    <Grid
                                         Grid.Row="1"
                                         Margin="0,5,0,0"
-                                        HorizontalAlignment="Center"
-                                        Orientation="Vertical"
-                                        Visibility="Collapsed">
-                                        <StackPanel.Resources>
+                                        HorizontalAlignment="Center">
+                                        <Grid.Resources>
+                                            <Style TargetType="{x:Type StackPanel}">
+                                                <Setter Property="Orientation" Value="Horizontal" />
+                                                <Setter Property="Height" Value="15.5" />
+                                                <Setter Property="HorizontalAlignment" Value="Center" />
+                                                <Setter Property="VerticalAlignment" Value="Center" />
+                                            </Style>
                                             <Style TargetType="{x:Type TextBlock}">
                                                 <Setter Property="HorizontalAlignment" Value="Center" />
                                                 <Setter Property="FontSize" Value="12" />
                                                 <Setter Property="FontFamily" Value="{StaticResource DosisMedium}" />
                                             </Style>
-                                        </StackPanel.Resources>
-                                        <TextBlock Opacity="1.0" Text="Processing URL ... fewf fewfe" />
-                                        <TextBlock Opacity="0.9" Text="Failed to process URL ... tzujtzt jtz" />
-                                        <TextBlock Opacity="0.75" Text="Processing URL ... ffwf f wj" />
-                                        <TextBlock Opacity="0.5" Text="Processing URL ... ffwfg ggej" />
-                                        <TextBlock Opacity="0.25" Text="Processing URL ... qwrre teej" />
-                                    </StackPanel>
+                                            <Style BasedOn="{StaticResource LightDarkTextButton}" TargetType="{x:Type Button}">
+                                                <Setter Property="Visibility" Value="Visible" />
+                                                <Setter Property="FontSize" Value="12" />
+                                                <Setter Property="Padding" Value="0" />
+                                                <Setter Property="Margin" Value="5,0,0,0" />
+                                                <Setter Property="Command" Value="{Binding OpenUrlCommand, Mode=OneWay}" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding CommandParameter, Converter={local:StringEmptyConverter}, RelativeSource={RelativeSource Self}}" Value="True">
+                                                        <Setter Property="Visibility" Value="Collapsed" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Grid.Resources>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                        </Grid.RowDefinitions>
+                                        <StackPanel Grid.Row="0" Opacity="1.0">
+                                            <TextBlock Text="{Binding CrawlerProgressMsgs[0], Mode=OneWay}" />
+                                            <Button CommandParameter="{Binding CrawlerProgressUrls[0], Mode=OneWay}" Content="(link)" />
+                                        </StackPanel>
+                                        <StackPanel Grid.Row="1" Opacity="0.9">
+                                            <TextBlock Text="{Binding CrawlerProgressMsgs[1], Mode=OneWay}" />
+                                            <Button CommandParameter="{Binding CrawlerProgressUrls[1], Mode=OneWay}" Content="(link)" />
+                                        </StackPanel>
+                                        <StackPanel Grid.Row="2" Opacity="0.75">
+                                            <TextBlock Text="{Binding CrawlerProgressMsgs[2], Mode=OneWay}" />
+                                            <Button CommandParameter="{Binding CrawlerProgressUrls[2], Mode=OneWay}" Content="(link)" />
+                                        </StackPanel>
+                                        <StackPanel Grid.Row="3" Opacity="0.5">
+                                            <TextBlock Text="{Binding CrawlerProgressMsgs[3], Mode=OneWay}" />
+                                            <Button CommandParameter="{Binding CrawlerProgressUrls[3], Mode=OneWay}" Content="(link)" />
+                                        </StackPanel>
+                                        <StackPanel Grid.Row="4" Opacity="0.25">
+                                            <TextBlock Text="{Binding CrawlerProgressMsgs[4], Mode=OneWay}" />
+                                            <Button CommandParameter="{Binding CrawlerProgressUrls[4], Mode=OneWay}" Content="(link)" />
+                                        </StackPanel>
+                                    </Grid>
                                 </Grid>
 
                                 <!--  View Configuration BTN  -->

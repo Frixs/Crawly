@@ -1,6 +1,7 @@
 ﻿using InformationRetrievalManager.Core;
 using InformationRetrievalManager.Crawler;
 using InformationRetrievalManager.Relational;
+using Ixs.DNA;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -87,6 +88,16 @@ namespace InformationRetrievalManager
         /// </summary>
         public string FormErrorString { get; protected set; }
 
+        /// <summary>
+        /// Crawler progress feedback message (1-5)
+        /// </summary>
+        public string[] CrawlerProgressMsgs { get; protected set; } = new string[5];
+
+        /// <summary>
+        /// Crawler progress page url (1-5)
+        /// </summary>
+        public string[] CrawlerProgressUrls { get; protected set; } = new string[5];
+
         #endregion
 
         #region Command Flags
@@ -115,6 +126,11 @@ namespace InformationRetrievalManager
         /// </summary>
         public bool QueryInWorkFlag { get; set; }
 
+        /// <summary>
+        /// Command flag for opening process for opening web pages
+        /// </summary>
+        private bool OpenWebpageFlag { get; set; }
+
         #endregion
 
         #region Commands
@@ -123,6 +139,11 @@ namespace InformationRetrievalManager
         /// The command to go to the another page.
         /// </summary>
         public ICommand GoToHomePageCommand { get; set; }
+
+        /// <summary>
+        /// The command to open URL according to the command parameter.
+        /// </summary>
+        public ICommand OpenUrlCommand { get; set; }
 
         /// <summary>
         /// The command to start crawler processing.
@@ -145,6 +166,7 @@ namespace InformationRetrievalManager
         {
             // Create commands.
             GoToHomePageCommand = new RelayCommand(GoToHomePageCommandRoutine);
+            OpenUrlCommand = new RelayParameterizedCommand((parameter) => OpenUrlCommandRoutineAsync(parameter));
             StartCrawlerCommand = new RelayCommand(async () => await StartCrawlerCommandRoutineAsync());
             CancelCrawlerCommand = new RelayCommand(async () => await CancelCrawlerCommandRoutineAsync());
 
@@ -231,6 +253,23 @@ namespace InformationRetrievalManager
         }
 
         /// <summary>
+        /// Open URL according to the <paramref name="parameter"/>.
+        /// </summary>
+        /// <param name="parameter">The URL</param>
+        private async Task OpenUrlCommandRoutineAsync(object parameter)
+        {
+            await RunCommandAsync(() => OpenWebpageFlag, async () =>
+            {
+                string url = parameter as string;
+
+                if (!string.IsNullOrEmpty(url) && url.IsURL())
+                    System.Diagnostics.Process.Start(url);
+
+                await Task.Delay(1);
+            });
+        }
+
+        /// <summary>
         /// Command Routine : Start crawler processing
         /// </summary>
         private async Task StartCrawlerCommandRoutineAsync()
@@ -280,7 +319,7 @@ namespace InformationRetrievalManager
             await RunCommandAsync(() => CrawlerInWorkFlag, async () =>
             {
                 _crawlerEngine.Cancel();
-                
+
                 await Task.Delay(1);
             });
         }
@@ -328,8 +367,33 @@ namespace InformationRetrievalManager
             };
             crawler.OnProcessProgressEvent += (s, e) =>
             {
+                for (int i = CrawlerProgressMsgs.Length - 1; i >= 0; --i)
+                {
+                    if (i == 0)
+                    {
+                        CrawlerProgressMsgs[i] = e.CrawlingProgressMsg;
+                        CrawlerProgressUrls[i] = e.CrawlingProgressUrl;
+                    }
+                    else
+                    {
+                        if (string.IsNullOrEmpty(CrawlerProgressMsgs[i - 1]))
+                            continue;
+                        else
+                        {
+                            CrawlerProgressMsgs[i] = CrawlerProgressMsgs[i - 1];
+                            CrawlerProgressUrls[i] = CrawlerProgressUrls[i - 1];
+                        }
+                    }
+                }
+
                 CrawlerProgress = $"{e.CrawlingProgressPct}%";
-                Application.Current.Dispatcher.Invoke(() => OnPropertyChanged(nameof(CrawlerProgress)));
+
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    OnPropertyChanged(nameof(CrawlerProgressMsgs));
+                    OnPropertyChanged(nameof(CrawlerProgressUrls));
+                    OnPropertyChanged(nameof(CrawlerProgress));
+                });
             };
             crawler.OnFinishProcessEvent += (s, e) =>
             {
@@ -341,6 +405,9 @@ namespace InformationRetrievalManager
                     _crawlerEngine = null;
 
                     OnPropertyChanged(nameof(CrawlerInWork));
+
+                    for (int i = 0; i < CrawlerProgressMsgs.Length; ++i)
+                        CrawlerProgressMsgs[i] = CrawlerProgressUrls[i] = string.Empty;
                 });
             };
         }

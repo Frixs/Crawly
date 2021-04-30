@@ -19,6 +19,7 @@
         public DataInstancePageDesignModel()
         {
             DataLoaded = true;
+            CrawlerInWork = true;
         }
 
         #endregion
