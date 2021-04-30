@@ -1,21 +1,28 @@
-﻿namespace InformationRetrievalManager
+﻿using System;
+
+namespace InformationRetrievalManager
 {
     /// <summary>
     /// Wrapper to keep crawler data file information bound together.
     /// </summary>
-    public class CrawlerFileInfo
+    public class DataFileInfo
     {
         #region Public Properties
 
         /// <summary>
         /// Label representing the data file.
         /// </summary>
-        public string Label { get; set; }
+        public string Label { get; }
 
         /// <summary>
         /// Filepath of the data file.
         /// </summary>
-        public string FilePath { get; set; }
+        public string FilePath { get; }
+
+        /// <summary>
+        /// Filepath of the data file.
+        /// </summary>
+        public DateTime CreatedAt { get; }
 
         #endregion
 
@@ -26,10 +33,12 @@
         /// </summary>
         /// <param name="label">Label of the file.</param>
         /// <param name="filePath">Filepath of the file.</param>
-        public CrawlerFileInfo(string label, string filePath)
+        /// <param name="createdAt">Created at date time of the file..</param>
+        public DataFileInfo(string label, string filePath, DateTime createdAt)
         {
             Label = label;
             FilePath = filePath;
+            CreatedAt = createdAt;
         }
 
         #endregion

@@ -118,13 +118,10 @@ namespace InformationRetrievalManager.Crawler
         }
 
         /// <inheritdoc/>
-        public string[] GetDataFiles(ICrawlerEngine crawler)
+        public string[] GetDataFiles(string cid)
         {
-            if (crawler == null)
-                throw new ArgumentNullException("Crawler is not defined!");
-
-            if (crawler.IsCurrentlyCrawling)
-                return null;
+            if (cid == null)
+                throw new ArgumentNullException("Crawler ID is not defined!");
 
             var result = new List<string>();
 
@@ -134,7 +131,7 @@ namespace InformationRetrievalManager.Crawler
                 string[] dirs = Directory.GetDirectories(Constants.CrawlerDataStorageDir);
                 for (int i = 0; i < dirs.Length; ++i)
                     // Find the one specific for the searched crawler...
-                    if (Path.GetFileName(dirs[i]).StartsWith(crawler.NameIdentifier))
+                    if (Path.GetFileName(dirs[i]).StartsWith(cid))
                     {
                         result.AddRange(
                             Directory.GetFiles(dirs[i])

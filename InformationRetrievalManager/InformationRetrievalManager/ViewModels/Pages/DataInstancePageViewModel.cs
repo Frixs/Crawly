@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
@@ -24,6 +25,7 @@ namespace InformationRetrievalManager
         private readonly ITaskManager _taskManager;
         private readonly IUnitOfWork _uow;
         private readonly ICrawlerManager _crawlerManager;
+        private readonly ICrawlerStorage _crawlerStorage;
 
         #endregion
 
@@ -42,12 +44,12 @@ namespace InformationRetrievalManager
         /// <summary>
         /// Collection of available data files for indexation.
         /// </summary>
-        private List<CrawlerFileInfo> _dataFileSelection; //; ctor
+        private List<DataFileInfo> _dataFileSelection; //; ctor
 
         /// <summary>
         /// Collection of available index files.
         /// </summary>
-        private List<CrawlerFileInfo> _indexFileSelection; //; ctor
+        private List<DataFileInfo> _indexFileSelection; //; ctor
 
         #endregion
 
@@ -66,12 +68,12 @@ namespace InformationRetrievalManager
         /// <summary>
         /// Entry selection of available data files.
         /// </summary>
-        public ComboEntryViewModel<CrawlerFileInfo> DataFileEntry { get; protected set; }
+        public ComboEntryViewModel<DataFileInfo> DataFileEntry { get; protected set; }
 
         /// <summary>
         /// Entry selection of available indexed data files.
         /// </summary>
-        public ComboEntryViewModel<CrawlerFileInfo> IndexFileEntry { get; protected set; }
+        public ComboEntryViewModel<DataFileInfo> IndexFileEntry { get; protected set; }
 
         /// <summary>
         /// Entry for query
@@ -155,6 +157,11 @@ namespace InformationRetrievalManager
         /// </summary>
         public ICommand CancelCrawlerCommand { get; set; }
 
+        /// <summary>
+        /// The command to start index processing.
+        /// </summary>
+        public ICommand StartIndexProcessingCommand { get; set; }
+
         #endregion
 
         #region Constructor
@@ -166,32 +173,33 @@ namespace InformationRetrievalManager
         {
             // Create commands.
             GoToHomePageCommand = new RelayCommand(GoToHomePageCommandRoutine);
-            OpenUrlCommand = new RelayParameterizedCommand((parameter) => OpenUrlCommandRoutineAsync(parameter));
+            OpenUrlCommand = new RelayParameterizedCommand(async (parameter) => await OpenUrlCommandRoutineAsync(parameter));
             StartCrawlerCommand = new RelayCommand(async () => await StartCrawlerCommandRoutineAsync());
             CancelCrawlerCommand = new RelayCommand(async () => await CancelCrawlerCommandRoutineAsync());
+            StartIndexProcessingCommand = new RelayCommand(async () => await StartIndexProcessingCommandRoutineAsync());
 
             // Create data selection with its entry.
-            _dataFileSelection = new List<CrawlerFileInfo>() { new CrawlerFileInfo("< Select Data File >", null) };
-            DataFileEntry = new ComboEntryViewModel<CrawlerFileInfo>
+            _dataFileSelection = new List<DataFileInfo>() { new DataFileInfo("< Select Data File >", null, default) };
+            DataFileEntry = new ComboEntryViewModel<DataFileInfo>
             {
                 Label = null,
                 Description = "Please, select data for index processing from the selection of crawled data.",
                 Validation = null,
                 Value = _dataFileSelection[0],
                 ValueList = _dataFileSelection,
-                DisplayMemberPath = nameof(CrawlerFileInfo.Label)
+                DisplayMemberPath = nameof(DataFileInfo.Label)
             };
 
             // Create index selection with its entry
-            _indexFileSelection = new List<CrawlerFileInfo>() { new CrawlerFileInfo("< Select Index File >", null) };
-            IndexFileEntry = new ComboEntryViewModel<CrawlerFileInfo>
+            _indexFileSelection = new List<DataFileInfo>() { new DataFileInfo("< Select Index File >", null, default) };
+            IndexFileEntry = new ComboEntryViewModel<DataFileInfo>
             {
                 Label = null,
                 Description = "Please, select an index for querying from the selection of indexed data.",
                 Validation = null,
                 Value = _indexFileSelection[0],
                 ValueList = _indexFileSelection,
-                DisplayMemberPath = nameof(CrawlerFileInfo.Label)
+                DisplayMemberPath = nameof(DataFileInfo.Label)
             };
 
             // Create query entry
@@ -209,13 +217,14 @@ namespace InformationRetrievalManager
         /// <summary>
         /// DI constructor
         /// </summary>
-        public DataInstancePageViewModel(ILogger logger, ITaskManager taskManager, IUnitOfWork uow, ICrawlerManager crawlerManager)
+        public DataInstancePageViewModel(ILogger logger, ITaskManager taskManager, IUnitOfWork uow, ICrawlerManager crawlerManager, ICrawlerStorage crawlerStorage)
             : this()
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _taskManager = taskManager ?? throw new ArgumentNullException(nameof(taskManager));
             _uow = uow ?? throw new ArgumentNullException(nameof(uow));
             _crawlerManager = crawlerManager ?? throw new ArgumentNullException(nameof(crawlerManager));
+            _crawlerStorage = crawlerStorage ?? throw new ArgumentNullException(nameof(crawlerStorage));
         }
 
         /// <summary>
@@ -270,7 +279,7 @@ namespace InformationRetrievalManager
         }
 
         /// <summary>
-        /// Command Routine : Start crawler processing
+        /// Command Routine : Start crawler processing.
         /// </summary>
         private async Task StartCrawlerCommandRoutineAsync()
         {
@@ -309,7 +318,7 @@ namespace InformationRetrievalManager
         }
 
         /// <summary>
-        /// Command Routine : Cancel crawler processing
+        /// Command Routine : Cancel crawler processing.
         /// </summary>
         private async Task CancelCrawlerCommandRoutineAsync()
         {
@@ -322,6 +331,53 @@ namespace InformationRetrievalManager
 
                 await Task.Delay(1);
             });
+        }
+
+        /// <summary>
+        /// Command Routine : Start index processing.
+        /// </summary>
+        /// <returns></returns>
+        private Task StartIndexProcessingCommandRoutineAsync()
+        {
+            throw new NotImplementedException();
+        }
+
+        #endregion
+
+        #region Public Methods
+
+        /// <summary>
+        /// Loads data files
+        /// </summary>
+        public void LoadDataFiles()
+        {
+            string startsWith = "data_";
+            string endsWith = ".json";
+
+            var filePaths = _crawlerStorage.GetDataFiles(_dataInstance.Id.ToString());
+            var dataFilePaths = filePaths.Where(o => o.EndsWith(endsWith)).ToArray();
+            if (dataFilePaths != null)
+            {
+                var data = new List<DataFileInfo>();
+                for (int i = 0; i < dataFilePaths.Length; ++i)
+                {
+                    string filename = Path.GetFileName(dataFilePaths[i]);
+                    string dateStr = filename.Substring(startsWith.Length, filename.Length - startsWith.Length - endsWith.Length);
+                    try
+                    {
+                        var datetime = DateTime.ParseExact(dateStr, "yyyy_M_d_H_m_s", CultureInfo.InvariantCulture);
+                        data.Add(new DataFileInfo(datetime.ToString("yyyy-MM-dd (HH:mm:ss)"), dataFilePaths[i], datetime));
+                    }
+                    catch
+                    {
+                        // Corrupted filename
+                        // skip
+                    }
+                }
+
+                data.Sort((x, y) => DateTime.Compare(y.CreatedAt, x.CreatedAt));
+                UpdateDataFileSelection(data);
+            }
         }
 
         #endregion
@@ -349,6 +405,9 @@ namespace InformationRetrievalManager
             _crawlerEngine = await _crawlerManager.GetCrawlerAsync(_dataInstance.Id.ToString());
             if (_crawlerEngine != null)
                 UpdateCrawlerEvents(_crawlerEngine);
+
+            // Load data files
+            LoadDataFiles();
 
             // Flag up data load is done
             DataLoaded = true;
@@ -409,6 +468,9 @@ namespace InformationRetrievalManager
 
                     for (int i = 0; i < CrawlerProgressMsgs.Length; ++i)
                         CrawlerProgressMsgs[i] = CrawlerProgressUrls[i] = string.Empty;
+
+                    // Load data files
+                    LoadDataFiles();
                 });
             };
         }
@@ -416,13 +478,13 @@ namespace InformationRetrievalManager
         /// <summary>
         /// Update data file selection and its entry.
         /// </summary>
-        /// <param name="data">New data selection list (<see langword="null"/> clears just the list).</param>
+        /// <param name="data">New data selection array (<see langword="null"/> just clears the list).</param>
         /// <remarks>
         ///     Method expects to already have 1 item (first) that represents default selected item in <see cref="_dataFileSelection"/>.
         /// </remarks>
-        private void UpdateDataFileSelection(List<CrawlerFileInfo> data)
+        private void UpdateDataFileSelection(List<DataFileInfo> data)
         {
-            var newData = new List<CrawlerFileInfo>();
+            var newData = new List<DataFileInfo>();
             newData.Add(_dataFileSelection[0]);
 
             // Clear previous data selection

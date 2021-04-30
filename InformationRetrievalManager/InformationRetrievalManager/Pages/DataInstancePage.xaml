@@ -382,6 +382,7 @@
                                     HorizontalAlignment="Center"
                                     VerticalAlignment="Top"
                                     local:IsBusyProperty.Value="{Binding IndexProcessingInWorkFlag}"
+                                    Command="{Binding StartIndexProcessingCommand, Mode=OneWay}"
                                     Content="START INDEX PROCESSING"
                                     FontSize="16">
                                     <Button.Style>

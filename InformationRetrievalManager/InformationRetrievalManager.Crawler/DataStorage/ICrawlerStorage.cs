@@ -30,10 +30,13 @@ namespace InformationRetrievalManager.Crawler
         /// Find all data files related to specific crawler. 
         /// It is not possible to get the data if the crawler is currently processing.
         /// </summary>
-        /// <param name="crawler">The crawler</param>
-        /// <returns>Array of all data files (file paths) - if the crawler is processing, it returns <see langword="null"/>.</returns>
-        /// <exception cref="ArgumentNullException">Crawler is not defined.</exception>
-        string[] GetDataFiles(ICrawlerEngine crawler);
+        /// <param name="cid">The crawler identifier</param>
+        /// <returns>Array of all data files (file paths).</returns>
+        /// <exception cref="ArgumentNullException">Crawler ID is not defined.</exception>
+        /// <remarks>
+        ///     Make sure to check the crawler is not crawling at the moment of getting data files.
+        /// </remarks>
+        string[] GetDataFiles(string cid);
 
         #endregion
     }
