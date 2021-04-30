@@ -17,6 +17,7 @@ namespace InformationRetrievalManager
 
         private readonly ILogger _logger;
         private readonly IUnitOfWork _uow;
+        private readonly ICrawlerManager _crawlerManager;
 
         #endregion
 
@@ -155,11 +156,12 @@ namespace InformationRetrievalManager
         /// <summary>
         /// DI constructor
         /// </summary>
-        public DataInstancePageViewModel(ILogger logger, IUnitOfWork uow)
+        public DataInstancePageViewModel(ILogger logger, IUnitOfWork uow, ICrawlerManager crawlerManager)
             : this()
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _uow = uow ?? throw new ArgumentNullException(nameof(uow));
+            _crawlerManager = crawlerManager ?? throw new ArgumentNullException(nameof(crawlerManager));
         }
 
         /// <summary>
@@ -215,6 +217,9 @@ namespace InformationRetrievalManager
             if (_dataInstance == null)
                 // Move the user back...
                 GoToHomePageCommandRoutine();
+
+            // Get crawler engine (if there is running one)
+            _crawlerEngine = _crawlerManager.GetCrawlerAsync(_dataInstance.Id.ToString()).Result;
 
             // Flag up data load is done
             DataLoaded = true;

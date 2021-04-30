@@ -259,8 +259,18 @@
                                         VerticalAlignment="Top"
                                         Content="{StaticResource FontAwesomeCodeIcon}"
                                         FontFamily="{StaticResource FontAwesomeSolid}"
-                                        Style="{StaticResource DarkLightButton}"
-                                        ToolTip="Open Raw Data" />
+                                        ToolTip="Open Raw Data">
+                                        <Button.Style>
+                                            <Style BasedOn="{StaticResource DarkLightButton}" TargetType="{x:Type Button}">
+                                                <Setter Property="Visibility" Value="Visible" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding DataFileEntry.Value.FilePath, Mode=OneWay}" Value="{x:Null}">
+                                                        <Setter Property="Visibility" Value="Collapsed" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Button.Style>
+                                    </Button>
                                     <!--  Data File Entry  -->
                                     <local:ComboEntry
                                         Width="205"
@@ -275,8 +285,18 @@
                                         VerticalAlignment="Top"
                                         Content="{StaticResource FontAwesomeTrashAltIcon}"
                                         FontFamily="{StaticResource FontAwesomeSolid}"
-                                        Style="{StaticResource DarkLightButton}"
-                                        ToolTip="Delete Data" />
+                                        ToolTip="Delete Data">
+                                        <Button.Style>
+                                            <Style BasedOn="{StaticResource DarkLightButton}" TargetType="{x:Type Button}">
+                                                <Setter Property="Visibility" Value="Visible" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding DataFileEntry.Value.FilePath, Mode=OneWay}" Value="{x:Null}">
+                                                        <Setter Property="Visibility" Value="Collapsed" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Button.Style>
+                                    </Button>
                                 </Grid>
 
                                 <!--  Start Index Processing BTN  -->
@@ -289,8 +309,21 @@
                                     VerticalAlignment="Top"
                                     local:IsBusyProperty.Value="{Binding IndexProcessingInWorkFlag}"
                                     Content="START INDEX PROCESSING"
-                                    FontSize="16"
-                                    Style="{StaticResource LightColorButton}" />
+                                    FontSize="16">
+                                    <Button.Style>
+                                        <Style BasedOn="{StaticResource LightColorButton}" TargetType="{x:Type Button}">
+                                            <Setter Property="IsEnabled" Value="False" />
+                                            <Style.Triggers>
+                                                <MultiDataTrigger>
+                                                    <MultiDataTrigger.Conditions>
+                                                        <Condition Binding="{Binding DataFileEntry.Value.FilePath, Converter={local:StringEmptyConverter}}" Value="False" />
+                                                    </MultiDataTrigger.Conditions>
+                                                    <Setter Property="IsEnabled" Value="True" />
+                                                </MultiDataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Button.Style>
+                                </Button>
 
                                 <!--  Progress Wrapper  -->
                                 <Grid Grid.Row="2">
@@ -355,8 +388,18 @@
                                         VerticalAlignment="Top"
                                         Content="{StaticResource FontAwesomeTrashAltIcon}"
                                         FontFamily="{StaticResource FontAwesomeSolid}"
-                                        Style="{StaticResource DarkLightButton}"
-                                        ToolTip="Delete Data" />
+                                        ToolTip="Delete Data">
+                                        <Button.Style>
+                                            <Style BasedOn="{StaticResource DarkLightButton}" TargetType="{x:Type Button}">
+                                                <Setter Property="Visibility" Value="Visible" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IndexFileEntry.Value.FilePath, Mode=OneWay}" Value="{x:Null}">
+                                                        <Setter Property="Visibility" Value="Collapsed" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Button.Style>
+                                    </Button>
                                 </Grid>
 
                                 <!--  Index File Entry  -->
@@ -377,8 +420,22 @@
                                     VerticalAlignment="Top"
                                     local:IsBusyProperty.Value="{Binding QueryInWorkFlag}"
                                     Content="SEARCH"
-                                    FontSize="16"
-                                    Style="{StaticResource LightColorButton}" />
+                                    FontSize="16">
+                                    <Button.Style>
+                                        <Style BasedOn="{StaticResource LightColorButton}" TargetType="{x:Type Button}">
+                                            <Setter Property="IsEnabled" Value="False" />
+                                            <Style.Triggers>
+                                                <MultiDataTrigger>
+                                                    <MultiDataTrigger.Conditions>
+                                                        <Condition Binding="{Binding IndexFileEntry.Value.FilePath, Converter={local:StringEmptyConverter}}" Value="False" />
+                                                        <Condition Binding="{Binding QueryEntry.Value, Converter={local:StringEmptyConverter}}" Value="False" />
+                                                    </MultiDataTrigger.Conditions>
+                                                    <Setter Property="IsEnabled" Value="True" />
+                                                </MultiDataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Button.Style>
+                                </Button>
                             </Grid>
                         </Grid>
                     </Grid>
