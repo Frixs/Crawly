@@ -302,9 +302,9 @@ namespace InformationRetrievalManager
 
                 // Start the crawler
                 _crawlerEngine.Start();
+                await _crawlerManager.AddCrawlerAsync(_crawlerEngine);
 
                 OnPropertyChanged(nameof(CrawlerInWork));
-                await Task.Delay(1);
             });
         }
 
@@ -402,6 +402,7 @@ namespace InformationRetrievalManager
                 {
                     OnPropertyChanged(nameof(CrawlerProgress));
 
+                    _ = _crawlerManager.RemoveCrawlerAsync(_crawlerEngine.NameIdentifier);
                     _crawlerEngine = null;
 
                     OnPropertyChanged(nameof(CrawlerInWork));
