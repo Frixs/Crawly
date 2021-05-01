@@ -30,6 +30,7 @@ namespace InformationRetrievalManager
         private readonly ICrawlerManager _crawlerManager;
         private readonly ICrawlerStorage _crawlerStorage;
         private readonly IIndexStorage _indexStorage;
+        private readonly IQueryIndexManager _queryIndexManager;
 
         #endregion
 
@@ -54,6 +55,11 @@ namespace InformationRetrievalManager
         /// Collection of available index files.
         /// </summary>
         private List<DataFileInfo> _indexFileSelection; //; ctor
+
+        /// <summary>
+        /// Currently selected query model.
+        /// </summary>
+        private QueryModelType _selectedQueryModel; //; ctor
 
         #endregion
 
@@ -85,6 +91,11 @@ namespace InformationRetrievalManager
         public TextEntryViewModel QueryEntry { get; protected set; }
 
         /// <summary>
+        /// Query model radio entry array
+        /// </summary>
+        public RadioEntryViewModel[] QueryModelEntryArray { get; protected set; }
+
+        /// <summary>
         /// Crawler processing progress feedback message to user.
         /// </summary>
         public string CrawlerProgress { get; protected set; }
@@ -108,6 +119,10 @@ namespace InformationRetrievalManager
         /// Crawler progress page url (1-5)
         /// </summary>
         public string[] CrawlerProgressUrls { get; protected set; } = new string[5];
+
+
+
+        public string QueryTempResults { get; protected set; }
 
         #endregion
 
@@ -235,7 +250,7 @@ namespace InformationRetrievalManager
                 DisplayMemberPath = nameof(DataFileInfo.Label)
             };
 
-            // Create query entry
+            // Create query input entry
             QueryEntry = new TextEntryViewModel
             {
                 Label = null,
@@ -245,12 +260,36 @@ namespace InformationRetrievalManager
                 Placeholder = "Ask Me Here",
                 MaxLength = 155
             };
+
+            // Create query model entries
+            _selectedQueryModel = QueryModelType.TfIdf; // Set default selection
+            QueryModelEntryArray = new RadioEntryViewModel[2] 
+            {
+                new RadioEntryViewModel
+                {
+                    Label = "TF-IDF",
+                    Description = null,
+                    Validation = null,
+                    Value = true, // Set default selection
+                    GroupName = nameof(QueryModelEntryArray),
+                    CheckAction = async () => { _selectedQueryModel = QueryModelType.TfIdf; await Task.Delay(1); }
+                },
+                new RadioEntryViewModel
+                {
+                    Label = "Boolean",
+                    Description = null,
+                    Validation = null,
+                    Value = false,
+                    GroupName = nameof(QueryModelEntryArray),
+                    CheckAction = async () => { _selectedQueryModel = QueryModelType.Boolean; await Task.Delay(1); }
+                }
+            };
         }
 
         /// <summary>
         /// DI constructor
         /// </summary>
-        public DataInstancePageViewModel(ILogger logger, ITaskManager taskManager, IFileManager fileManager, IUnitOfWork uow, ICrawlerManager crawlerManager, ICrawlerStorage crawlerStorage, IIndexStorage indexStorage)
+        public DataInstancePageViewModel(ILogger logger, ITaskManager taskManager, IFileManager fileManager, IUnitOfWork uow, ICrawlerManager crawlerManager, ICrawlerStorage crawlerStorage, IIndexStorage indexStorage, IQueryIndexManager queryIndexManager)
             : this()
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -260,6 +299,7 @@ namespace InformationRetrievalManager
             _crawlerManager = crawlerManager ?? throw new ArgumentNullException(nameof(crawlerManager));
             _crawlerStorage = crawlerStorage ?? throw new ArgumentNullException(nameof(crawlerStorage));
             _indexStorage = indexStorage ?? throw new ArgumentNullException(nameof(indexStorage));
+            _queryIndexManager = queryIndexManager ?? throw new ArgumentNullException(nameof(queryIndexManager));
         }
 
         /// <summary>
@@ -533,32 +573,31 @@ namespace InformationRetrievalManager
         {
             await RunCommandAsync(() => QueryInWorkFlag, async () =>
             {
-                Console.WriteLine("TODO");
+                await Task.Delay(3000);
+                string query = QueryEntry.Value ?? string.Empty;
+                QueryModelType queryModel = _selectedQueryModel;
+                DataFileInfo file = IndexFileEntry.Value;
+                
+                if (file.FilePath == null) // should not happen - but it is default selection protection
+                    return;
 
-                await Task.Delay(1);
+                // We do not want to let it process during indexation
+                if (IndexProcessingInWorkFlag)
+                    return;
+
+                var ii = new InvertedIndex(_dataInstance.Id.ToString(), file.CreatedAt, _fileManager, _logger);
+
+                long[] results = Array.Empty<long>();
+
+                await _taskManager.Run(async () =>
+                {
+                    ii.Load();
+                    results = await _queryIndexManager.QueryAsync(query, ii.GetReadOnlyVocabulary(), queryModel, _dataInstance.IndexProcessingConfiguration, 10);
+                });
+
+                // TODO - continue here
+                QueryTempResults = "Results: [" + string.Join(",", results) + "]";
             });
-
-            //    // TODO : we need to have a currently processing index name list to be able to say when we are able to touch the data 
-            //    // (as a feature update while multiple processing will run and we want to query only the instances that are not indexing/processing atm and visa/versa).
-
-            //    await RunCommandAsync(() => ProcessingCommandFlag, async () =>
-            //    {
-            //        var ii = new InvertedIndex("my_index", _fileManager, _logger);
-
-            //        QueryStatus = "Searching...";
-
-            //        int[] results = Array.Empty<int>();
-
-            //        await _taskManager.Run(async () =>
-            //        {
-            //            ii.Load();
-            //            results = await _queryIndexManager.QueryAsync(Query, ii.GetReadOnlyVocabulary(), QueryModelType.Boolean, _processingConfiguration, 10);
-            //        });
-
-            //        QueryStatus = "Results: [" + string.Join(",", results) + "]";
-
-            //        await Task.Delay(1);
-            //    });
         }
 
         #endregion

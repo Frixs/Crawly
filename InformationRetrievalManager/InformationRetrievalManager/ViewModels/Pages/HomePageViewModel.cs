@@ -83,7 +83,7 @@ namespace InformationRetrievalManager
             _uow = uow ?? throw new ArgumentNullException(nameof(uow));
             _taskManager = taskManager ?? throw new ArgumentNullException(nameof(taskManager));
 
-            // HACK: crawler starter
+            // Load data into the VM
             _taskManager.RunAndForget(LoadAsync);
         }
 
