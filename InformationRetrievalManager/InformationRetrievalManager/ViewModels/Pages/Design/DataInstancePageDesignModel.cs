@@ -20,6 +20,7 @@
         {
             DataLoaded = true;
             CrawlerInWork = true;
+            IndexProcessingInWorkFlag = true;
         }
 
         #endregion

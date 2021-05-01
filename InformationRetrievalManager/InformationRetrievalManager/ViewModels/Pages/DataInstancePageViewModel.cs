@@ -1,8 +1,10 @@
 ﻿using InformationRetrievalManager.Core;
 using InformationRetrievalManager.Crawler;
+using InformationRetrievalManager.NLP;
 using InformationRetrievalManager.Relational;
 using Ixs.DNA;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -23,6 +25,7 @@ namespace InformationRetrievalManager
 
         private readonly ILogger _logger;
         private readonly ITaskManager _taskManager;
+        private readonly IFileManager _fileManager;
         private readonly IUnitOfWork _uow;
         private readonly ICrawlerManager _crawlerManager;
         private readonly ICrawlerStorage _crawlerStorage;
@@ -84,6 +87,11 @@ namespace InformationRetrievalManager
         /// Crawler processing progress feedback message to user.
         /// </summary>
         public string CrawlerProgress { get; protected set; }
+
+        /// <summary>
+        /// Index processing progress feedback message to user.
+        /// </summary>
+        public string IndexProcessingProgress { get; protected set; }
 
         /// <summary>
         /// Error string as a feedback to the user.
@@ -229,11 +237,12 @@ namespace InformationRetrievalManager
         /// <summary>
         /// DI constructor
         /// </summary>
-        public DataInstancePageViewModel(ILogger logger, ITaskManager taskManager, IUnitOfWork uow, ICrawlerManager crawlerManager, ICrawlerStorage crawlerStorage)
+        public DataInstancePageViewModel(ILogger logger, ITaskManager taskManager, IFileManager fileManager, IUnitOfWork uow, ICrawlerManager crawlerManager, ICrawlerStorage crawlerStorage)
             : this()
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _taskManager = taskManager ?? throw new ArgumentNullException(nameof(taskManager));
+            _fileManager = fileManager ?? throw new ArgumentNullException(nameof(fileManager));
             _uow = uow ?? throw new ArgumentNullException(nameof(uow));
             _crawlerManager = crawlerManager ?? throw new ArgumentNullException(nameof(crawlerManager));
             _crawlerStorage = crawlerStorage ?? throw new ArgumentNullException(nameof(crawlerStorage));
@@ -375,7 +384,7 @@ namespace InformationRetrievalManager
                 if (fileInfo != null && fileInfo.FilePath != null && File.Exists(fileInfo.FilePath))
                 {
                     _crawlerStorage.DeleteDataFiles(_dataInstance.Id.ToString(), fileInfo.CreatedAt);
-                    LoadDataFiles();
+                    LoadDataFiles(true);
                 }
 
                 await Task.Delay(1);
@@ -385,10 +394,100 @@ namespace InformationRetrievalManager
         /// <summary>
         /// Command Routine : Start index processing.
         /// </summary>
-        /// <returns></returns>
-        private Task StartIndexProcessingCommandRoutineAsync()
+        private async Task StartIndexProcessingCommandRoutineAsync()
         {
-            throw new NotImplementedException();
+            await RunCommandAsync(() => IndexProcessingInWorkFlag, async () =>
+            {
+                IndexProcessingProgress = string.Empty;
+
+                DataFileInfo file = DataFileEntry.Value;
+                if (file.FilePath == null) // should not happen - but it is default selection protection
+                    return;
+
+                // We do not want to let it process during crawling
+                if (CrawlerInWork)
+                    return;
+
+                IndexProcessingProgress = "Starting...";
+
+                await _taskManager.Run(async () =>
+                {
+                    CrawlerDataModel[] data = null;
+                    // Deserialize JSON directly from the file
+                    using (StreamReader sr = File.OpenText(file.FilePath))
+                    {
+                        JsonSerializer jsonSerializer = new JsonSerializer();
+                        data = (CrawlerDataModel[])jsonSerializer.Deserialize(sr, typeof(CrawlerDataModel[]));
+                    }
+
+                    // If any data...
+                    if (data != null && data.Length > 0)
+                    {
+                        _uow.BeginTransaction();
+
+                        IndexProcessingProgress = "Preparing documents...";
+
+                        // Clear all the previous/old indexes first (if any)
+                        foreach (var doc in _uow.IndexedDocuments.Get())
+                            _uow.IndexedDocuments.Delete(doc);
+
+                        // Prepare documents for indexation
+                        bool anyIndexedData = false;
+                        List<IndexDocument> docs = new List<IndexDocument>();
+                        for (int i = 0; i < data.Length; ++i)
+                        {
+                            var model = new IndexedDocumentDataModel
+                            {
+                                DataInstanceId = _dataInstance.Id,
+                                Title = data[i].Title,
+                                Category = data[i].Category,
+                                Timestamp = data[i].Timestamp,
+                                SourceUrl = data[i].SourceUrl,
+                                Content = StringHelpers.ShortenWithDots(data[i].Content, 160)
+                            };
+
+                            // Validate, if no errors...
+                            if (ValidationHelpers.ValidateModel(model).Count == 0)
+                            {
+                                _uow.IndexedDocuments.Insert(model);
+                                _uow.Commit();
+
+                                docs.Add(data[i].ToIndexDocument(model.Id));
+                                anyIndexedData = true;
+                            }
+                        }
+
+                        // If any documents are ready for indexation...
+                        if (anyIndexedData)
+                        {
+                            IndexProcessingProgress = "Indexing...";
+
+                            // Indexate documents
+                            var processing = new IndexProcessing(_dataInstance.Id.ToString(), _dataInstance.IndexProcessingConfiguration, _fileManager, _logger);
+
+                            processing.IndexDocuments(docs.ToArray(), save: true);
+                            _logger.LogDebugSource("Index processing done!");
+                            IndexProcessingProgress = "Successfully indexed the documents!";
+
+                            _uow.CommitTransaction();
+                        }
+                        // Otherwise no documents are ready (corrupted)...
+                        else
+                        {
+                            IndexProcessingProgress = "No documents are valid for indexation!";
+
+                            _uow.RollbackTransaction();
+                        }
+                    }
+                    // Otherwise, corrupted data or no data...
+                    else
+                    {
+                        IndexProcessingProgress = "Corrupted data file!";
+
+                        await DeleteDataFileCommandRoutineAsync(file);
+                    }
+                });
+            });
         }
 
         #endregion
@@ -398,7 +497,8 @@ namespace InformationRetrievalManager
         /// <summary>
         /// Loads data files
         /// </summary>
-        public void LoadDataFiles()
+        /// <param name="resetToDefaultSelection">Indication to reset the selection entry to default value.</param>
+        public void LoadDataFiles(bool resetToDefaultSelection = false)
         {
             ushort fileLimit = 50;
             string startsWith = "data_";
@@ -428,7 +528,7 @@ namespace InformationRetrievalManager
                 data.Sort((x, y) => DateTime.Compare(y.CreatedAt, x.CreatedAt));
                 if (data.Count > fileLimit)
                     data = data.Take(fileLimit).ToList();
-                UpdateDataFileSelection(data);
+                UpdateDataFileSelection(data, resetToDefaultSelection);
             }
         }
 
@@ -459,7 +559,7 @@ namespace InformationRetrievalManager
                 UpdateCrawlerEvents(_crawlerEngine);
 
             // Load data files
-            LoadDataFiles();
+            LoadDataFiles(true);
 
             // Flag up data load is done
             DataLoaded = true;
@@ -522,7 +622,7 @@ namespace InformationRetrievalManager
                         CrawlerProgressMsgs[i] = CrawlerProgressUrls[i] = string.Empty;
 
                     // Load data files
-                    LoadDataFiles();
+                    LoadDataFiles(true);
                 });
             };
         }
@@ -531,10 +631,11 @@ namespace InformationRetrievalManager
         /// Update data file selection and its entry.
         /// </summary>
         /// <param name="data">New data selection array (<see langword="null"/> just clears the list).</param>
+        /// <param name="resetToDefaultSelection">Indication to reset the selection entry to default value.</param>
         /// <remarks>
         ///     Method expects to already have 1 item (first) that represents default selected item in <see cref="_dataFileSelection"/>.
         /// </remarks>
-        private void UpdateDataFileSelection(List<DataFileInfo> data)
+        private void UpdateDataFileSelection(List<DataFileInfo> data, bool resetToDefaultSelection = false)
         {
             var newData = new List<DataFileInfo>();
             newData.Add(_dataFileSelection[0]);
@@ -550,7 +651,8 @@ namespace InformationRetrievalManager
 
             // Update the file selection entry
             DataFileEntry.ValueList = _dataFileSelection;
-            DataFileEntry.Value = _dataFileSelection[0]; // Default selected value
+            if (resetToDefaultSelection)
+                DataFileEntry.Value = _dataFileSelection[0]; // Default selected value
         }
 
         #endregion

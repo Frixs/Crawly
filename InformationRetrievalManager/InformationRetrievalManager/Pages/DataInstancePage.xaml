@@ -201,7 +201,7 @@
                                     Padding="15,0,15,0"
                                     HorizontalAlignment="Center"
                                     VerticalAlignment="Top"
-                                    local:IsBusyProperty.Value="{Binding CrawlerInWork}"
+                                    local:IsBusyProperty.Value="{Binding CrawlerInWork, Mode=OneWay}"
                                     Command="{Binding StartCrawlerCommand, Mode=OneWay}"
                                     Content="START CRAWLER"
                                     FontSize="16"
@@ -240,7 +240,7 @@
                                     <!--  Progress Verbose  -->
                                     <Grid
                                         Grid.Row="1"
-                                        Margin="0,5,0,0"
+                                        Margin="0,4,0,0"
                                         HorizontalAlignment="Center">
                                         <Grid.Resources>
                                             <Style TargetType="{x:Type StackPanel}">
@@ -323,7 +323,10 @@
                                 </Grid.RowDefinitions>
 
                                 <!--  Crawled Data Selection  -->
-                                <Grid Grid.Row="0" Margin="0,0,0,10">
+                                <Grid
+                                    Grid.Row="0"
+                                    Margin="0,0,0,10"
+                                    IsEnabled="{Binding IndexProcessingInWorkFlag, Converter={local:BooleanInvertConverter}, Mode=OneWay}">
                                     <!--  Open Raw BTN  -->
                                     <Button
                                         Width="34"
@@ -363,6 +366,7 @@
                                         CommandParameter="{Binding DataFileEntry.Value, Mode=OneWay}"
                                         Content="{StaticResource FontAwesomeTrashAltIcon}"
                                         FontFamily="{StaticResource FontAwesomeSolid}"
+                                        IsEnabled="{Binding CrawlerInWork, Converter={local:BooleanInvertConverter}, Mode=OneWay}"
                                         ToolTip="Delete Data">
                                         <Button.Style>
                                             <Style BasedOn="{StaticResource DarkLightButton}" TargetType="{x:Type Button}">
@@ -385,7 +389,7 @@
                                     Padding="15,0,15,0"
                                     HorizontalAlignment="Center"
                                     VerticalAlignment="Top"
-                                    local:IsBusyProperty.Value="{Binding IndexProcessingInWorkFlag}"
+                                    local:IsBusyProperty.Value="{Binding IndexProcessingInWorkFlag, Mode=OneWay}"
                                     Command="{Binding StartIndexProcessingCommand, Mode=OneWay}"
                                     Content="START INDEX PROCESSING"
                                     FontSize="16">
@@ -395,7 +399,8 @@
                                             <Style.Triggers>
                                                 <MultiDataTrigger>
                                                     <MultiDataTrigger.Conditions>
-                                                        <Condition Binding="{Binding DataFileEntry.Value.FilePath, Converter={local:StringEmptyConverter}}" Value="False" />
+                                                        <Condition Binding="{Binding DataFileEntry.Value.FilePath, Converter={local:StringEmptyConverter}, Mode=OneWay}" Value="False" />
+                                                        <Condition Binding="{Binding CrawlerInWork, Mode=OneWay}" Value="False" />
                                                     </MultiDataTrigger.Conditions>
                                                     <Setter Property="IsEnabled" Value="True" />
                                                 </MultiDataTrigger>
@@ -405,7 +410,7 @@
                                 </Button>
 
                                 <!--  Progress Wrapper  -->
-                                <Grid Grid.Row="2">
+                                <Grid Grid.Row="2" local:AnimateFadeInProperty.Value="{Binding IndexProcessingInWorkFlag, Mode=OneWay}">
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="Auto" />
                                     </Grid.RowDefinitions>
@@ -417,7 +422,7 @@
                                         HorizontalAlignment="Center"
                                         FontFamily="{StaticResource DosisExtraBold}"
                                         FontSize="15"
-                                        Text="Done!" />
+                                        Text="{Binding IndexProcessingProgress, Mode=OneWay}" />
                                 </Grid>
 
                                 <!--  View Configuration BTN  -->
