@@ -202,7 +202,7 @@
                                     HorizontalAlignment="Center"
                                     VerticalAlignment="Top"
                                     local:IsBusyProperty.Value="{Binding CrawlerInWork, Mode=OneWay}"
-                                    Command="{Binding StartCrawlerCommand, Mode=OneWay}"
+                                    Command="{Binding StartCrawlerCommand, Mode=OneTime}"
                                     Content="START CRAWLER"
                                     FontSize="16"
                                     Style="{StaticResource LightColorButton}" />
@@ -222,7 +222,7 @@
                                         VerticalAlignment="Top">
                                         <Button
                                             HorizontalAlignment="Right"
-                                            Command="{Binding CancelCrawlerCommand, Mode=OneWay}"
+                                            Command="{Binding CancelCrawlerCommand, Mode=OneTime}"
                                             Content="CANCEL"
                                             FontSize="12"
                                             Style="{StaticResource LightDarkTextButton}" />
@@ -259,7 +259,7 @@
                                                 <Setter Property="FontSize" Value="12" />
                                                 <Setter Property="Padding" Value="0" />
                                                 <Setter Property="Margin" Value="5,0,0,0" />
-                                                <Setter Property="Command" Value="{Binding OpenUrlCommand, Mode=OneWay}" />
+                                                <Setter Property="Command" Value="{Binding OpenUrlCommand, Mode=OneTime}" />
                                                 <Style.Triggers>
                                                     <DataTrigger Binding="{Binding CommandParameter, Converter={local:StringEmptyConverter}, RelativeSource={RelativeSource Self}}" Value="True">
                                                         <Setter Property="Visibility" Value="Collapsed" />
@@ -334,7 +334,7 @@
                                         Margin="0,0,258,0"
                                         HorizontalAlignment="Center"
                                         VerticalAlignment="Top"
-                                        Command="{Binding OpenRawDataCommand, Mode=OneWay}"
+                                        Command="{Binding OpenRawDataCommand, Mode=OneTime}"
                                         CommandParameter="{Binding DataFileEntry.Value, Mode=OneWay}"
                                         Content="{StaticResource FontAwesomeCodeIcon}"
                                         FontFamily="{StaticResource FontAwesomeSolid}"
@@ -362,7 +362,7 @@
                                         Margin="258,0,0,0"
                                         HorizontalAlignment="Center"
                                         VerticalAlignment="Top"
-                                        Command="{Binding DeleteDataFileCommand, Mode=OneWay}"
+                                        Command="{Binding DeleteDataFileCommand, Mode=OneTime}"
                                         CommandParameter="{Binding DataFileEntry.Value, Mode=OneWay}"
                                         Content="{StaticResource FontAwesomeTrashAltIcon}"
                                         FontFamily="{StaticResource FontAwesomeSolid}"
@@ -390,7 +390,7 @@
                                     HorizontalAlignment="Center"
                                     VerticalAlignment="Top"
                                     local:IsBusyProperty.Value="{Binding IndexProcessingInWorkFlag, Mode=OneWay}"
-                                    Command="{Binding StartIndexProcessingCommand, Mode=OneWay}"
+                                    Command="{Binding StartIndexProcessingCommand, Mode=OneTime}"
                                     Content="START INDEX PROCESSING"
                                     FontSize="16">
                                     <Button.Style>
@@ -470,7 +470,7 @@
                                         Margin="258,0,0,0"
                                         HorizontalAlignment="Center"
                                         VerticalAlignment="Top"
-                                        Command="{Binding DeleteIndexFileCommand, Mode=OneWay}"
+                                        Command="{Binding DeleteIndexFileCommand, Mode=OneTime}"
                                         CommandParameter="{Binding IndexFileEntry.Value, Mode=OneWay}"
                                         Content="{StaticResource FontAwesomeTrashAltIcon}"
                                         FontFamily="{StaticResource FontAwesomeSolid}"
@@ -513,7 +513,7 @@
                                     HorizontalAlignment="Center"
                                     VerticalAlignment="Top"
                                     local:IsBusyProperty.Value="{Binding QueryInWorkFlag}"
-                                    Command="{Binding StartQueryCommand, Mode=OneWay}"
+                                    Command="{Binding StartQueryCommand, Mode=OneTime}"
                                     Content="SEARCH"
                                     FontSize="16">
                                     <Button.Style>
