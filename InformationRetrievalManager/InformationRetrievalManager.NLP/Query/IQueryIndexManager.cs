@@ -19,7 +19,7 @@ namespace InformationRetrievalManager.NLP
         /// <param name="select">Limit number of records to select (0 to ignore limit).</param>
         /// <returns>Array of document IDs sorted from the most relevant to the least.</returns>
         /// <exception cref="ArgumentNullException">Invalid parameters.</exception>
-        Task<int[]> QueryAsync(string query, IReadOnlyDictionary<string, IReadOnlyDictionary<int, IReadOnlyTermInfo>> data, QueryModelType modelType, IndexProcessingConfiguration configuration, int select);
+        Task<long[]> QueryAsync(string query, IReadOnlyDictionary<string, IReadOnlyDictionary<long, IReadOnlyTermInfo>> data, QueryModelType modelType, IndexProcessingConfiguration configuration, int select);
 
         /// <summary>
         /// Resets model data that are saved from previous query calls. 

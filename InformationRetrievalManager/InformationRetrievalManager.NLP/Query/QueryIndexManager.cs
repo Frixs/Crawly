@@ -62,7 +62,7 @@ namespace InformationRetrievalManager.NLP
         #region Interface Methods
 
         /// <inheritdoc/>
-        public async Task<int[]> QueryAsync(string query, IReadOnlyDictionary<string, IReadOnlyDictionary<int, IReadOnlyTermInfo>> data, QueryModelType modelType, IndexProcessingConfiguration configuration, int select = 0)
+        public async Task<long[]> QueryAsync(string query, IReadOnlyDictionary<string, IReadOnlyDictionary<long, IReadOnlyTermInfo>> data, QueryModelType modelType, IndexProcessingConfiguration configuration, int select = 0)
         {
             if (query == null || data == null)
                 throw new ArgumentNullException("Query data not specified!");
@@ -150,7 +150,7 @@ namespace InformationRetrievalManager.NLP
         /// </summary>
         /// <param name="data">The data (<see cref="InvertedIndex._vocabulary"/>)</param>
         /// <returns>Checksum</returns>
-        private byte[] GetDataChecksum(IReadOnlyDictionary<string, IReadOnlyDictionary<int, IReadOnlyTermInfo>> data)
+        private byte[] GetDataChecksum(IReadOnlyDictionary<string, IReadOnlyDictionary<long, IReadOnlyTermInfo>> data)
         {
             var bf = new BinaryFormatter();
             using (var stream = new MemoryStream())

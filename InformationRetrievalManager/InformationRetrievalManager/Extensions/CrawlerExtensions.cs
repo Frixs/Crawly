@@ -10,7 +10,7 @@ namespace InformationRetrievalManager
         /// </summary>
         /// <param name="model">The crawler model <see cref="CrawlerDataModel"/></param>
         /// <returns>Index data model with initialized ID</returns>
-        public static IndexDocument ToIndexDocument(this CrawlerDataModel model, int id)
+        public static IndexDocument ToIndexDocument(this CrawlerDataModel model, long id)
         {
             return new IndexDocument(id, model.Title, model.SourceUrl, model.Category, model.Timestamp, model.Content);
         }

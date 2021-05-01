@@ -23,7 +23,7 @@ namespace InformationRetrievalManager.NLP
         /// <summary>
         /// Results made by the query based on its data
         /// </summary>
-        private int[] _queryResults = Array.Empty<int>();
+        private long[] _queryResults = Array.Empty<long>();
 
         #endregion
 
@@ -43,7 +43,7 @@ namespace InformationRetrievalManager.NLP
         #region Interface Methods
 
         /// <inheritdoc/>
-        public void CalculateData(IReadOnlyDictionary<string, IReadOnlyDictionary<int, IReadOnlyTermInfo>> data)
+        public void CalculateData(IReadOnlyDictionary<string, IReadOnlyDictionary<long, IReadOnlyTermInfo>> data)
         {
             if (data == null)
                 throw new ArgumentNullException("Data not specified!");
@@ -55,16 +55,16 @@ namespace InformationRetrievalManager.NLP
         }
 
         /// <inheritdoc/>
-        public void CalculateQuery(string query, IReadOnlyDictionary<string, IReadOnlyDictionary<int, IReadOnlyTermInfo>> data, IndexProcessingConfiguration processingConfiguration)
+        public void CalculateQuery(string query, IReadOnlyDictionary<string, IReadOnlyDictionary<long, IReadOnlyTermInfo>> data, IndexProcessingConfiguration processingConfiguration)
         {
             if (query == null || data == null)
                 throw new ArgumentNullException("Data not specified!");
 
             // (Re)Initialize the values
-            _queryResults = Array.Empty<int>();
+            _queryResults = Array.Empty<long>();
 
             // Set of all document IDs found among terms
-            HashSet<int> documents = new HashSet<int>();
+            var documents = new HashSet<long>();
 
             // Get all document IDs
             foreach (var term in data)
@@ -97,7 +97,7 @@ namespace InformationRetrievalManager.NLP
             // If the query is successfully parsed...
             if (queryParsed != null)
             {
-                List<int> results = new List<int>();
+                var results = new List<long>();
                 foreach (var documentId in documents)
                 {
                     if (queryParsed.Evaluate(new DocumentTermEvaluator(documentId, data, processingConfiguration)))
@@ -114,7 +114,7 @@ namespace InformationRetrievalManager.NLP
         }
 
         /// <inheritdoc/>
-        public int[] CalculateBestMatch(int select = 0)
+        public long[] CalculateBestMatch(int select = 0)
         {
             // The calculations are made in the query method due to parameter limitations.
 
@@ -133,15 +133,15 @@ namespace InformationRetrievalManager.NLP
         public class DocumentTermEvaluator
         {
             private readonly IndexProcessing _processing;
-            public readonly int documentId;
-            public readonly IReadOnlyDictionary<string, IReadOnlyDictionary<int, IReadOnlyTermInfo>> data;
+            public readonly long documentId;
+            public readonly IReadOnlyDictionary<string, IReadOnlyDictionary<long, IReadOnlyTermInfo>> data;
 
             /// <summary>
             /// Default constructor
             /// </summary>
             /// <param name="documentId">Document ID for which the evaluation is made.</param>
             /// <param name="data">Documents data(<see cref="InvertedIndex._vocabulary"/>)</param>
-            public DocumentTermEvaluator(int documentId, IReadOnlyDictionary<string, IReadOnlyDictionary<int, IReadOnlyTermInfo>> data, IndexProcessingConfiguration processingConfiguration)
+            public DocumentTermEvaluator(long documentId, IReadOnlyDictionary<string, IReadOnlyDictionary<long, IReadOnlyTermInfo>> data, IndexProcessingConfiguration processingConfiguration)
             {
                 if (documentId < 0)
                     throw new ArgumentNullException("Invalid document ID!");

@@ -28,7 +28,7 @@ namespace InformationRetrievalManager.NLP
         ///     SortedDictionary { Key=term, Value=posting list },
         ///     posting list aka Dictionary { Key=DocumentId, Value=TermInfo obj }
         /// </remarks>
-        private readonly SortedDictionary<string, Dictionary<int, TermInfo>> _vocabulary = new SortedDictionary<string, Dictionary<int, TermInfo>>();
+        private readonly SortedDictionary<string, Dictionary<long, TermInfo>> _vocabulary = new SortedDictionary<string, Dictionary<long, TermInfo>>();
 
         #endregion
 
@@ -61,13 +61,13 @@ namespace InformationRetrievalManager.NLP
         /// <inheritdoc/>
         /// </summary>
         /// <remarks>O(n^2)</remarks>
-        public IReadOnlyDictionary<string, IReadOnlyDictionary<int, IReadOnlyTermInfo>> GetReadOnlyVocabulary()
+        public IReadOnlyDictionary<string, IReadOnlyDictionary<long, IReadOnlyTermInfo>> GetReadOnlyVocabulary()
         {
-            return _vocabulary.ToDictionary(o => o.Key, o => (IReadOnlyDictionary<int, IReadOnlyTermInfo>)o.Value.ToDictionary(x => x.Key, x => (IReadOnlyTermInfo)x.Value));
+            return _vocabulary.ToDictionary(o => o.Key, o => (IReadOnlyDictionary<long, IReadOnlyTermInfo>)o.Value.ToDictionary(x => x.Key, x => (IReadOnlyTermInfo)x.Value));
         }
 
         /// <inheritdoc/>
-        public void Put(string term, int documentId)
+        public void Put(string term, long documentId)
         {
             if (string.IsNullOrEmpty(term) || documentId < 0)
                 throw new ArgumentNullException("Invalid parameters for indexing!");
@@ -89,7 +89,7 @@ namespace InformationRetrievalManager.NLP
             // Otherwise, create a new record...
             else
             {
-                _vocabulary.Add(term, new Dictionary<int, TermInfo>()
+                _vocabulary.Add(term, new Dictionary<long, TermInfo>()
                 {
                     { documentId, new TermInfo(frequency: 1) }
                 });
@@ -121,7 +121,7 @@ namespace InformationRetrievalManager.NLP
             if (status == 0 && obj != null)
             {
                 // Try to load vocabulary
-                var newVocabulary = obj as SortedDictionary<string, Dictionary<int, TermInfo>>;
+                var newVocabulary = obj as SortedDictionary<string, Dictionary<long, TermInfo>>;
                 if (newVocabulary != null)
                 {
                     ok = true;

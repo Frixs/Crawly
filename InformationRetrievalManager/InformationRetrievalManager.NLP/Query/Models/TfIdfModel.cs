@@ -28,7 +28,7 @@ namespace InformationRetrievalManager.NLP
         /// <summary>
         /// Calculated document vectors based on the last run of <see cref="CalculateData"/>.
         /// </summary>
-        private Dictionary<int, double[]> _documentVectors = null;
+        private Dictionary<long, double[]> _documentVectors = null;
 
         /// <summary>
         /// Calculated query vector based on the last run of <see cref="CalculateQuery"/>.
@@ -53,7 +53,7 @@ namespace InformationRetrievalManager.NLP
         #region Interface Methods
 
         /// <inheritdoc/>
-        public void CalculateData(IReadOnlyDictionary<string, IReadOnlyDictionary<int, IReadOnlyTermInfo>> data)
+        public void CalculateData(IReadOnlyDictionary<string, IReadOnlyDictionary<long, IReadOnlyTermInfo>> data)
         {
             if (data == null)
                 throw new ArgumentNullException("Data not specified!");
@@ -63,7 +63,7 @@ namespace InformationRetrievalManager.NLP
             _documentVectors = null;
 
             // Set of all document IDs found among terms
-            HashSet<int> documents = new HashSet<int>();
+            var documents = new HashSet<long>();
 
             // Calculate term IDF
             foreach (var term in data)
@@ -84,7 +84,7 @@ namespace InformationRetrievalManager.NLP
             }
 
             // Create array for document vectors
-            Dictionary<int, double[]> docVectors = new Dictionary<int, double[]>();
+            var docVectors = new Dictionary<long, double[]>();
 
             // Go through documents and create document vectors...
             foreach (var documentId in documents)
@@ -98,7 +98,7 @@ namespace InformationRetrievalManager.NLP
         }
 
         /// <inheritdoc/>
-        public void CalculateQuery(string query, IReadOnlyDictionary<string, IReadOnlyDictionary<int, IReadOnlyTermInfo>> data, IndexProcessingConfiguration processingConfiguration)
+        public void CalculateQuery(string query, IReadOnlyDictionary<string, IReadOnlyDictionary<long, IReadOnlyTermInfo>> data, IndexProcessingConfiguration processingConfiguration)
         {
             if (query == null || data == null)
                 throw new ArgumentNullException("Data not specified!");
@@ -131,7 +131,7 @@ namespace InformationRetrievalManager.NLP
         }
 
         /// <inheritdoc/>
-        public int[] CalculateBestMatch(int select = 0)
+        public long[] CalculateBestMatch(int select = 0)
         {
             var documentVectors = _documentVectors;
             var queryVector = _queryVector;
@@ -145,7 +145,7 @@ namespace InformationRetrievalManager.NLP
                 throw new InvalidOperationException("Query vector is not defined!");
 
             // Calculate cosine similarity for each document...
-            List<(int, double)> results = new List<(int, double)>();
+            var results = new List<(long, double)>();
             foreach (var document in documentVectors)
                 results.Add(
                     (document.Key, CalculateCosSimilarity(queryVector, document.Value))
@@ -198,7 +198,7 @@ namespace InformationRetrievalManager.NLP
         /// <param name="data">The data</param>
         /// <param name="documentId">The ID</param>
         /// <returns>Document vector from <paramref name="data"/> based on <paramref name="documentId"/>.</returns>
-        private double[] CalculateDocumentVector(IReadOnlyDictionary<string, IReadOnlyDictionary<int, IReadOnlyTermInfo>> data, int documentId)
+        private double[] CalculateDocumentVector(IReadOnlyDictionary<string, IReadOnlyDictionary<long, IReadOnlyTermInfo>> data, long documentId)
         {
             List<double> docVector = new List<double>();
             foreach (var term in data)
@@ -228,13 +228,13 @@ namespace InformationRetrievalManager.NLP
         /// <param name="query">The query vocabulary</param>
         /// <param name="data">The document vocabulary</param>
         /// <returns>Query vocabulary in scope of document vocabulary terms.</returns>
-        private IReadOnlyDictionary<string, IReadOnlyDictionary<int, IReadOnlyTermInfo>> CreateQueryDataVocabulary(IReadOnlyDictionary<string, IReadOnlyDictionary<int, IReadOnlyTermInfo>> query, IReadOnlyDictionary<string, IReadOnlyDictionary<int, IReadOnlyTermInfo>> data)
+        private IReadOnlyDictionary<string, IReadOnlyDictionary<long, IReadOnlyTermInfo>> CreateQueryDataVocabulary(IReadOnlyDictionary<string, IReadOnlyDictionary<long, IReadOnlyTermInfo>> query, IReadOnlyDictionary<string, IReadOnlyDictionary<long, IReadOnlyTermInfo>> data)
         {
-            SortedDictionary<string, Dictionary<int, TermInfo>> result = new SortedDictionary<string, Dictionary<int, TermInfo>>();
+            var result = new SortedDictionary<string, Dictionary<long, TermInfo>>();
 
             foreach (var term in data)
             {
-                var postingList = new Dictionary<int, TermInfo>();
+                var postingList = new Dictionary<long, TermInfo>();
 
                 if (query.ContainsKey(term.Key))
                     foreach (var document in query[term.Key])
@@ -243,7 +243,7 @@ namespace InformationRetrievalManager.NLP
                 result.Add(term.Key, postingList);
             }
 
-            return result.ToDictionary(o => o.Key, o => (IReadOnlyDictionary<int, IReadOnlyTermInfo>)o.Value.ToDictionary(x => x.Key, x => (IReadOnlyTermInfo)x.Value)); ;
+            return result.ToDictionary(o => o.Key, o => (IReadOnlyDictionary<long, IReadOnlyTermInfo>)o.Value.ToDictionary(x => x.Key, x => (IReadOnlyTermInfo)x.Value)); ;
         }
 
         #endregion

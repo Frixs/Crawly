@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace InformationRetrievalManager.NLP
+﻿namespace InformationRetrievalManager.NLP
 {
     /// <summary>
     /// Model containing the data about term in vocabulary in <see cref="InvertedIndex"/>.

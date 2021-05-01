@@ -206,7 +206,7 @@ namespace InformationRetrievalManager.NLP
         /// </summary>
         /// <param name="text">The text</param>
         /// <returns>Indexed vocabulary based on the <paramref name="text"/>. The structure is the same as <see cref="InvertedIndex._vocabulary"/> with the only document here (ID=0).</returns>
-        public IReadOnlyDictionary<string, IReadOnlyDictionary<int, IReadOnlyTermInfo>> IndexText(string text)
+        public IReadOnlyDictionary<string, IReadOnlyDictionary<long, IReadOnlyTermInfo>> IndexText(string text)
         {
             if (text == null)
                 throw new ArgumentNullException("Text not specified!");
@@ -274,7 +274,7 @@ namespace InformationRetrievalManager.NLP
         /// <param name="documentId">The document ID for indexation (If <paramref name="invertedIndex"/> is not defined, indexation will not proceed and this parameter will be ignored).</param>
         /// <param name="invertedIndex">Inverted index instance used for the indexation.</param>
         /// <returns>Processed terms</returns>
-        private string[] Process(string text, int documentId, IInvertedIndex invertedIndex = null)
+        private string[] Process(string text, long documentId, IInvertedIndex invertedIndex = null)
         {
             // To lower
             if (ToLowerCase)
