@@ -113,7 +113,7 @@ namespace InformationRetrievalManager.NLP
             bool ok = false;
 
             // Deserialize
-            var result = _fileManager.DeserializeObjectFromBinFileAsync($"{Constants.IndexDataStorageDir}/{MakeFilename()}").Result;
+            var result = _fileManager.DeserializeObjectFromBinFileAsync($"{Constants.IndexDataStorageDir}/{Name}/{MakeFilename()}").Result;
             short status = result.Item1;
             object obj = result.Item2;
 
@@ -156,7 +156,7 @@ namespace InformationRetrievalManager.NLP
             bool ok = false;
 
             // Serialize
-            short status = _fileManager.SerializeObjectToBinFileAsync(_vocabulary, $"{Constants.IndexDataStorageDir}/{MakeFilename()}").Result;
+            short status = _fileManager.SerializeObjectToBinFileAsync(_vocabulary, $"{Constants.IndexDataStorageDir}/{Name}/{MakeFilename()}").Result;
 
             // Check serialization result
             if (status == 0)

@@ -43,6 +43,7 @@ namespace InformationRetrievalManager.Crawler
         /// </summary>
         /// <param name="cid">The crawler identifier.</param>
         /// <param name="fileTimestamp">The file timestamp.</param>
+        /// <exception cref="ArgumentNullException">Crawler ID is not defined.</exception>
         /// <remarks>
         ///     Make sure to check the crawler is not crawling at the moment of deleting data files.
         /// </remarks>
