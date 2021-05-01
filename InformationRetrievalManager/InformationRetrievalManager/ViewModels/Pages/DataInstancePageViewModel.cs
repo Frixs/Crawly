@@ -29,6 +29,7 @@ namespace InformationRetrievalManager
         private readonly IUnitOfWork _uow;
         private readonly ICrawlerManager _crawlerManager;
         private readonly ICrawlerStorage _crawlerStorage;
+        private readonly IIndexStorage _indexStorage;
 
         #endregion
 
@@ -171,7 +172,7 @@ namespace InformationRetrievalManager
         public ICommand OpenRawDataCommand { get; set; }
 
         /// <summary>
-        /// The command to open raw file data.
+        /// The command to delete crawler data file.
         /// </summary>
         public ICommand DeleteDataFileCommand { get; set; }
 
@@ -179,6 +180,11 @@ namespace InformationRetrievalManager
         /// The command to start index processing.
         /// </summary>
         public ICommand StartIndexProcessingCommand { get; set; }
+
+        /// <summary>
+        /// The command to delete index data file.
+        /// </summary>
+        public ICommand DeleteIndexFileCommand { get; set; }
 
         #endregion
 
@@ -197,6 +203,7 @@ namespace InformationRetrievalManager
             OpenRawDataCommand = new RelayParameterizedCommand(async (parameter) => await OpenRawDataCommandRoutineAsync(parameter));
             DeleteDataFileCommand = new RelayParameterizedCommand(async (parameter) => await DeleteDataFileCommandRoutineAsync(parameter));
             StartIndexProcessingCommand = new RelayCommand(async () => await StartIndexProcessingCommandRoutineAsync());
+            DeleteIndexFileCommand = new RelayParameterizedCommand(async (parameter) => await DeleteIndexFileCommandRoutineAsync(parameter));
 
             // Create data selection with its entry.
             _dataFileSelection = new List<DataFileInfo>() { new DataFileInfo("< Select Data File >", null, default) };
@@ -237,7 +244,7 @@ namespace InformationRetrievalManager
         /// <summary>
         /// DI constructor
         /// </summary>
-        public DataInstancePageViewModel(ILogger logger, ITaskManager taskManager, IFileManager fileManager, IUnitOfWork uow, ICrawlerManager crawlerManager, ICrawlerStorage crawlerStorage)
+        public DataInstancePageViewModel(ILogger logger, ITaskManager taskManager, IFileManager fileManager, IUnitOfWork uow, ICrawlerManager crawlerManager, ICrawlerStorage crawlerStorage, IIndexStorage indexStorage)
             : this()
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -246,6 +253,7 @@ namespace InformationRetrievalManager
             _uow = uow ?? throw new ArgumentNullException(nameof(uow));
             _crawlerManager = crawlerManager ?? throw new ArgumentNullException(nameof(crawlerManager));
             _crawlerStorage = crawlerStorage ?? throw new ArgumentNullException(nameof(crawlerStorage));
+            _indexStorage = indexStorage ?? throw new ArgumentNullException(nameof(indexStorage));
         }
 
         /// <summary>
@@ -463,13 +471,15 @@ namespace InformationRetrievalManager
                             IndexProcessingProgress = "Indexing...";
 
                             // Indexate documents
-                            var processing = new IndexProcessing(_dataInstance.Id.ToString(), _dataInstance.IndexProcessingConfiguration, _fileManager, _logger);
+                            var processing = new IndexProcessing(_dataInstance.Id.ToString(), DateTime.Now, _dataInstance.IndexProcessingConfiguration, _fileManager, _logger);
 
                             processing.IndexDocuments(docs.ToArray(), save: true);
                             _logger.LogDebugSource("Index processing done!");
                             IndexProcessingProgress = "Successfully indexed the documents!";
 
                             _uow.CommitTransaction();
+
+                            LoadIndexFiles(true);
                         }
                         // Otherwise no documents are ready (corrupted)...
                         else
@@ -487,6 +497,26 @@ namespace InformationRetrievalManager
                         await DeleteDataFileCommandRoutineAsync(file);
                     }
                 });
+            });
+        }
+
+        /// <summary>
+        /// Command Routine : Delete data (crawler) file
+        /// </summary>
+        /// <param name="parameter"><see cref="DataFileInfo"/></param>
+        private async Task DeleteIndexFileCommandRoutineAsync(object parameter)
+        {
+            await RunCommandAsync(() => ProcessFlag, async () =>
+            {
+                var fileInfo = parameter as DataFileInfo;
+
+                if (fileInfo != null && fileInfo.FilePath != null && File.Exists(fileInfo.FilePath))
+                {
+                    _indexStorage.DeleteIndexFiles(_dataInstance.Id.ToString(), fileInfo.CreatedAt);
+                    LoadIndexFiles(true);
+                }
+
+                await Task.Delay(1);
             });
         }
 
@@ -512,9 +542,10 @@ namespace InformationRetrievalManager
                 for (int i = 0; i < dataFilePaths.Length; ++i)
                 {
                     string filename = Path.GetFileName(dataFilePaths[i]);
-                    string dateStr = filename.Substring(startsWith.Length, filename.Length - startsWith.Length - endsWith.Length);
                     try
                     {
+                        string dateStr = filename.Substring(startsWith.Length, filename.Length - startsWith.Length - endsWith.Length);
+
                         var datetime = DateTime.ParseExact(dateStr, "yyyy_M_d_H_m_s", CultureInfo.InvariantCulture);
                         data.Add(new DataFileInfo(datetime.ToString("yyyy-MM-dd (HH:mm:ss)"), dataFilePaths[i], datetime));
                     }
@@ -529,6 +560,44 @@ namespace InformationRetrievalManager
                 if (data.Count > fileLimit)
                     data = data.Take(fileLimit).ToList();
                 UpdateDataFileSelection(data, resetToDefaultSelection);
+            }
+        }
+
+        /// <summary>
+        /// Loads index files
+        /// </summary>
+        /// <param name="resetToDefaultSelection">Indication to reset the selection entry to default value.</param>
+        public void LoadIndexFiles(bool resetToDefaultSelection = false)
+        {
+            ushort fileLimit = 50;
+            string startsWith = $"{_dataInstance.Id}_";
+            string endsWith = ".idx";
+
+            var filePaths = _indexStorage.GetIndexFiles(_dataInstance.Id.ToString());
+            if (filePaths != null)
+            {
+                var data = new List<DataFileInfo>();
+                for (int i = 0; i < filePaths.Length; ++i)
+                {
+                    string filename = Path.GetFileName(filePaths[i]);
+                    try
+                    {
+                        string dateStr = filename.Substring(startsWith.Length, filename.Length - startsWith.Length - endsWith.Length);
+
+                        var datetime = DateTime.ParseExact(dateStr, "yyyy_M_d_H_m_s", CultureInfo.InvariantCulture);
+                        data.Add(new DataFileInfo(datetime.ToString("yyyy-MM-dd (HH:mm:ss)"), filePaths[i], datetime));
+                    }
+                    catch
+                    {
+                        // Corrupted filename
+                        // skip
+                    }
+                }
+
+                data.Sort((x, y) => DateTime.Compare(y.CreatedAt, x.CreatedAt));
+                if (data.Count > fileLimit)
+                    data = data.Take(fileLimit).ToList();
+                UpdateIndexFileSelection(data, resetToDefaultSelection);
             }
         }
 
@@ -560,6 +629,8 @@ namespace InformationRetrievalManager
 
             // Load data files
             LoadDataFiles(true);
+            // Load index files
+            LoadIndexFiles(true);
 
             // Flag up data load is done
             DataLoaded = true;
@@ -653,6 +724,34 @@ namespace InformationRetrievalManager
             DataFileEntry.ValueList = _dataFileSelection;
             if (resetToDefaultSelection)
                 DataFileEntry.Value = _dataFileSelection[0]; // Default selected value
+        }
+
+        /// <summary>
+        /// Update index file selection and its entry.
+        /// </summary>
+        /// <param name="data">New index selection array (<see langword="null"/> just clears the list).</param>
+        /// <param name="resetToDefaultSelection">Indication to reset the selection entry to default value.</param>
+        /// <remarks>
+        ///     Method expects to already have 1 item (first) that represents default selected item in <see cref="_indexFileSelection"/>.
+        /// </remarks>
+        private void UpdateIndexFileSelection(List<DataFileInfo> data, bool resetToDefaultSelection = false)
+        {
+            var newData = new List<DataFileInfo>();
+            newData.Add(_indexFileSelection[0]);
+
+            // Clear previous data selection
+            _indexFileSelection.Clear();
+
+            if (data != null)
+                newData.AddRange(data);
+
+            // Update the file selection
+            _indexFileSelection = newData;
+
+            // Update the file selection entry
+            IndexFileEntry.ValueList = _indexFileSelection;
+            if (resetToDefaultSelection)
+                IndexFileEntry.Value = _indexFileSelection[0]; // Default selected value
         }
 
         #endregion

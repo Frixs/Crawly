@@ -470,6 +470,8 @@
                                         Margin="258,0,0,0"
                                         HorizontalAlignment="Center"
                                         VerticalAlignment="Top"
+                                        Command="{Binding DeleteIndexFileCommand, Mode=OneWay}"
+                                        CommandParameter="{Binding IndexFileEntry.Value, Mode=OneWay}"
                                         Content="{StaticResource FontAwesomeTrashAltIcon}"
                                         FontFamily="{StaticResource FontAwesomeSolid}"
                                         ToolTip="Delete Data">
