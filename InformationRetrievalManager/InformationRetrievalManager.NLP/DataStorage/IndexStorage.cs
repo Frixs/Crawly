@@ -10,7 +10,7 @@ namespace InformationRetrievalManager.NLP
     /// <summary>
     /// Singleton boxing for managing index data
     /// </summary>
-    public sealed class IndexStorage
+    public sealed class IndexStorage : IIndexStorage
     {
         #region Private Members (Injects)
 
@@ -35,9 +35,9 @@ namespace InformationRetrievalManager.NLP
         #region Interface Methods
 
         /// <inheritdoc/>
-        public string[] GetDataFiles(string cid)
+        public string[] GetIndexFiles(string iid)
         {
-            if (cid == null)
+            if (iid == null)
                 throw new ArgumentNullException("Index ID is not defined!");
 
             var result = new List<string>();
@@ -48,7 +48,7 @@ namespace InformationRetrievalManager.NLP
                 string[] dirs = Directory.GetDirectories(Constants.IndexDataStorageDir);
                 for (int i = 0; i < dirs.Length; ++i)
                     // Find the one specific for the searched index...
-                    if (Path.GetFileName(dirs[i]).Equals(cid))
+                    if (Path.GetFileName(dirs[i]).Equals(iid))
                     {
                         result.AddRange(
                             Directory.GetFiles(dirs[i])
@@ -61,9 +61,9 @@ namespace InformationRetrievalManager.NLP
         }
 
         /// <inheritdoc/>
-        public void DeleteDataFiles(string cid, DateTime fileTimestamp)
+        public void DeleteIndexFiles(string iid, DateTime fileTimestamp)
         {
-            if (cid == null)
+            if (iid == null)
                 throw new ArgumentNullException("Index ID is not defined!");
 
             if (Directory.Exists(Constants.IndexDataStorageDir))
@@ -72,7 +72,7 @@ namespace InformationRetrievalManager.NLP
                 string[] dirs = Directory.GetDirectories(Constants.IndexDataStorageDir);
                 for (int i = 0; i < dirs.Length; ++i)
                     // Find the one specific for the searched index...
-                    if (Path.GetFileName(dirs[i]).Equals(cid))
+                    if (Path.GetFileName(dirs[i]).Equals(iid))
                     {
                         var filesToDelete = Directory.GetFiles(dirs[i]).Where(o => o.Contains(MakeFilenameTimestamp(fileTimestamp))).ToList();
                         foreach (var file in filesToDelete)
