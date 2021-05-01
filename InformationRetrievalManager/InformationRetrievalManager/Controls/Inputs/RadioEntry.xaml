@@ -38,14 +38,16 @@
         </TextBlock>
 
         <!--  Value Input  -->
+        <!--  IsChecked must be defined before GroupName !!!  -->
         <RadioButton
             Grid.Row="1"
             Margin="0,0,0,3"
             Padding="0"
             HorizontalAlignment="Center"
             VerticalAlignment="Center"
-            GroupName="{Binding GroupName, Mode=OneWay}"
-            IsChecked="{Binding Value}" />
+            Command="{Binding OnCheckCommand, Mode=OneTime}"
+            IsChecked="{Binding Value}"
+            GroupName="{Binding GroupName, Mode=OneWay}" />
 
         <!--  Description  -->
         <TextBlock
