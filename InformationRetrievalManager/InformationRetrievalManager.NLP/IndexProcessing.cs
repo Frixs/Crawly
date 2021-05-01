@@ -212,7 +212,7 @@ namespace InformationRetrievalManager.NLP
                 throw new ArgumentNullException("Text not specified!");
 
             // Define inverted index instance special for separate query indexing...
-            var ii = new InvertedIndex(Name + "(query)", null, _logger);
+            var ii = new InvertedIndex(Name + "(query)", default, null, _logger);
 
             // Process the text data
             _ = Process(text, 0, ii);

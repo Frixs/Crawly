@@ -152,6 +152,7 @@ namespace InformationRetrievalManager.NLP
 
                 // Process the query and indexate it for vocabulary
                 var processing = new IndexProcessing("__boolean",
+                    timestamp: default,
                     new Tokenizer(processingConfiguration.CustomRegex),
                     new Stemmer(processingConfiguration.Language),
                     new StopWordRemover(processingConfiguration.Language, processingConfiguration.CustomStopWords),
