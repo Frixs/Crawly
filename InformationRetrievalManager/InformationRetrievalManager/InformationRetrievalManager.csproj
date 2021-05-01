@@ -426,6 +426,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Controls\Inputs\RadioEntry.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Controls\Inputs\TextEntry.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -510,6 +514,9 @@
     <Compile Include="Controls\Inputs\IntegerEntry.xaml.cs">
       <DependentUpon>IntegerEntry.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\Inputs\RadioEntry.xaml.cs">
+      <DependentUpon>RadioEntry.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Controls\Inputs\TextEntry.xaml.cs">
       <DependentUpon>TextEntry.xaml</DependentUpon>
     </Compile>
@@ -561,6 +568,8 @@
     <Compile Include="ViewModels\Base\BaseViewModel.cs" />
     <Compile Include="ViewModels\Base\RelayCommand.cs" />
     <Compile Include="ViewModels\Base\RelayParameterizedCommand.cs" />
+    <Compile Include="ViewModels\Inputs\Design\RadioEntryDesignModel.cs" />
+    <Compile Include="ViewModels\Inputs\RadioEntryViewModel.cs" />
     <Compile Include="ViewModels\Inputs\CheckEntryViewModel.cs" />
     <Compile Include="ViewModels\Inputs\ComboEntryViewModel.cs" />
     <Compile Include="ViewModels\Inputs\Design\CheckEntryDesignModel.cs" />

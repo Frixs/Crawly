@@ -9,10 +9,14 @@ namespace InformationRetrievalManager
     /// <typeparam name="T">Type of the value</typeparam>
     public class ComboEntryViewModel<T> : BaseEntryViewModel<T>
     {
-        #region Public Properties
+        #region Protected Members
 
         /// <inheritdoc/>
         protected override Func<T, T> ValueCustomSetterProcess => null;
+
+        #endregion
+
+        #region Public Properties
 
         /// <summary>
         /// List of possible values in combo box

@@ -3,9 +3,9 @@
 namespace InformationRetrievalManager
 {
     /// <summary>
-    /// The view model for a checkbox entry
+    /// The view model for a radio button entry
     /// <summary>
-    public class CheckEntryViewModel : BaseEntryViewModel<bool>
+    public class RadioEntryViewModel : BaseEntryViewModel<bool>
     {
         #region Protected Members
 
@@ -16,6 +16,11 @@ namespace InformationRetrievalManager
 
         #region Public Properties
 
+        /// <summary>
+        /// The radio group name
+        /// </summary>
+        public string GroupName { get; set; }
+
         #endregion
 
         #region Constructor
@@ -23,7 +28,7 @@ namespace InformationRetrievalManager
         /// <summary>
         /// Default constructor
         /// </summary>
-        public CheckEntryViewModel() : base()
+        public RadioEntryViewModel() : base()
         {
         }
 

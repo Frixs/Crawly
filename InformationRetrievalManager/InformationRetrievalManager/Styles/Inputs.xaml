@@ -4,6 +4,21 @@
     xmlns:local="clr-namespace:InformationRetrievalManager"
     xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit">
 
+    <Style x:Key="OptionMarkFocusVisual">
+        <Setter Property="Control.Template">
+            <Setter.Value>
+                <ControlTemplate>
+                    <Rectangle
+                        Margin="14,0,0,0"
+                        SnapsToDevicePixels="true"
+                        Stroke="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"
+                        StrokeDashArray="1 2"
+                        StrokeThickness="1" />
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <!--  TextBox Input (with placeholder)  -->
     <Style BasedOn="{StaticResource BaseStyle}" TargetType="{x:Type TextBox}">
 
@@ -105,20 +120,6 @@
     </Style>
 
     <!--  Checkbox Input  -->
-    <Style x:Key="OptionMarkFocusVisual">
-        <Setter Property="Control.Template">
-            <Setter.Value>
-                <ControlTemplate>
-                    <Rectangle
-                        Margin="14,0,0,0"
-                        SnapsToDevicePixels="true"
-                        Stroke="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"
-                        StrokeDashArray="1 2"
-                        StrokeThickness="1" />
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-    </Style>
     <Style BasedOn="{StaticResource BaseStyle}" TargetType="{x:Type CheckBox}">
         <Setter Property="FontSize" Value="14" />
         <Setter Property="FontFamily" Value="{StaticResource DosisMedium}" />
@@ -242,12 +243,82 @@
     <Style BasedOn="{StaticResource BaseStyle}" TargetType="{x:Type RadioButton}">
         <Setter Property="FontSize" Value="14" />
         <Setter Property="FontFamily" Value="{StaticResource DosisMedium}" />
-        <Setter Property="Padding" Value="10" />
+        <Setter Property="Padding" Value="0" />
         <Setter Property="Margin" Value="0" />
         <Setter Property="Background" Value="{StaticResource InputBackgroundBrushKey}" />
         <Setter Property="Foreground" Value="{StaticResource InputForegroundBrushKey}" />
         <Setter Property="BorderBrush" Value="{StaticResource InputBorderBackgroundBrushKey}" />
-        <Setter Property="BorderThickness" Value="0,0,0,2" />
+        <Setter Property="BorderThickness" Value="2" />
+
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type RadioButton}">
+                    <Grid
+                        x:Name="templateRoot"
+                        Background="Transparent"
+                        SnapsToDevicePixels="True">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Border
+                            x:Name="radioButtonBorder"
+                            Margin="{TemplateBinding Margin}"
+                            HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                            VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="100">
+                            <Grid x:Name="markGrid" Margin="2">
+                                <Ellipse
+                                    x:Name="optionMark"
+                                    MinWidth="10"
+                                    MinHeight="10"
+                                    Fill="{StaticResource InputForegroundBrushKey}"
+                                    Opacity="0" />
+                            </Grid>
+                        </Border>
+                        <ContentPresenter
+                            x:Name="contentPresenter"
+                            Grid.Column="1"
+                            Margin="{TemplateBinding Padding}"
+                            HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                            VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                            Focusable="False"
+                            RecognizesAccessKey="True"
+                            SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="HasContent" Value="true">
+                            <Setter Property="FocusVisualStyle" Value="{StaticResource OptionMarkFocusVisual}" />
+                            <Setter Property="Padding" Value="4,-1,0,0" />
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="true">
+                            <Setter TargetName="radioButtonBorder" Property="Background" Value="{StaticResource InputBackgroundBrushKey}" />
+                            <Setter TargetName="radioButtonBorder" Property="BorderBrush" Value="{StaticResource InputFocusBorderBackgroundBrushKey}" />
+                            <Setter TargetName="optionMark" Property="Fill" Value="{StaticResource InputForegroundBrushKey}" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="false">
+                            <Setter TargetName="radioButtonBorder" Property="Background" Value="{StaticResource InputDisabledBackgroundBrushKey}" />
+                            <Setter TargetName="radioButtonBorder" Property="BorderBrush" Value="{StaticResource InputBorderBackgroundBrushKey}" />
+                            <Setter TargetName="optionMark" Property="Fill" Value="{StaticResource InputDisabledForegroundBrushKey}" />
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="true">
+                            <Setter TargetName="radioButtonBorder" Property="Background" Value="{StaticResource InputBackgroundBrushKey}" />
+                            <Setter TargetName="radioButtonBorder" Property="BorderBrush" Value="{StaticResource InputFocusBorderBackgroundBrushKey}" />
+                            <Setter TargetName="optionMark" Property="Fill" Value="{StaticResource InputFocusForegroundBrushKey}" />
+                        </Trigger>
+                        <Trigger Property="IsChecked" Value="true">
+                            <Setter TargetName="optionMark" Property="Opacity" Value="1" />
+                        </Trigger>
+                        <Trigger Property="IsChecked" Value="{x:Null}">
+                            <Setter TargetName="optionMark" Property="Opacity" Value="0.56" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
 
         <!--  Delete default error template  -->
         <Setter Property="Validation.ErrorTemplate">
