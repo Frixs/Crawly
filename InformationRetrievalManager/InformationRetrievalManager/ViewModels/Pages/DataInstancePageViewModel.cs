@@ -186,6 +186,11 @@ namespace InformationRetrievalManager
         /// </summary>
         public ICommand DeleteIndexFileCommand { get; set; }
 
+        /// <summary>
+        /// The command to start index processing.
+        /// </summary>
+        public ICommand StartQueryCommand { get; set; }
+
         #endregion
 
         #region Constructor
@@ -204,6 +209,7 @@ namespace InformationRetrievalManager
             DeleteDataFileCommand = new RelayParameterizedCommand(async (parameter) => await DeleteDataFileCommandRoutineAsync(parameter));
             StartIndexProcessingCommand = new RelayCommand(async () => await StartIndexProcessingCommandRoutineAsync());
             DeleteIndexFileCommand = new RelayParameterizedCommand(async (parameter) => await DeleteIndexFileCommandRoutineAsync(parameter));
+            StartQueryCommand = new RelayCommand(async () => await StartQueryCommandRoutineAsync());
 
             // Create data selection with its entry.
             _dataFileSelection = new List<DataFileInfo>() { new DataFileInfo("< Select Data File >", null, default) };
@@ -479,7 +485,7 @@ namespace InformationRetrievalManager
 
                             _uow.CommitTransaction();
 
-                            LoadIndexFiles(true);
+                            Application.Current.Dispatcher.Invoke(() => LoadIndexFiles(true));
                         }
                         // Otherwise no documents are ready (corrupted)...
                         else
@@ -518,6 +524,41 @@ namespace InformationRetrievalManager
 
                 await Task.Delay(1);
             });
+        }
+
+        /// <summary>
+        /// Command Routine : Start query request
+        /// </summary>
+        private async Task StartQueryCommandRoutineAsync()
+        {
+            await RunCommandAsync(() => QueryInWorkFlag, async () =>
+            {
+                Console.WriteLine("TODO");
+
+                await Task.Delay(1);
+            });
+
+            //    // TODO : we need to have a currently processing index name list to be able to say when we are able to touch the data 
+            //    // (as a feature update while multiple processing will run and we want to query only the instances that are not indexing/processing atm and visa/versa).
+
+            //    await RunCommandAsync(() => ProcessingCommandFlag, async () =>
+            //    {
+            //        var ii = new InvertedIndex("my_index", _fileManager, _logger);
+
+            //        QueryStatus = "Searching...";
+
+            //        int[] results = Array.Empty<int>();
+
+            //        await _taskManager.Run(async () =>
+            //        {
+            //            ii.Load();
+            //            results = await _queryIndexManager.QueryAsync(Query, ii.GetReadOnlyVocabulary(), QueryModelType.Boolean, _processingConfiguration, 10);
+            //        });
+
+            //        QueryStatus = "Results: [" + string.Join(",", results) + "]";
+
+            //        await Task.Delay(1);
+            //    });
         }
 
         #endregion

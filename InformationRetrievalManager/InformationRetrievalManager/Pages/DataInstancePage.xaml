@@ -478,10 +478,18 @@
                                         <Button.Style>
                                             <Style BasedOn="{StaticResource DarkLightButton}" TargetType="{x:Type Button}">
                                                 <Setter Property="Visibility" Value="Visible" />
+                                                <Setter Property="IsEnabled" Value="False" />
                                                 <Style.Triggers>
                                                     <DataTrigger Binding="{Binding IndexFileEntry.Value.FilePath, Mode=OneWay}" Value="{x:Null}">
                                                         <Setter Property="Visibility" Value="Collapsed" />
                                                     </DataTrigger>
+                                                    <MultiDataTrigger>
+                                                        <MultiDataTrigger.Conditions>
+                                                            <Condition Binding="{Binding IndexProcessingInWorkFlag, Mode=OneWay}" Value="False" />
+                                                            <Condition Binding="{Binding QueryInWorkFlag, Mode=OneWay}" Value="False" />
+                                                        </MultiDataTrigger.Conditions>
+                                                        <Setter Property="IsEnabled" Value="True" />
+                                                    </MultiDataTrigger>
                                                 </Style.Triggers>
                                             </Style>
                                         </Button.Style>
@@ -505,6 +513,7 @@
                                     HorizontalAlignment="Center"
                                     VerticalAlignment="Top"
                                     local:IsBusyProperty.Value="{Binding QueryInWorkFlag}"
+                                    Command="{Binding StartQueryCommand, Mode=OneWay}"
                                     Content="SEARCH"
                                     FontSize="16">
                                     <Button.Style>
@@ -513,8 +522,9 @@
                                             <Style.Triggers>
                                                 <MultiDataTrigger>
                                                     <MultiDataTrigger.Conditions>
-                                                        <Condition Binding="{Binding IndexFileEntry.Value.FilePath, Converter={local:StringEmptyConverter}}" Value="False" />
-                                                        <Condition Binding="{Binding QueryEntry.Value, Converter={local:StringEmptyConverter}}" Value="False" />
+                                                        <Condition Binding="{Binding IndexFileEntry.Value.FilePath, Converter={local:StringEmptyConverter}, Mode=OneWay}" Value="False" />
+                                                        <Condition Binding="{Binding QueryEntry.Value, Converter={local:StringEmptyConverter}, Mode=OneWay}" Value="False" />
+                                                        <Condition Binding="{Binding IndexProcessingInWorkFlag, Mode=OneWay}" Value="False" />
                                                     </MultiDataTrigger.Conditions>
                                                     <Setter Property="IsEnabled" Value="True" />
                                                 </MultiDataTrigger>
