@@ -496,9 +496,9 @@ namespace InformationRetrievalManager.NLP.Test
         /// Print word frequencies
         /// </summary>
         /// <param name="vocabulary">The vocabulary</param>
-        private void PrintWordFrequencies(IReadOnlyDictionary<string, IReadOnlyDictionary<int, IReadOnlyTermInfo>> vocabulary)
+        private void PrintWordFrequencies(IReadOnlyDictionary<string, IReadOnlyDictionary<long, IReadOnlyTermInfo>> vocabulary)
         {
-            foreach (KeyValuePair<string, IReadOnlyDictionary<int, IReadOnlyTermInfo>> entry in vocabulary)
+            foreach (KeyValuePair<string, IReadOnlyDictionary<long, IReadOnlyTermInfo>> entry in vocabulary)
                 _testOutputHelper.WriteLine(entry.Key + ":\t" + entry.Value.Sum(o => o.Value.Frequency));
             PrintSortedDictionary(vocabulary);
         }
@@ -507,7 +507,7 @@ namespace InformationRetrievalManager.NLP.Test
         /// Print sorted words from the lsit of frequencies
         /// </summary>
         /// <param name="vocabulary">The vocabulary</param>
-        private void PrintSortedDictionary(IReadOnlyDictionary<string, IReadOnlyDictionary<int, IReadOnlyTermInfo>> vocabulary)
+        private void PrintSortedDictionary(IReadOnlyDictionary<string, IReadOnlyDictionary<long, IReadOnlyTermInfo>> vocabulary)
         {
             string[] words = vocabulary.Keys.ToArray();
             Array.Sort(words);
