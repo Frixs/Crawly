@@ -30,6 +30,11 @@ namespace InformationRetrievalManager.NLP
         /// </remarks>
         private readonly SortedDictionary<string, Dictionary<long, TermInfo>> _vocabulary = new SortedDictionary<string, Dictionary<long, TermInfo>>();
 
+        /// <summary>
+        /// Timestamp as an additional identifier for indexation.
+        /// </summary>
+        private readonly DateTime _timestamp; //; ctor
+
         #endregion
 
         #region Interface Properties
@@ -44,10 +49,10 @@ namespace InformationRetrievalManager.NLP
         /// <summary>
         /// Default constructor
         /// </summary>
-        public InvertedIndex(string name, IFileManager fileManager = null, ILogger logger = null)
+        public InvertedIndex(string name, DateTime timestamp, IFileManager fileManager = null, ILogger logger = null)
         {
-            // TODO: check name allowed characters
             Name = name;
+            _timestamp = timestamp;
 
             _fileManager = fileManager;
             _logger = logger;
@@ -108,7 +113,7 @@ namespace InformationRetrievalManager.NLP
             bool ok = false;
 
             // Deserialize
-            var result = _fileManager.DeserializeObjectFromBinFileAsync($"{Constants.IndexDataStorageDir}/{Name}.idx").Result;
+            var result = _fileManager.DeserializeObjectFromBinFileAsync($"{Constants.IndexDataStorageDir}/{MakeFilename()}").Result;
             short status = result.Item1;
             object obj = result.Item2;
 
@@ -151,7 +156,7 @@ namespace InformationRetrievalManager.NLP
             bool ok = false;
 
             // Serialize
-            short status = _fileManager.SerializeObjectToBinFileAsync(_vocabulary, $"{Constants.IndexDataStorageDir}/{Name}.idx").Result;
+            short status = _fileManager.SerializeObjectToBinFileAsync(_vocabulary, $"{Constants.IndexDataStorageDir}/{MakeFilename()}").Result;
 
             // Check serialization result
             if (status == 0)
@@ -166,6 +171,19 @@ namespace InformationRetrievalManager.NLP
                 _vocabulary.Clear();
 
             return ok;
+        }
+
+        #endregion
+
+        #region Private Methods
+
+        /// <summary>
+        /// Generates filename specific for this index instance.
+        /// </summary>
+        /// <returns>The filename</returns>
+        private string MakeFilename()
+        {
+            return $"{Name}_{_timestamp.Year}_{_timestamp.Month}_{_timestamp.Day}_{_timestamp.Hour}_{_timestamp.Minute}_{_timestamp.Second}.idx";
         }
 
         #endregion
