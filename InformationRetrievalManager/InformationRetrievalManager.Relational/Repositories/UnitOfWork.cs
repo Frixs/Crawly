@@ -99,7 +99,37 @@ namespace InformationRetrievalManager.Relational
         public void Commit()
         {
             int n = _dbContext.SaveChanges();
-            _logger.LogDebugSource($"Total of {n} database changes saved!");
+            _logger.LogTraceSource($"Total of {n} database changes saved!");
+        }
+
+        /// <inheritdoc/>
+        public void BeginTransaction()
+        {
+            if (_dbContext.Database.CurrentTransaction != null)
+                return;
+
+            _dbContext.Database.BeginTransaction();
+            _logger.LogDebugSource($"Database transaction has started!");
+        }
+
+        /// <inheritdoc/>
+        public void CommitTransaction()
+        {
+            if (_dbContext.Database.CurrentTransaction == null)
+                return;
+
+            _dbContext.Database.CommitTransaction();
+            _logger.LogDebugSource($"Database transaction committed!");
+        }
+
+        /// <inheritdoc/>
+        public void RollbackTransaction()
+        {
+            if (_dbContext.Database.CurrentTransaction == null)
+                return;
+
+            _dbContext.Database.RollbackTransaction();
+            _logger.LogDebugSource($"Database transaction roll-backed!");
         }
 
         /// <inheritdoc/>
