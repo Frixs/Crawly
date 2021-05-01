@@ -481,7 +481,7 @@ namespace InformationRetrievalManager
 
                             processing.IndexDocuments(docs.ToArray(), save: true);
                             _logger.LogDebugSource("Index processing done!");
-                            IndexProcessingProgress = "Successfully indexed the documents!";
+                            IndexProcessingProgress = "Done!";
 
                             _uow.CommitTransaction();
 
