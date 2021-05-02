@@ -72,14 +72,14 @@ namespace InformationRetrievalManager
         #region Public Properties
 
         /// <summary>
-        /// Indicates if the data are already loaded into the VM (once the values changes to <see langword="true"/>).
-        /// </summary>
-        public bool DataLoaded { get; protected set; }
-
-        /// <summary>
         /// Property for <see cref="_dataInstance"/>.
         /// </summary>
         public DataInstanceDataModel DataInstance => _dataInstance;
+
+        /// <summary>
+        /// <see cref="View.Results"/> context
+        /// </summary>
+        public QueryDataResultContext ResultContext { get; } = new QueryDataResultContext();
 
         /// <summary>
         /// Entry selection of available data files.
@@ -116,11 +116,6 @@ namespace InformationRetrievalManager
         public string IndexProcessingProgress { get; protected set; }
 
         /// <summary>
-        /// Error string as a feedback to the user.
-        /// </summary>
-        public string FormErrorString { get; protected set; }
-
-        /// <summary>
         /// Crawler progress feedback message (1-5)
         /// </summary>
         public string[] CrawlerProgressMsgs { get; protected set; } = new string[5];
@@ -130,13 +125,19 @@ namespace InformationRetrievalManager
         /// </summary>
         public string[] CrawlerProgressUrls { get; protected set; } = new string[5];
 
-
-
-        public string QueryTempResults { get; protected set; }
-
         #endregion
 
-        #region Command Flags
+        #region Flags
+
+        /// <summary>
+        /// Indicates current view that should be (is) displayed.
+        /// </summary>
+        public View CurrentView { get; set; } //; ctor init
+
+        /// <summary>
+        /// Indicates if the data are already loaded into the VM (once the values changes to <see langword="true"/>).
+        /// </summary>
+        public bool DataLoaded { get; protected set; }
 
         /// <summary>
         /// Indicates if crawler is currently processing
@@ -146,6 +147,10 @@ namespace InformationRetrievalManager
             get => CrawlerInWorkFlag || _crawlerEngine != null || (_crawlerEngine != null && _crawlerEngine.IsCurrentlyCrawling);
             set => CrawlerInWorkFlag = value;
         }
+
+        #endregion
+
+        #region Command Flags
 
         /// <summary>
         /// Command flag for crawler controls
@@ -216,6 +221,11 @@ namespace InformationRetrievalManager
         /// </summary>
         public ICommand StartQueryCommand { get; set; }
 
+        /// <summary>
+        /// The command to change the view based on parameter.
+        /// </summary>
+        public ICommand ShowViewCommand { get; set; }
+
         #endregion
 
         #region Constructor
@@ -235,6 +245,7 @@ namespace InformationRetrievalManager
             StartIndexProcessingCommand = new RelayCommand(async () => await StartIndexProcessingCommandRoutineAsync());
             DeleteIndexFileCommand = new RelayParameterizedCommand(async (parameter) => await DeleteIndexFileCommandRoutineAsync(parameter));
             StartQueryCommand = new RelayCommand(async () => await StartQueryCommandRoutineAsync());
+            ShowViewCommand = new RelayParameterizedCommand((parameter) => ShowViewCommandRoutine(parameter));
 
             // Create data selection with its entry.
             _dataFileSelection = new List<DataFileInfo>() { new DataFileInfo("< Select Data File >", null, default) };
@@ -288,7 +299,7 @@ namespace InformationRetrievalManager
                         _selectedQueryModel = QueryModelType.TfIdf;
                         QueryEntry.Description = Localization.Resource.QueryEntry_Description_TfIdf;
                         QueryEntry.Validation = new ValidateStringAttribute("Query", typeof(DataInstancePageViewModel), nameof(QueryEntry_IsRequired));
-                        await Task.Delay(1); 
+                        await Task.Delay(1);
                     }
                 },
                 new RadioEntryViewModel
@@ -298,7 +309,7 @@ namespace InformationRetrievalManager
                     Validation = null,
                     Value = false,
                     GroupName = nameof(QueryModelEntryArray),
-                    CheckAction = async () => 
+                    CheckAction = async () =>
                     {
                         _selectedQueryModel = QueryModelType.Boolean;
                         QueryEntry.Description = Localization.Resource.QueryEntry_Description_Boolean;
@@ -622,8 +633,23 @@ namespace InformationRetrievalManager
                 });
 
                 // TODO - continue here
-                QueryTempResults = "Results: [" + string.Join(",", results) + "]";
+                //QueryTempResults = "Results: [" + string.Join(",", results) + "]";
+                ResultContext.Data.Add(new QueryDataResultContext.Result());
+                OnPropertyChanged(nameof(ResultContext));
+                ShowViewCommandRoutine(View.Results);
             });
+        }
+
+        /// <summary>
+        /// Change view to the result one.
+        /// </summary>
+        /// <param name="parameter">Int id specific for <see cref="View"/> or itself the enum.</param>
+        private void ShowViewCommandRoutine(object parameter)
+        {
+            if (parameter.GetType().Equals(typeof(View)))
+                CurrentView = (View)parameter;
+            else
+                CurrentView = (View)Enum.ToObject(typeof(View),  int.Parse(parameter.ToString()));
         }
 
         #endregion
@@ -739,6 +765,7 @@ namespace InformationRetrievalManager
             LoadIndexFiles(true);
 
             // Flag up data load is done
+            CurrentView = View.Main;
             DataLoaded = true;
         }
 
@@ -858,6 +885,22 @@ namespace InformationRetrievalManager
             IndexFileEntry.ValueList = _indexFileSelection;
             if (resetToDefaultSelection)
                 IndexFileEntry.Value = _indexFileSelection[0]; // Default selected value
+        }
+
+        #endregion
+
+        #region Helper View Enum
+
+        /// <summary>
+        /// Defines views associated to this view model and GUI.
+        /// </summary>
+        public enum View
+        {
+            Main = 0,
+            Results = 1,
+            Configuration = 2,
+            ConfigurationCrawlerEdit = 3,
+            ConfigurationProcessingEdit = 4
         }
 
         #endregion

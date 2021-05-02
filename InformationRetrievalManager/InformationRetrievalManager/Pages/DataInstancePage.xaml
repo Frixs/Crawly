@@ -99,12 +99,25 @@
                     Style="{StaticResource SpinningText}" />
             </Grid>
 
-            <!--  Main Content Wrapper  -->
+            <!--  Main Content View  -->
             <Grid
                 Grid.Row="1"
                 HorizontalAlignment="Center"
-                local:AnimateSlideInFromTopGoneProperty.Value="{Binding DataLoaded, Mode=OneWay}"
                 Visibility="Collapsed">
+                <Grid.Style>
+                    <Style TargetType="{x:Type Grid}">
+                        <Setter Property="local:AnimateSlideInFromTopGoneProperty.Value" Value="False" />
+                        <Style.Triggers>
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding DataLoaded, Mode=OneWay}" Value="True" />
+                                    <Condition Binding="{Binding CurrentView, Mode=OneWay}" Value="0" />
+                                </MultiDataTrigger.Conditions>
+                                <Setter Property="local:AnimateSlideInFromTopGoneProperty.Value" Value="True" />
+                            </MultiDataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Grid.Style>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="*" />
@@ -112,17 +125,12 @@
 
                 <!--  Titles  -->
                 <Grid Grid.Row="0" Margin="0,0,0,15">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                    </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="2*" />
                         <ColumnDefinition Width="2*" />
                     </Grid.ColumnDefinitions>
 
                     <TextBlock
-                        Grid.Row="0"
                         Grid.Column="0"
                         HorizontalAlignment="Center"
                         FontFamily="{StaticResource DosisRegular}"
@@ -130,34 +138,11 @@
                         Text="Configuration" />
 
                     <TextBlock
-                        Grid.Row="0"
                         Grid.Column="1"
                         HorizontalAlignment="Center"
                         FontFamily="{StaticResource DosisRegular}"
                         FontSize="15"
                         Text="Query" />
-
-                    <TextBlock
-                        Grid.Row="1"
-                        Grid.ColumnSpan="2"
-                        Margin="0,10,0,0"
-                        HorizontalAlignment="Center"
-                        FontFamily="{StaticResource DosisMedium}"
-                        FontSize="15"
-                        Foreground="{StaticResource LightColorShinyBrushKey}"
-                        Text="{Binding FormErrorString, Mode=OneWay}"
-                        TextAlignment="Center">
-                        <TextBlock.Style>
-                            <Style TargetType="{x:Type TextBlock}">
-                                <Setter Property="Visibility" Value="Visible" />
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding FormErrorString, Mode=OneWay}" Value="{x:Null}">
-                                        <Setter Property="Visibility" Value="Collapsed" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </TextBlock.Style>
-                    </TextBlock>
                 </Grid>
 
                 <!--  Content  -->
@@ -302,6 +287,8 @@
                                     Grid.Row="2"
                                     Margin="0,15,0,0"
                                     HorizontalAlignment="Center"
+                                    Command="{Binding ShowViewCommand, Mode=OneTime}"
+                                    CommandParameter="2"
                                     Content="&gt;&gt; View Crawler Configuration &lt;&lt;"
                                     FontFamily="{StaticResource DosisLight}"
                                     FontSize="13"
@@ -431,6 +418,8 @@
                                     Grid.Row="3"
                                     Margin="0,15,0,0"
                                     HorizontalAlignment="Center"
+                                    Command="{Binding ShowViewCommand, Mode=OneTime}"
+                                    CommandParameter="2"
                                     Content="&gt;&gt; View Processing Configuration &lt;&lt;"
                                     FontFamily="{StaticResource DosisLight}"
                                     FontSize="13"
@@ -574,11 +563,133 @@
                                     </Button.Style>
                                 </Button>
 
-                                <TextBlock Grid.Row="2" Text="{Binding QueryTempResults}" />
+                                <!--  View Results BTN  -->
+                                <Button
+                                    Grid.Row="2"
+                                    Margin="0,15,0,0"
+                                    HorizontalAlignment="Center"
+                                    Command="{Binding ShowViewCommand, Mode=OneTime}"
+                                    CommandParameter="1"
+                                    Content="&gt;&gt; View Results &lt;&lt;"
+                                    FontFamily="{StaticResource DosisLight}"
+                                    FontSize="13">
+                                    <Button.Style>
+                                        <Style BasedOn="{StaticResource LightDarkTextButton}" TargetType="{x:Type Button}">
+                                            <Setter Property="local:AnimateFadeInProperty.Value" Value="False" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding ResultContext.Data, Converter={local:CollectionHasAnyItemsConverter}, Mode=OneWay}" Value="True">
+                                                    <Setter Property="local:AnimateFadeInProperty.Value" Value="True" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Button.Style>
+                                </Button>
                             </Grid>
                         </Grid>
                     </Grid>
                 </ScrollViewer>
+            </Grid>
+
+            <!--  Query Result View  -->
+            <Grid
+                Grid.Row="1"
+                HorizontalAlignment="Center"
+                Visibility="Collapsed">
+                <Grid.Style>
+                    <Style TargetType="{x:Type Grid}">
+                        <Setter Property="local:AnimateSlideInFromRightMarginGoneProperty.Value" Value="False" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding CurrentView, Mode=OneWay}" Value="1">
+                                <Setter Property="local:AnimateSlideInFromRightMarginGoneProperty.Value" Value="True" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Grid.Style>
+                <TextBlock Text="Show Results" />
+                <Button
+                    Margin="0,50,0,0"
+                    Command="{Binding ShowViewCommand, Mode=OneTime}"
+                    CommandParameter="0"
+                    Content="back" />
+            </Grid>
+
+            <!--  Configuration View  -->
+            <Grid
+                Grid.Row="1"
+                HorizontalAlignment="Center"
+                Visibility="Collapsed">
+                <Grid.Style>
+                    <Style TargetType="{x:Type Grid}">
+                        <Setter Property="local:AnimateSlideInFromLeftMarginGoneProperty.Value" Value="False" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding CurrentView, Mode=OneWay}" Value="2">
+                                <Setter Property="local:AnimateSlideInFromLeftMarginGoneProperty.Value" Value="True" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Grid.Style>
+                <TextBlock Text="Configuration" />
+                <Button
+                    Margin="0,50,0,0"
+                    Command="{Binding ShowViewCommand, Mode=OneTime}"
+                    CommandParameter="0"
+                    Content="back" />
+                <Button
+                    Margin="0,100,0,0"
+                    Command="{Binding ShowViewCommand, Mode=OneTime}"
+                    CommandParameter="3"
+                    Content="crawler" />
+                <Button
+                    Margin="0,150,0,0"
+                    Command="{Binding ShowViewCommand, Mode=OneTime}"
+                    CommandParameter="4"
+                    Content="processing" />
+            </Grid>
+
+            <!--  Configuration Crawler Edit View  -->
+            <Grid
+                Grid.Row="1"
+                HorizontalAlignment="Center"
+                Visibility="Collapsed">
+                <Grid.Style>
+                    <Style TargetType="{x:Type Grid}">
+                        <Setter Property="local:AnimateSlideInFromLeftMarginGoneProperty.Value" Value="False" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding CurrentView, Mode=OneWay}" Value="3">
+                                <Setter Property="local:AnimateSlideInFromLeftMarginGoneProperty.Value" Value="True" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Grid.Style>
+                <TextBlock Text="Crawler Edit" />
+                <Button
+                    Margin="0,50,0,0"
+                    Command="{Binding ShowViewCommand, Mode=OneTime}"
+                    CommandParameter="2"
+                    Content="back" />
+            </Grid>
+
+            <!--  Configuration Processing Edit View  -->
+            <Grid
+                Grid.Row="1"
+                HorizontalAlignment="Center"
+                Visibility="Collapsed">
+                <Grid.Style>
+                    <Style TargetType="{x:Type Grid}">
+                        <Setter Property="local:AnimateSlideInFromLeftMarginGoneProperty.Value" Value="False" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding CurrentView, Mode=OneWay}" Value="4">
+                                <Setter Property="local:AnimateSlideInFromLeftMarginGoneProperty.Value" Value="True" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Grid.Style>
+                <TextBlock Text="Processing Edit" />
+                <Button
+                    Margin="0,50,0,0"
+                    Command="{Binding ShowViewCommand, Mode=OneTime}"
+                    CommandParameter="2"
+                    Content="back" />
             </Grid>
         </Grid>
     </Border>

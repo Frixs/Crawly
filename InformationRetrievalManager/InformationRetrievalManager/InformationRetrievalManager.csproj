@@ -502,6 +502,7 @@
     <Compile Include="AttachedProperties\TextAttachedProperties.cs" />
     <Compile Include="ControlContexts\CrawlerConfigurationFormContext.cs" />
     <Compile Include="ControlContexts\ProcessingConfigurationFormContext.cs" />
+    <Compile Include="ControlContexts\QueryDataResultContext.cs" />
     <Compile Include="Controls\CrawlerConfigurationForm.xaml.cs">
       <DependentUpon>CrawlerConfigurationForm.xaml</DependentUpon>
     </Compile>
