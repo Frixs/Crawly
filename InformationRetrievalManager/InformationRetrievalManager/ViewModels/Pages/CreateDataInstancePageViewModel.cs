@@ -28,12 +28,12 @@ namespace InformationRetrievalManager
         /// <summary>
         /// Context of the <see cref="CrawlerConfigurationForm"/> control.
         /// </summary>
-        public CrawlerConfigurationFormContext CrawlerConfigurationContext { get; set; } = new CrawlerConfigurationFormContext();
+        public CrawlerConfigurationFormContext CrawlerConfigurationContext { get; } = new CrawlerConfigurationFormContext();
 
         /// <summary>
         /// Context of the <see cref="ProcessingConfigurationForm"/> control.
         /// </summary>
-        public ProcessingConfigurationFormContext ProcessingConfigurationContext { get; set; } = new ProcessingConfigurationFormContext();
+        public ProcessingConfigurationFormContext ProcessingConfigurationContext { get; } = new ProcessingConfigurationFormContext();
 
         /// <summary>
         /// Property for input field to set data instance name.

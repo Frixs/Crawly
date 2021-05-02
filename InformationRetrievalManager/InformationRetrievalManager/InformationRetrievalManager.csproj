@@ -438,6 +438,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Controls\QueryDataResult.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Pages\CreateDataInstancePage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -523,6 +527,9 @@
     </Compile>
     <Compile Include="Controls\ProcessingConfigurationForm.xaml.cs">
       <DependentUpon>ProcessingConfigurationForm.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\QueryDataResult.xaml.cs">
+      <DependentUpon>QueryDataResult.xaml</DependentUpon>
     </Compile>
     <Compile Include="Controls\Structure\AlignableWrapPanel.cs" />
     <Compile Include="Controls\Base\PageHost.xaml.cs">

@@ -605,12 +605,30 @@
                         </Style.Triggers>
                     </Style>
                 </Grid.Style>
-                <TextBlock Text="Show Results" />
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <!--  Back to Main View BTN  -->
                 <Button
-                    Margin="0,50,0,0"
+                    Grid.Row="0"
+                    Width="34"
+                    Height="34"
                     Command="{Binding ShowViewCommand, Mode=OneTime}"
                     CommandParameter="0"
-                    Content="back" />
+                    Content="{StaticResource FontAwesomeUndoAltIcon}"
+                    FontFamily="{StaticResource FontAwesomeSolid}"
+                    FontSize="16"
+                    Style="{StaticResource DarkLightButton}" />
+
+                <!--  Content  -->
+                <ScrollViewer
+                    Grid.Row="1"
+                    Padding="0,15,0,0"
+                    VerticalScrollBarVisibility="Auto">
+                    <local:QueryDataResult ResultContext="{Binding ResultContext, Mode=OneWay}" />
+                </ScrollViewer>
             </Grid>
 
             <!--  Configuration View  -->
@@ -628,68 +646,53 @@
                         </Style.Triggers>
                     </Style>
                 </Grid.Style>
-                <TextBlock Text="Configuration" />
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <!--  Titles  -->
+                <Grid Grid.Row="0" Margin="0,0,0,15">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="2*" />
+                        <ColumnDefinition Width="2*" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock
+                        Grid.Column="0"
+                        HorizontalAlignment="Center"
+                        FontFamily="{StaticResource DosisRegular}"
+                        FontSize="15"
+                        Text="Configuration" />
+
+                    <TextBlock
+                        Grid.Column="1"
+                        HorizontalAlignment="Center"
+                        FontFamily="{StaticResource DosisRegular}"
+                        FontSize="15"
+                        Text="Query" />
+                </Grid>
+
+                <!--  Back to Main View BTN  -->
                 <Button
-                    Margin="0,50,0,0"
+                    Grid.Row="0"
+                    Width="34"
+                    Height="34"
                     Command="{Binding ShowViewCommand, Mode=OneTime}"
                     CommandParameter="0"
-                    Content="back" />
-                <Button
-                    Margin="0,100,0,0"
-                    Command="{Binding ShowViewCommand, Mode=OneTime}"
-                    CommandParameter="3"
-                    Content="crawler" />
-                <Button
-                    Margin="0,150,0,0"
-                    Command="{Binding ShowViewCommand, Mode=OneTime}"
-                    CommandParameter="4"
-                    Content="processing" />
-            </Grid>
+                    Content="{StaticResource FontAwesomeUndoAltIcon}"
+                    FontFamily="{StaticResource FontAwesomeSolid}"
+                    FontSize="16"
+                    Style="{StaticResource DarkLightButton}" />
 
-            <!--  Configuration Crawler Edit View  -->
-            <Grid
-                Grid.Row="1"
-                HorizontalAlignment="Center"
-                Visibility="Collapsed">
-                <Grid.Style>
-                    <Style TargetType="{x:Type Grid}">
-                        <Setter Property="local:AnimateSlideInFromLeftMarginGoneProperty.Value" Value="False" />
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding CurrentView, Mode=OneWay}" Value="3">
-                                <Setter Property="local:AnimateSlideInFromLeftMarginGoneProperty.Value" Value="True" />
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </Grid.Style>
-                <TextBlock Text="Crawler Edit" />
-                <Button
-                    Margin="0,50,0,0"
-                    Command="{Binding ShowViewCommand, Mode=OneTime}"
-                    CommandParameter="2"
-                    Content="back" />
-            </Grid>
-
-            <!--  Configuration Processing Edit View  -->
-            <Grid
-                Grid.Row="1"
-                HorizontalAlignment="Center"
-                Visibility="Collapsed">
-                <Grid.Style>
-                    <Style TargetType="{x:Type Grid}">
-                        <Setter Property="local:AnimateSlideInFromLeftMarginGoneProperty.Value" Value="False" />
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding CurrentView, Mode=OneWay}" Value="4">
-                                <Setter Property="local:AnimateSlideInFromLeftMarginGoneProperty.Value" Value="True" />
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </Grid.Style>
-                <TextBlock Text="Processing Edit" />
-                <Button
-                    Margin="0,50,0,0"
-                    Command="{Binding ShowViewCommand, Mode=OneTime}"
-                    CommandParameter="2"
-                    Content="back" />
+                <!--  Content  -->
+                <ScrollViewer
+                    Grid.Row="1"
+                    Width="830"
+                    Padding="30,15,30,0"
+                    VerticalScrollBarVisibility="Auto">
+                    <TextBlock Text="Configuration view" />
+                </ScrollViewer>
             </Grid>
         </Grid>
     </Border>

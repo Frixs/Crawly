@@ -82,6 +82,16 @@ namespace InformationRetrievalManager
         public QueryDataResultContext ResultContext { get; } = new QueryDataResultContext();
 
         /// <summary>
+        /// <see cref="View.Configuration"/> context of the <see cref="CrawlerConfigurationForm"/> control.
+        /// </summary>
+        public CrawlerConfigurationFormContext CrawlerConfigurationContext { get; } = new CrawlerConfigurationFormContext();
+
+        /// <summary>
+        /// <see cref="View.Configuration"/> context of the <see cref="ProcessingConfigurationForm"/> control.
+        /// </summary>
+        public ProcessingConfigurationFormContext ProcessingConfigurationContext { get; } = new ProcessingConfigurationFormContext();
+
+        /// <summary>
         /// Entry selection of available data files.
         /// </summary>
         public ComboEntryViewModel<DataFileInfo> DataFileEntry { get; protected set; }
@@ -898,9 +908,7 @@ namespace InformationRetrievalManager
         {
             Main = 0,
             Results = 1,
-            Configuration = 2,
-            ConfigurationCrawlerEdit = 3,
-            ConfigurationProcessingEdit = 4
+            Configuration = 2
         }
 
         #endregion

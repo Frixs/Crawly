@@ -44,5 +44,6 @@
     <system:String x:Key="FontAwesomeQuestionmarkIcon">&#xf128;</system:String>
     <system:String x:Key="FontAwesomeCodeIcon">&#xf121;</system:String>
     <system:String x:Key="FontAwesomeTrashAltIcon">&#xf2ed;</system:String>
+    <system:String x:Key="FontAwesomeUndoAltIcon">&#xf2ea;</system:String>
 
 </ResourceDictionary>
