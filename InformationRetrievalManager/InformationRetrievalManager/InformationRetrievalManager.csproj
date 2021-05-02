@@ -535,6 +535,11 @@
     <Compile Include="DI\DI.cs" />
     <Compile Include="DI\FrameworkConstructionExtensions.cs" />
     <Compile Include="Extensions\CrawlerExtensions.cs" />
+    <Compile Include="Localization\Resource.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resource.resx</DependentUpon>
+    </Compile>
     <Compile Include="Pages\Base\BasePage.cs" />
     <Compile Include="Pages\CreateDataInstancePage.xaml.cs">
       <DependentUpon>CreateDataInstancePage.xaml</DependentUpon>
@@ -605,6 +610,10 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <EmbeddedResource Include="Localization\Resource.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resource.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>

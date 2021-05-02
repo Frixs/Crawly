@@ -34,6 +34,12 @@ namespace InformationRetrievalManager
 
         #endregion
 
+        #region Limit Constants
+
+        public static readonly bool QueryEntry_IsRequired = true;
+
+        #endregion
+
         #region Private Members
 
         /// <summary>
@@ -88,6 +94,10 @@ namespace InformationRetrievalManager
         /// <summary>
         /// Entry for query
         /// </summary>
+        [ValidateString(nameof(QueryEntry), typeof(DataInstancePageViewModel),
+            pIsRequired: nameof(QueryEntry_IsRequired))]
+        [ValidateBooleanExpressionString(nameof(QueryEntry), typeof(DataInstancePageViewModel),
+            pIsRequired: nameof(QueryEntry_IsRequired))]
         public TextEntryViewModel QueryEntry { get; protected set; }
 
         /// <summary>
@@ -254,7 +264,7 @@ namespace InformationRetrievalManager
             QueryEntry = new TextEntryViewModel
             {
                 Label = null,
-                Description = null,
+                Description = Localization.Resource.QueryEntry_Description_TfIdf,
                 Validation = null,
                 Value = null,
                 Placeholder = "Ask Me Here",
@@ -263,7 +273,8 @@ namespace InformationRetrievalManager
 
             // Create query model entries
             _selectedQueryModel = QueryModelType.TfIdf; // Set default selection
-            QueryModelEntryArray = new RadioEntryViewModel[2] 
+            QueryEntry.Validation = new ValidateStringAttribute("Query", typeof(DataInstancePageViewModel), nameof(QueryEntry_IsRequired));
+            QueryModelEntryArray = new RadioEntryViewModel[2]
             {
                 new RadioEntryViewModel
                 {
@@ -272,7 +283,13 @@ namespace InformationRetrievalManager
                     Validation = null,
                     Value = true, // Set default selection
                     GroupName = nameof(QueryModelEntryArray),
-                    CheckAction = async () => { _selectedQueryModel = QueryModelType.TfIdf; await Task.Delay(1); }
+                    CheckAction = async () =>
+                    {
+                        _selectedQueryModel = QueryModelType.TfIdf;
+                        QueryEntry.Description = Localization.Resource.QueryEntry_Description_TfIdf;
+                        QueryEntry.Validation = new ValidateStringAttribute("Query", typeof(DataInstancePageViewModel), nameof(QueryEntry_IsRequired));
+                        await Task.Delay(1); 
+                    }
                 },
                 new RadioEntryViewModel
                 {
@@ -281,7 +298,13 @@ namespace InformationRetrievalManager
                     Validation = null,
                     Value = false,
                     GroupName = nameof(QueryModelEntryArray),
-                    CheckAction = async () => { _selectedQueryModel = QueryModelType.Boolean; await Task.Delay(1); }
+                    CheckAction = async () => 
+                    {
+                        _selectedQueryModel = QueryModelType.Boolean;
+                        QueryEntry.Description = Localization.Resource.QueryEntry_Description_Boolean;
+                        QueryEntry.Validation = new ValidateBooleanExpressionStringAttribute("Query", typeof(DataInstancePageViewModel), nameof(QueryEntry_IsRequired));
+                        await Task.Delay(1);
+                    }
                 }
             };
         }
@@ -574,10 +597,13 @@ namespace InformationRetrievalManager
             await RunCommandAsync(() => QueryInWorkFlag, async () =>
             {
                 await Task.Delay(3000);
-                string query = QueryEntry.Value ?? string.Empty;
+                string query = QueryEntry.Value;
                 QueryModelType queryModel = _selectedQueryModel;
                 DataFileInfo file = IndexFileEntry.Value;
-                
+
+                if (string.IsNullOrEmpty(query))
+                    return;
+
                 if (file.FilePath == null) // should not happen - but it is default selection protection
                     return;
 
