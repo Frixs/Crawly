@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="QueryEntry_Description_Boolean" xml:space="preserve">
-    <value>Ask with logical operators AND and OR with the ability to prioritize them with brackets. You can use them in combination with your search text.</value>
+    <value>Ask with logical operators AND, OR, and NOT with the ability to prioritize them with brackets. Searched documents must contain/match the logical expression.</value>
   </data>
   <data name="QueryEntry_Description_TfIdf" xml:space="preserve">
     <value>Ask anything. The TF–IDF value increases proportionally to the number of times a word appears in the document.</value>

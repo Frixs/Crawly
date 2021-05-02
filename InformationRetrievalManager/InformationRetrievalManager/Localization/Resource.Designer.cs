@@ -61,7 +61,7 @@ namespace InformationRetrievalManager.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Ask with logical operators AND and OR with the ability to prioritize them with brackets. You can use them in combination with your search text..
+        ///   Looks up a localized string similar to Ask with logical operators AND, OR, and NOT with the ability to prioritize them with brackets. Searched documents must contain/match the logical expression..
         /// </summary>
         internal static string QueryEntry_Description_Boolean {
             get {
