@@ -442,7 +442,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Controls\QueryDataResult.xaml">
+    <Page Include="Controls\QueryDataResultView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -511,7 +511,7 @@
     <Compile Include="ControlContexts\CrawlerConfigurationFormContext.cs" />
     <Compile Include="ControlContexts\DataInstanceConfigurationViewContext.cs" />
     <Compile Include="ControlContexts\ProcessingConfigurationFormContext.cs" />
-    <Compile Include="ControlContexts\QueryDataResultContext.cs" />
+    <Compile Include="ControlContexts\QueryDataResultViewContext.cs" />
     <Compile Include="Controls\CrawlerConfigurationForm.xaml.cs">
       <DependentUpon>CrawlerConfigurationForm.xaml</DependentUpon>
     </Compile>
@@ -536,8 +536,8 @@
     <Compile Include="Controls\ProcessingConfigurationForm.xaml.cs">
       <DependentUpon>ProcessingConfigurationForm.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Controls\QueryDataResult.xaml.cs">
-      <DependentUpon>QueryDataResult.xaml</DependentUpon>
+    <Compile Include="Controls\QueryDataResultView.xaml.cs">
+      <DependentUpon>QueryDataResultView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Controls\Structure\AlignableWrapPanel.cs" />
     <Compile Include="Controls\Base\PageHost.xaml.cs">

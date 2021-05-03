@@ -80,7 +80,7 @@ namespace InformationRetrievalManager
         /// <summary>
         /// <see cref="View.Results"/> context
         /// </summary>
-        public QueryDataResultContext ResultContext { get; } = new QueryDataResultContext();
+        public QueryDataResultViewContext ResultContext { get; } = new QueryDataResultViewContext();
 
         /// <summary>
         /// <see cref="View.Configuration"/> context of the <see cref="CrawlerConfigurationForm"/> control.
@@ -676,7 +676,7 @@ namespace InformationRetrievalManager
                     var doc = _uow.IndexedDocuments.GetByID(queryResult.Item1[i]);
                     if (doc != null)
                     {
-                        ResultContext.Data.Add(new QueryDataResultContext.Result
+                        ResultContext.Data.Add(new QueryDataResultViewContext.Result
                         {
                             Title = doc.Title,
                             Category = doc.Category,

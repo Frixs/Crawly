@@ -3,9 +3,9 @@
 namespace InformationRetrievalManager
 {
     /// <summary>
-    /// Context for control <see cref="QueryDataResult"/>.
+    /// Context for control <see cref="QueryDataResultView"/>.
     /// </summary>
-    public class QueryDataResultContext : BaseViewModel
+    public class QueryDataResultViewContext : BaseViewModel
     {
         #region Public Properties
 
@@ -31,7 +31,7 @@ namespace InformationRetrievalManager
         /// <summary>
         /// Default constructor
         /// </summary>
-        public QueryDataResultContext()
+        public QueryDataResultViewContext()
         {
 
         }

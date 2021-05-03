@@ -678,7 +678,7 @@
                     MinWidth="830"
                     MaxWidth="830"
                     VerticalScrollBarVisibility="Auto">
-                    <local:QueryDataResult OpenSourceUrlCommand="{Binding OpenUrlCommand, Mode=OneTime}" ResultContext="{Binding ResultContext, Mode=OneWay}" />
+                    <local:QueryDataResultView OpenSourceUrlCommand="{Binding OpenUrlCommand, Mode=OneTime}" ResultContext="{Binding ResultContext, Mode=OneWay}" />
                     <ScrollViewer.Style>
                         <Style TargetType="{x:Type ScrollViewer}">
                             <Setter Property="Padding" Value="0,15,0,0" />

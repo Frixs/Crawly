@@ -6,7 +6,7 @@
     xmlns:local="clr-namespace:InformationRetrievalManager"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     x:Name="this"
-    d:DataContext="{x:Static local:QueryDataResult.DesignInstance}"
+    d:DataContext="{x:Static local:DataInstanceConfigurationView.DesignInstance}"
     d:DesignHeight="450"
     d:DesignWidth="830"
     mc:Ignorable="d">
