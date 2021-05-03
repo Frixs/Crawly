@@ -119,7 +119,7 @@ namespace InformationRetrievalManager.Crawler
         }
 
         /// <inheritdoc/>
-        public string[] GetDataFiles(string cid)
+        public string[] GetAllDataFiles(string cid)
         {
             if (cid == null)
                 throw new ArgumentNullException("Crawler ID is not defined!");

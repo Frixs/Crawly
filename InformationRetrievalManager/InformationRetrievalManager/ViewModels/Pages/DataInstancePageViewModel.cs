@@ -766,6 +766,7 @@ namespace InformationRetrievalManager
                     return;
                 }
 
+                string currentSite = _dataInstance.CrawlerConfiguration.SiteAddress + _dataInstance.CrawlerConfiguration.SiteSuffix;
                 // Assign updated data
                 _dataInstance.CrawlerConfiguration.SiteAddress = ConfigurationContext.CrawlerConfigurationContext.SiteAddressEntry.Value;
                 _dataInstance.CrawlerConfiguration.SiteSuffix = ConfigurationContext.CrawlerConfigurationContext.SiteSuffixEntry.Value;
@@ -808,18 +809,43 @@ namespace InformationRetrievalManager
                 // Otherwise valid results...
                 else
                 {
-                    // TODO if site has changes delete crawled data
+                    var fileDeletionOk = true;
+                    // If the site has changed...
+                    if (!currentSite.Equals(ConfigurationContext.CrawlerConfigurationContext.SiteAddressEntry.Value + ConfigurationContext.CrawlerConfigurationContext.SiteSuffixEntry.Value))
+                    {
+                        // Find and delete all the crawled data files...
+                        try
+                        {
+                            var filePaths = _crawlerStorage.GetAllDataFiles(_dataInstance.Id.ToString());
+                            for (int i = 0; i < filePaths.Length; ++i)
+                                File.Delete(filePaths[i]);
+                        }
+                        catch
+                        {
+                            fileDeletionOk = false;
+                        }
+                    }
 
-                    // Update
-                    _uow.CrawlerConfigurations.Update(_dataInstance.CrawlerConfiguration);
-                    _uow.SaveChanges();
+                    // If the file deletion has no errors...
+                    if (fileDeletionOk)
+                    {
+                        // Update
+                        _uow.CrawlerConfigurations.Update(_dataInstance.CrawlerConfiguration);
+                        _uow.SaveChanges();
 
-                    // Reaload data
-                    await LoadAsync(_dataInstance.Id);
-                    ToggleEditCrawlerConfigurationReadOnlyCommandRoutine(); // close form
+                        // Reaload data
+                        await LoadAsync(_dataInstance.Id);
+                        ToggleEditCrawlerConfigurationReadOnlyCommandRoutine(); // close form
 
-                    // Log it
-                    _logger.LogInformationSource($"Crawler configuration of '{_dataInstance.Name}' successfully updated!");
+                        // Log it
+                        _logger.LogInformationSource($"Crawler configuration of '{_dataInstance.Name}' successfully updated!");
+                    }
+                    // Otherwise, something went wrong during the file deletion...
+                    else
+                    {
+                        _uow.UndoEntityChanges(_dataInstance.CrawlerConfiguration);
+                        ConfigurationContext.FormErrorString = "Something went wrong during clearing old crawled data.";
+                    }
                 }
             });
         }
@@ -859,18 +885,39 @@ namespace InformationRetrievalManager
                 // Otherwise valid results...
                 else
                 {
-                    // TODO delete indexes
+                    var fileDeletionOk = true;
+                    // Find and delete all the index files...
+                    try
+                    {
+                        var filePaths = _indexStorage.GetIndexFiles(_dataInstance.Id.ToString());
+                        for (int i = 0; i < filePaths.Length; ++i)
+                            File.Delete(filePaths[i]);
+                    }
+                    catch
+                    {
+                        fileDeletionOk = false;
+                    }
 
-                    // Update
-                    _uow.IndexProcessingConfigurations.Update(_dataInstance.IndexProcessingConfiguration);
-                    _uow.SaveChanges();
+                    // If the file deletion has no errors...
+                    if (fileDeletionOk)
+                    {
+                        // Update
+                        _uow.IndexProcessingConfigurations.Update(_dataInstance.IndexProcessingConfiguration);
+                        _uow.SaveChanges();
 
-                    // Reaload data
-                    await LoadAsync(_dataInstance.Id);
-                    ToggleEditProcessingConfigurationReadOnlyCommandRoutine(); // close form
+                        // Reaload data
+                        await LoadAsync(_dataInstance.Id);
+                        ToggleEditProcessingConfigurationReadOnlyCommandRoutine(); // close form
 
-                    // Log it
-                    _logger.LogInformationSource($"Index processing configuration of '{_dataInstance.Name}' successfully updated!");
+                        // Log it
+                        _logger.LogInformationSource($"Index processing configuration of '{_dataInstance.Name}' successfully updated!");
+                    }
+                    // Otherwise, something went wrong during the file deletion...
+                    else
+                    {
+                        _uow.UndoEntityChanges(_dataInstance.CrawlerConfiguration);
+                        ConfigurationContext.FormErrorString = "Something went wrong during clearing old index data.";
+                    }
                 }
             });
         }
@@ -955,7 +1002,7 @@ namespace InformationRetrievalManager
             string startsWith = "data_";
             string endsWith = ".json";
 
-            var filePaths = _crawlerStorage.GetDataFiles(_dataInstance.Id.ToString());
+            var filePaths = _crawlerStorage.GetAllDataFiles(_dataInstance.Id.ToString());
             var dataFilePaths = filePaths.Where(o => o.EndsWith(endsWith)).ToArray();
             if (dataFilePaths != null)
             {

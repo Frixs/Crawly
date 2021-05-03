@@ -36,7 +36,7 @@ namespace InformationRetrievalManager.Crawler
         /// <remarks>
         ///     Make sure to check the crawler is not crawling at the moment of getting data files.
         /// </remarks>
-        string[] GetDataFiles(string cid);
+        string[] GetAllDataFiles(string cid);
 
         /// <summary>
         /// Delete files according to crawler identifier and file timestmap.
