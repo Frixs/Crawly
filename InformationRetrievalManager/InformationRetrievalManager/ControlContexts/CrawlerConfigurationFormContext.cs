@@ -6,7 +6,7 @@ namespace InformationRetrievalManager
     /// <summary>
     /// Context for control <see cref="CrawlerConfigurationForm"/>.
     /// </summary>
-    public class CrawlerConfigurationFormContext
+    public class CrawlerConfigurationFormContext : BaseViewModel
     {
         #region Public Properties
 

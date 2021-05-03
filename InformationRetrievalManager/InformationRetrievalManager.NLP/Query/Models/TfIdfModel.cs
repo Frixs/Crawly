@@ -53,7 +53,7 @@ namespace InformationRetrievalManager.NLP
         #region Interface Methods
 
         /// <inheritdoc/>
-        public void CalculateData(IReadOnlyDictionary<string, IReadOnlyDictionary<long, IReadOnlyTermInfo>> data)
+        public void CalculateData(IReadOnlyDictionary<string, IReadOnlyDictionary<long, IReadOnlyTermInfo>> data, out long totalDocuments)
         {
             if (data == null)
                 throw new ArgumentNullException("Data not specified!");
@@ -82,6 +82,7 @@ namespace InformationRetrievalManager.NLP
                 // The IDF calculation
                 _termIdf[term.Key] = Math.Log(documents.Count / termDocCount, 10);
             }
+            totalDocuments = documents.Count;
 
             // Create array for document vectors
             var docVectors = new Dictionary<long, double[]>();
@@ -132,7 +133,7 @@ namespace InformationRetrievalManager.NLP
         }
 
         /// <inheritdoc/>
-        public long[] CalculateBestMatch(int select = 0)
+        public long[] CalculateBestMatch(int select, out long foundDocuments)
         {
             var documentVectors = _documentVectors;
             var queryVector = _queryVector;
@@ -155,6 +156,7 @@ namespace InformationRetrievalManager.NLP
             // Sort and return result
             //results.Sort((x, y) => y.Item2.CompareTo(x.Item2));
             results = results.OrderByDescending(o => o.Item2).ThenBy(o => o.Item1).ToList();
+            foundDocuments = results.Count;
             if (select > 0)
                 return results.Select(o => o.Item1).Take(select).ToArray();
             return results.Select(o => o.Item1).ToArray();

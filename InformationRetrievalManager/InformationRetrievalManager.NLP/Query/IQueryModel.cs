@@ -13,8 +13,9 @@ namespace InformationRetrievalManager.NLP
         /// Calculates model for documents
         /// </summary>
         /// <param name="data">Documents data(<see cref="InvertedIndex._vocabulary"/>)</param>
+        /// <param name="totalDocuments">Number of documents that <paramref name="data"/> consists of.</param>
         /// <exception cref="ArgumentNullException">Missing data reference.</exception>
-        void CalculateData(IReadOnlyDictionary<string, IReadOnlyDictionary<long, IReadOnlyTermInfo>> data);
+        void CalculateData(IReadOnlyDictionary<string, IReadOnlyDictionary<long, IReadOnlyTermInfo>> data, out long totalDocuments);
 
         /// <summary>
         /// Calculates model for query
@@ -30,8 +31,9 @@ namespace InformationRetrievalManager.NLP
         /// Calculate best matching documents by the query.
         /// </summary>
         /// <param name="select">Limit number of records to select (0 to ignore limit).</param>
+        /// <param name="foundDocuments">Number of documents that was found regardless of <paramref name="select"/>.</param>
         /// <returns>Sorted array of document IDs from the best matching to the least.</returns>
         /// <exception cref="InvalidOperationException">Missing parameters. <see cref="CalculateData"/> and <see cref="CalculateQuery"/> must be called beforehand.</exception>
-        long[] CalculateBestMatch(int select);
+        long[] CalculateBestMatch(int select, out long foundDocuments);
     }
 }

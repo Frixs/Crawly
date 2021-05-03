@@ -8,7 +8,7 @@ namespace InformationRetrievalManager
     /// <summary>
     /// Context for control <see cref="ProcessingConfigurationForm"/>.
     /// </summary>
-    public class ProcessingConfigurationFormContext
+    public class ProcessingConfigurationFormContext : BaseViewModel
     {
         #region Public Properties
 

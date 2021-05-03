@@ -5,7 +5,7 @@ namespace InformationRetrievalManager
     /// <summary>
     /// Context for control <see cref="QueryDataResult"/>.
     /// </summary>
-    public class QueryDataResultContext
+    public class QueryDataResultContext : BaseViewModel
     {
         #region Public Properties
 

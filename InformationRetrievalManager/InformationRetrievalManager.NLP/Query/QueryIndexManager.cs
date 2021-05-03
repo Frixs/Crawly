@@ -45,6 +45,11 @@ namespace InformationRetrievalManager.NLP
         /// </summary>
         private byte[] _lastDataChecksum = null;
 
+        /// <summary>
+        /// Last saved number of total document searched from the document calculation.
+        /// </summary>
+        private long _lastTotalDocumentCount = 0;
+
         #endregion
 
         #region Constructor
@@ -62,7 +67,7 @@ namespace InformationRetrievalManager.NLP
         #region Interface Methods
 
         /// <inheritdoc/>
-        public async Task<long[]> QueryAsync(string query, IReadOnlyDictionary<string, IReadOnlyDictionary<long, IReadOnlyTermInfo>> data, QueryModelType modelType, IndexProcessingConfiguration configuration, int select = 0)
+        public async Task<(long[], long, long)> QueryAsync(string query, IReadOnlyDictionary<string, IReadOnlyDictionary<long, IReadOnlyTermInfo>> data, QueryModelType modelType, IndexProcessingConfiguration configuration, int select = 0)
         {
             if (query == null || data == null)
                 throw new ArgumentNullException("Query data not specified!");
@@ -78,6 +83,8 @@ namespace InformationRetrievalManager.NLP
                 var t_modelType = modelType;
                 var t_configuration = configuration;
 
+                long totalDocuments = _lastTotalDocumentCount;
+                long foundDocuments = 0;
                 var dataChecksum = GetDataChecksum(t_data);
 
                 // If the model type is the same as the one from the last query request...
@@ -96,7 +103,7 @@ namespace InformationRetrievalManager.NLP
                     // Otherwise, recalculate everything...
                     else
                     {
-                        _lastModel.CalculateData(t_data);
+                        _lastModel.CalculateData(t_data, out totalDocuments);
                         _lastModel.CalculateQuery(t_query, t_data, t_configuration);
                     }
                 }
@@ -119,7 +126,7 @@ namespace InformationRetrievalManager.NLP
                             break;
                     }
 
-                    _lastModel.CalculateData(t_data);
+                    _lastModel.CalculateData(t_data, out totalDocuments);
                     _lastModel.CalculateQuery(t_query, t_data, t_configuration);
                 }
 
@@ -127,8 +134,9 @@ namespace InformationRetrievalManager.NLP
                 _lastModelType = t_modelType;
                 _lastQuery = t_query;
                 _lastDataChecksum = dataChecksum;
+                _lastTotalDocumentCount = totalDocuments;
 
-                return _lastModel.CalculateBestMatch(select);
+                return (Results: _lastModel.CalculateBestMatch(select, out foundDocuments), FoundDocuments: foundDocuments, TotalDocuments: totalDocuments);
             });
         }
 

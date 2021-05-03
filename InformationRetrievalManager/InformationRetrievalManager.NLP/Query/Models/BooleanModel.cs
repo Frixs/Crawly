@@ -43,12 +43,27 @@ namespace InformationRetrievalManager.NLP
         #region Interface Methods
 
         /// <inheritdoc/>
-        public void CalculateData(IReadOnlyDictionary<string, IReadOnlyDictionary<long, IReadOnlyTermInfo>> data)
+        public void CalculateData(IReadOnlyDictionary<string, IReadOnlyDictionary<long, IReadOnlyTermInfo>> data, out long totalDocuments)
         {
             if (data == null)
                 throw new ArgumentNullException("Data not specified!");
 
-            // There is no need for any calculation.
+            // Set of all document IDs found among terms
+            var documents = new HashSet<long>();
+
+            // Count all documents
+            foreach (var term in data)
+            {
+                foreach (var termDocument in term.Value)
+                {
+                    if (termDocument.Key < 0)
+                        continue;
+
+                    documents.Add(termDocument.Key);
+                }
+            }
+
+            totalDocuments = documents.Count;
 
             // Log it
             _logger?.LogDebugSource("Data has been successfully calculated.");
@@ -114,9 +129,11 @@ namespace InformationRetrievalManager.NLP
         }
 
         /// <inheritdoc/>
-        public long[] CalculateBestMatch(int select = 0)
+        public long[] CalculateBestMatch(int select, out long foundDocuments)
         {
             // The calculations are made in the query method due to parameter limitations.
+
+            foundDocuments = _queryResults.Length;
 
             if (select > 0)
                 return _queryResults.Take(select).ToArray();

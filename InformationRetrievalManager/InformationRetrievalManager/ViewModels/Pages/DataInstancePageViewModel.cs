@@ -662,18 +662,18 @@ namespace InformationRetrievalManager
 
                 var ii = new InvertedIndex(_dataInstance.Id.ToString(), file.CreatedAt, _fileManager, _logger);
 
-                long[] results = Array.Empty<long>();
+                (long[], long, long) queryResult = (Array.Empty<long>(), -1, -1);
 
                 await _taskManager.Run(async () =>
                 {
                     ii.Load();
-                    results = await _queryIndexManager.QueryAsync(query, ii.GetReadOnlyVocabulary(), queryModel, _dataInstance.IndexProcessingConfiguration, select);
+                    queryResult = await _queryIndexManager.QueryAsync(query, ii.GetReadOnlyVocabulary(), queryModel, _dataInstance.IndexProcessingConfiguration, select);
                 });
 
                 // Go through the results...
-                for (int i = 0; i < results.Length; ++i)
+                for (int i = 0; i < queryResult.Item1.Length; ++i)
                 {
-                    var doc = _uow.IndexedDocuments.GetByID(results[i]);
+                    var doc = _uow.IndexedDocuments.GetByID(queryResult.Item1[i]);
                     if (doc != null)
                     {
                         ResultContext.Data.Add(new QueryDataResultContext.Result
@@ -694,10 +694,10 @@ namespace InformationRetrievalManager
                 }
 
                 // If no error occurred...
-                if (QueryErrorString != null)
+                if (QueryErrorString == null)
                 {
-                    ResultContext.TotalDocuments = 0;
-                    ResultContext.FoundDocuments = 0;
+                    ResultContext.FoundDocuments = queryResult.Item2;
+                    ResultContext.TotalDocuments = queryResult.Item3;
                     // Fire update context property
                     OnPropertyChanged(nameof(ResultContext));
 
