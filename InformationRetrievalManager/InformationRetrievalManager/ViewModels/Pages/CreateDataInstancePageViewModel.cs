@@ -196,7 +196,7 @@ namespace InformationRetrievalManager
                 {
                     // Insert
                     _uow.DataInstances.Insert(dataInstance);
-                    _uow.Commit();
+                    _uow.SaveChanges();
 
                     // Log it
                     _logger.LogInformationSource($"Data Instance '{dataInstance.Name}' successfully created!");

@@ -186,7 +186,7 @@ namespace InformationRetrievalManager
                 MainWindowSizeX = mainWindowSize.X,
                 MainWindowSizeY = mainWindowSize.Y
             });
-            uof.Commit();
+            uof.SaveChanges();
         }
 
         #endregion

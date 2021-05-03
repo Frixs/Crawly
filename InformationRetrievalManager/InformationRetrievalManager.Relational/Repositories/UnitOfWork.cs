@@ -9,7 +9,7 @@ namespace InformationRetrievalManager.Relational
 {
     /// <summary>
     /// The unit of work class serves one purpose: to make sure that when you use multiple repositories, they share a single database context. 
-    /// That way, when a unit of work is complete you can call the <see cref="Commit"/> method on that instance of the context and be assured that all related changes will be coordinated.
+    /// That way, when a unit of work is complete you can call the <see cref="SaveChanges"/> method on that instance of the context and be assured that all related changes will be coordinated.
     /// </summary>
     internal sealed class UnitOfWork : IUnitOfWork
     {
@@ -98,7 +98,7 @@ namespace InformationRetrievalManager.Relational
         #region Interface Methods
 
         /// <inheritdoc/>
-        public void Commit()
+        public void SaveChanges()
         {
             int n = _dbContext.SaveChanges();
             _logger.LogTraceSource($"Total of {n} database changes saved!");

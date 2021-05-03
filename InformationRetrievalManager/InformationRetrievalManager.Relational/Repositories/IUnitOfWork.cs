@@ -35,7 +35,7 @@ namespace InformationRetrievalManager.Relational
         /// <summary>
         /// Commit database context changes.
         /// </summary>
-        void Commit();
+        void SaveChanges();
 
         /// <summary>
         /// Undo database context changes.

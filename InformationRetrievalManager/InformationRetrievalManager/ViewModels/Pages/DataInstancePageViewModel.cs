@@ -577,7 +577,7 @@ namespace InformationRetrievalManager
                             if (ValidationHelpers.ValidateModel(model).Count == 0)
                             {
                                 _uow.IndexedDocuments.Insert(model);
-                                _uow.Commit();
+                                _uow.SaveChanges();
 
                                 docs.Add(data[i].ToIndexDocument(model.Id));
                                 anyIndexedData = true;
@@ -812,7 +812,7 @@ namespace InformationRetrievalManager
 
                     // Update
                     _uow.CrawlerConfigurations.Update(_dataInstance.CrawlerConfiguration);
-                    _uow.Commit();
+                    _uow.SaveChanges();
 
                     // Reaload data
                     await LoadAsync(_dataInstance.Id);
@@ -863,7 +863,7 @@ namespace InformationRetrievalManager
 
                     // Update
                     _uow.IndexProcessingConfigurations.Update(_dataInstance.IndexProcessingConfiguration);
-                    _uow.Commit();
+                    _uow.SaveChanges();
 
                     // Reaload data
                     await LoadAsync(_dataInstance.Id);
@@ -918,7 +918,7 @@ namespace InformationRetrievalManager
                 {
                     // Update
                     _uow.DataInstances.Update(_dataInstance);
-                    _uow.Commit();
+                    _uow.SaveChanges();
 
                     // Reaload data
                     await LoadAsync(_dataInstance.Id);
