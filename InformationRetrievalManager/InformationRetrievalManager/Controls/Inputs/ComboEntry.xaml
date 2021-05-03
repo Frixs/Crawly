@@ -46,7 +46,7 @@
             VerticalAlignment="Center"
             DisplayMemberPath="{Binding DisplayMemberPath, Mode=OneWay}"
             FontSize="14"
-            IsReadOnly="{Binding IsReadOnly, Mode=OneWay}"
+            IsEnabled="{Binding IsReadOnly, Converter={local:BooleanInvertConverter}, Mode=OneWay}"
             ItemsSource="{Binding ValueList}"
             SelectedItem="{Binding Value, UpdateSourceTrigger=PropertyChanged}">
             <ComboBox.Style>
@@ -68,7 +68,7 @@
             Padding="10,8"
             VerticalAlignment="Center"
             FontSize="14"
-            IsReadOnly="{Binding IsReadOnly, Mode=OneWay}"
+            IsEnabled="{Binding IsReadOnly, Converter={local:BooleanInvertConverter}, Mode=OneWay}"
             ItemsSource="{Binding ValueList}"
             SelectedItem="{Binding Value, UpdateSourceTrigger=PropertyChanged}">
             <ComboBox.ItemTemplate>

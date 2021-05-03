@@ -85,20 +85,33 @@
                     </Grid>
 
                     <ControlTemplate.Triggers>
+                        <!--  Is Read Only  -->
+                        <Trigger Property="IsReadOnly" Value="True">
+                            <Setter TargetName="border" Property="BorderBrush" Value="{StaticResource InputBackgroundBrushKey}" />
+                        </Trigger>
                         <!--  Is Disabled  -->
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter Property="Background" Value="{StaticResource InputDisabledBackgroundBrushKey}" />
                             <Setter Property="Foreground" Value="{StaticResource InputDisabledForegroundBrushKey}" />
+                            <Setter TargetName="border" Property="BorderBrush" Value="{StaticResource InputBorderBackgroundBrushKey}" />
                         </Trigger>
                         <!--  Hover  -->
-                        <Trigger Property="IsMouseOver" Value="True">
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="IsReadOnly" Value="False" />
+                                <Condition Property="IsMouseOver" Value="True" />
+                            </MultiTrigger.Conditions>
                             <Setter TargetName="border" Property="BorderBrush" Value="{StaticResource InputFocusBorderBackgroundBrushKey}" />
-                        </Trigger>
+                        </MultiTrigger>
                         <!--  Focus  -->
-                        <Trigger Property="IsKeyboardFocused" Value="True">
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="IsReadOnly" Value="False" />
+                                <Condition Property="IsKeyboardFocused" Value="True" />
+                            </MultiTrigger.Conditions>
                             <Setter TargetName="border" Property="BorderBrush" Value="{StaticResource InputFocusBorderBackgroundBrushKey}" />
                             <Setter Property="Foreground" Value="{StaticResource InputFocusForegroundBrushKey}" />
-                        </Trigger>
+                        </MultiTrigger>
                         <!--  Has Error  -->
                         <Trigger Property="Validation.HasError" Value="True">
                             <Setter Property="ToolTip" Value="{Binding RelativeSource={x:Static RelativeSource.Self}, Path=(Validation.Errors)/ErrorContent}" />
@@ -117,6 +130,62 @@
             </Setter.Value>
         </Setter>
 
+    </Style>
+
+    <!--  Integer Input  -->
+    <Style BasedOn="{StaticResource BaseStyle}" TargetType="{x:Type xctk:IntegerUpDown}">
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontFamily" Value="{StaticResource DosisMedium}" />
+        <Setter Property="Padding" Value="10" />
+        <Setter Property="Margin" Value="0" />
+        <Setter Property="Background" Value="{StaticResource InputBackgroundBrushKey}" />
+        <Setter Property="Foreground" Value="{StaticResource InputForegroundBrushKey}" />
+        <Setter Property="BorderBrush" Value="{StaticResource InputBorderBackgroundBrushKey}" />
+        <Setter Property="BorderThickness" Value="0,0,0,2" />
+
+        <!--  Delete default error template  -->
+        <Setter Property="Validation.ErrorTemplate">
+            <Setter.Value>
+                <ControlTemplate>
+                    <Grid />
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+
+        <Style.Triggers>
+            <!--  Is Read Only  -->
+            <Trigger Property="IsReadOnly" Value="True">
+                <Setter Property="BorderBrush" Value="{StaticResource InputBackgroundBrushKey}" />
+            </Trigger>
+            <!--  Is Disabled  -->
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Background" Value="{StaticResource InputDisabledBackgroundBrushKey}" />
+                <Setter Property="Foreground" Value="{StaticResource InputDisabledForegroundBrushKey}" />
+                <Setter Property="BorderBrush" Value="{StaticResource InputBorderBackgroundBrushKey}" />
+            </Trigger>
+            <!--  Hover  -->
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="IsReadOnly" Value="False" />
+                    <Condition Property="IsMouseOver" Value="True" />
+                </MultiTrigger.Conditions>
+                <Setter Property="BorderBrush" Value="{StaticResource InputFocusBorderBackgroundBrushKey}" />
+            </MultiTrigger>
+            <!--  Focus  -->
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="IsReadOnly" Value="False" />
+                    <Condition Property="IsKeyboardFocused" Value="True" />
+                </MultiTrigger.Conditions>
+                <Setter Property="BorderBrush" Value="{StaticResource InputFocusBorderBackgroundBrushKey}" />
+                <Setter Property="Foreground" Value="{StaticResource InputFocusForegroundBrushKey}" />
+            </MultiTrigger>
+            <!--  Has Error  -->
+            <Trigger Property="Validation.HasError" Value="True">
+                <Setter Property="ToolTip" Value="{Binding RelativeSource={x:Static RelativeSource.Self}, Path=(Validation.Errors)/ErrorContent}" />
+                <Setter Property="BorderBrush" Value="{StaticResource InputErrorBorderBackgroundBrushKey}" />
+            </Trigger>
+        </Style.Triggers>
     </Style>
 
     <!--  Checkbox Input  -->
@@ -581,120 +650,6 @@
                 <Setter Property="Foreground" Value="{StaticResource InputFocusForegroundBrushKey}" />
             </Trigger>
             <!--  Has Error  -->
-            <Trigger Property="Validation.HasError" Value="True">
-                <Setter Property="ToolTip" Value="{Binding RelativeSource={x:Static RelativeSource.Self}, Path=(Validation.Errors)/ErrorContent}" />
-                <Setter Property="BorderBrush" Value="{StaticResource InputErrorBorderBackgroundBrushKey}" />
-            </Trigger>
-        </Style.Triggers>
-    </Style>
-
-    <!--  Integer Input  -->
-    <Style BasedOn="{StaticResource BaseStyle}" TargetType="{x:Type xctk:IntegerUpDown}">
-        <Setter Property="FontSize" Value="14" />
-        <Setter Property="FontFamily" Value="{StaticResource DosisMedium}" />
-        <Setter Property="Padding" Value="10" />
-        <Setter Property="Margin" Value="0" />
-        <Setter Property="Background" Value="{StaticResource InputBackgroundBrushKey}" />
-        <Setter Property="Foreground" Value="{StaticResource InputForegroundBrushKey}" />
-        <Setter Property="BorderBrush" Value="{StaticResource InputBorderBackgroundBrushKey}" />
-        <Setter Property="BorderThickness" Value="0,0,0,2" />
-
-        <!--  Delete default error template  -->
-        <Setter Property="Validation.ErrorTemplate">
-            <Setter.Value>
-                <ControlTemplate>
-                    <Grid />
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-
-        <Style.Triggers>
-            <!--  Is Disabled  -->
-            <Trigger Property="IsEnabled" Value="False">
-                <Setter Property="Background" Value="{StaticResource InputDisabledBackgroundBrushKey}" />
-                <Setter Property="Foreground" Value="{StaticResource InputDisabledForegroundBrushKey}" />
-            </Trigger>
-            <!--  Hover  -->
-            <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="BorderBrush" Value="{StaticResource InputFocusBorderBackgroundBrushKey}" />
-            </Trigger>
-            <!--  Focus  -->
-            <Trigger Property="IsKeyboardFocusWithin" Value="True">
-                <Setter Property="BorderBrush" Value="{StaticResource InputFocusBorderBackgroundBrushKey}" />
-                <Setter Property="Foreground" Value="{StaticResource InputFocusForegroundBrushKey}" />
-            </Trigger>
-            <!--  Has Error  -->
-            <Trigger Property="Validation.HasError" Value="True">
-                <Setter Property="ToolTip" Value="{Binding RelativeSource={x:Static RelativeSource.Self}, Path=(Validation.Errors)/ErrorContent}" />
-                <Setter Property="BorderBrush" Value="{StaticResource InputErrorBorderBackgroundBrushKey}" />
-            </Trigger>
-        </Style.Triggers>
-    </Style>
-
-    <!--  Double Input  -->
-    <Style BasedOn="{StaticResource BaseStyle}" TargetType="{x:Type xctk:DoubleUpDown}">
-        <Setter Property="FontSize" Value="14" />
-        <Setter Property="FontFamily" Value="{StaticResource DosisMedium}" />
-        <Setter Property="Padding" Value="10" />
-        <Setter Property="Margin" Value="0" />
-        <Setter Property="Background" Value="{StaticResource InputBackgroundBrushKey}" />
-        <Setter Property="Foreground" Value="{StaticResource InputForegroundBrushKey}" />
-        <Setter Property="BorderBrush" Value="{StaticResource InputBorderBackgroundBrushKey}" />
-        <Setter Property="BorderThickness" Value="0,0,0,2" />
-
-        <!--  Delete default error template  -->
-        <Setter Property="Validation.ErrorTemplate">
-            <Setter.Value>
-                <ControlTemplate>
-                    <Grid />
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-
-        <Style.Triggers>
-            <!--  Hover  -->
-            <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="BorderBrush" Value="{StaticResource InputFocusBorderBackgroundBrushKey}" />
-            </Trigger>
-            <!--  Focus  -->
-            <Trigger Property="IsKeyboardFocusWithin" Value="True">
-                <Setter Property="BorderBrush" Value="{StaticResource InputFocusBorderBackgroundBrushKey}" />
-                <Setter Property="Foreground" Value="{StaticResource InputFocusForegroundBrushKey}" />
-            </Trigger>
-            <!--  Has Error  -->
-            <Trigger Property="Validation.HasError" Value="True">
-                <Setter Property="ToolTip" Value="{Binding RelativeSource={x:Static RelativeSource.Self}, Path=(Validation.Errors)/ErrorContent}" />
-                <Setter Property="BorderBrush" Value="{StaticResource InputErrorBorderBackgroundBrushKey}" />
-            </Trigger>
-        </Style.Triggers>
-    </Style>
-
-    <!--  TimeSpan Input  -->
-    <Style BasedOn="{StaticResource BaseStyle}" TargetType="{x:Type xctk:TimeSpanUpDown}">
-        <Setter Property="FontSize" Value="14" />
-        <Setter Property="FontFamily" Value="{StaticResource DosisMedium}" />
-        <Setter Property="Padding" Value="10" />
-        <Setter Property="Margin" Value="0" />
-        <Setter Property="Background" Value="{StaticResource InputBackgroundBrushKey}" />
-        <Setter Property="Foreground" Value="{StaticResource InputForegroundBrushKey}" />
-        <Setter Property="BorderBrush" Value="{StaticResource InputBorderBackgroundBrushKey}" />
-        <Setter Property="BorderThickness" Value="0,0,0,2" />
-
-        <!--  Delete default error template  -->
-        <Setter Property="Validation.ErrorTemplate">
-            <Setter.Value>
-                <ControlTemplate />
-            </Setter.Value>
-        </Setter>
-
-        <Style.Triggers>
-            <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="BorderBrush" Value="{StaticResource InputFocusBorderBackgroundBrushKey}" />
-            </Trigger>
-            <Trigger Property="IsKeyboardFocusWithin" Value="True">
-                <Setter Property="BorderBrush" Value="{StaticResource InputFocusBorderBackgroundBrushKey}" />
-                <Setter Property="Foreground" Value="{StaticResource InputFocusForegroundBrushKey}" />
-            </Trigger>
             <Trigger Property="Validation.HasError" Value="True">
                 <Setter Property="ToolTip" Value="{Binding RelativeSource={x:Static RelativeSource.Self}, Path=(Validation.Errors)/ErrorContent}" />
                 <Setter Property="BorderBrush" Value="{StaticResource InputErrorBorderBackgroundBrushKey}" />
