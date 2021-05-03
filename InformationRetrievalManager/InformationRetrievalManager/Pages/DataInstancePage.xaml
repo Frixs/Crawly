@@ -9,7 +9,7 @@
     Title="DataInstancePage"
     d:Background="{StaticResource BackgroundBrushKey}"
     d:DataContext="{x:Static local:DataInstancePageDesignModel.Instance}"
-    d:DesignHeight="800"
+    d:DesignHeight="1200"
     d:DesignWidth="960"
     x:TypeArguments="local:DataInstancePageViewModel"
     mc:Ignorable="d">
@@ -724,14 +724,14 @@
                         HorizontalAlignment="Center"
                         FontFamily="{StaticResource DosisRegular}"
                         FontSize="15"
-                        Text="Configuration" />
+                        Text="Crawler Configuration" />
 
                     <TextBlock
                         Grid.Column="1"
                         HorizontalAlignment="Center"
                         FontFamily="{StaticResource DosisRegular}"
                         FontSize="15"
-                        Text="Query" />
+                        Text="Processing Configuration" />
                 </Grid>
 
                 <!--  Back to Main View BTN  -->
@@ -751,7 +751,7 @@
                     Grid.Row="1"
                     Padding="30,15,30,0"
                     VerticalScrollBarVisibility="Auto">
-                    <TextBlock Text="Configuration view" />
+                    <TextBlock Text="todo" />
                 </ScrollViewer>
             </Grid>
         </Grid>

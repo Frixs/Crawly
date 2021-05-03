@@ -410,6 +410,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Controls\DataInstanceConfigurationView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Controls\DataInstanceView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -505,10 +509,14 @@
     <Compile Include="AttachedProperties\NoFrameHistory.cs" />
     <Compile Include="AttachedProperties\TextAttachedProperties.cs" />
     <Compile Include="ControlContexts\CrawlerConfigurationFormContext.cs" />
+    <Compile Include="ControlContexts\DataInstanceConfigurationViewContext.cs" />
     <Compile Include="ControlContexts\ProcessingConfigurationFormContext.cs" />
     <Compile Include="ControlContexts\QueryDataResultContext.cs" />
     <Compile Include="Controls\CrawlerConfigurationForm.xaml.cs">
       <DependentUpon>CrawlerConfigurationForm.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\DataInstanceConfigurationView.xaml.cs">
+      <DependentUpon>DataInstanceConfigurationView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Controls\Inputs\CheckEntry.xaml.cs">
       <DependentUpon>CheckEntry.xaml</DependentUpon>

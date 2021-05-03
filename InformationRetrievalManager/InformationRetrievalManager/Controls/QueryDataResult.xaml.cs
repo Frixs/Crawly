@@ -19,7 +19,6 @@ namespace InformationRetrievalManager
 
         #endregion
 
-
         public QueryDataResult()
         {
             InitializeComponent();
