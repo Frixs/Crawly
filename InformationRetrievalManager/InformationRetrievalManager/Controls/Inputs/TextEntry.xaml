@@ -46,6 +46,7 @@
             Padding="10,8"
             VerticalAlignment="Center"
             FontSize="14"
+            IsReadOnly="{Binding IsReadOnly, Mode=OneWay}"
             MaxLength="{Binding MaxLength, Mode=OneWay}"
             Tag="{Binding Placeholder, Mode=OneWay}"
             TextAlignment="{Binding TextAlignment, ElementName=this, Mode=OneWay}">

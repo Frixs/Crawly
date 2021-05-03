@@ -43,6 +43,7 @@
             Grid.Row="1"
             Margin="0,0,0,3"
             Padding="0"
+            IsEnabled="{Binding IsReadOnly, Converter={local:BooleanInvertConverter}, Mode=OneWay}"
             HorizontalAlignment="Center"
             VerticalAlignment="Center"
             Command="{Binding OnCheckCommand, Mode=OneTime}"

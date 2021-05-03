@@ -49,6 +49,7 @@
             FontSize="14"
             FormatString="N0"
             Increment="{Binding Increment, Mode=OneWay}"
+            IsReadOnly="{Binding IsReadOnly, Mode=OneWay}"
             Maximum="{Binding MaxValue, Mode=OneWay}"
             Minimum="{Binding MinValue, Mode=OneWay}"
             TextAlignment="Left">
