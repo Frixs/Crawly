@@ -838,7 +838,7 @@ namespace InformationRetrievalManager
                         ToggleEditCrawlerConfigurationReadOnlyCommandRoutine(); // close form
 
                         // Log it
-                        _logger.LogInformationSource($"Crawler configuration of '{_dataInstance.Name}' successfully updated!");
+                        _logger.LogInformationSource($"Crawler configuration of '{_dataInstance.Name}' ({_dataInstance.Id}) successfully updated!");
                     }
                     // Otherwise, something went wrong during the file deletion...
                     else
@@ -910,7 +910,7 @@ namespace InformationRetrievalManager
                         ToggleEditProcessingConfigurationReadOnlyCommandRoutine(); // close form
 
                         // Log it
-                        _logger.LogInformationSource($"Index processing configuration of '{_dataInstance.Name}' successfully updated!");
+                        _logger.LogInformationSource($"Index processing configuration of '{_dataInstance.Name}' ({_dataInstance.Id}) successfully updated!");
                     }
                     // Otherwise, something went wrong during the file deletion...
                     else
@@ -972,7 +972,7 @@ namespace InformationRetrievalManager
                     ToggleEditDataInstanceNameReadOnlyCommandRoutine(); // close form
 
                     // Log it
-                    _logger.LogInformationSource($"Data instance name of '{_dataInstance.Name}' successfully updated!");
+                    _logger.LogInformationSource($"Data instance name of '{_dataInstance.Name}' ({_dataInstance.Id}) successfully updated!");
                 }
             });
         }
@@ -983,7 +983,53 @@ namespace InformationRetrievalManager
         {
             await RunCommandAsync(() => ConfigurationContext.DataInstanceDeleteCommandFlag, async () =>
             {
-                // TODO delete data instance - delete all files and then the instance data
+                // Re-initialize state values
+                ConfigurationContext.FormErrorString = null;
+
+                if (CrawlerInWork || IndexProcessingInWorkFlag || QueryInWorkFlag)
+                {
+                    ConfigurationContext.FormErrorString = "Cannot update configuration during processing!";
+                    return;
+                }
+
+                var fileDeletionOk = true;
+                // Find and delete all the crawled data files...
+                try
+                {
+                    var crawlerFilePaths = _crawlerStorage.GetAllDataFiles(_dataInstance.Id.ToString());
+                    for (int i = 0; i < crawlerFilePaths.Length; ++i)
+                        File.Delete(crawlerFilePaths[i]);
+                    var indexFilePaths = _indexStorage.GetIndexFiles(_dataInstance.Id.ToString());
+                    for (int i = 0; i < indexFilePaths.Length; ++i)
+                        File.Delete(indexFilePaths[i]);
+                }
+                catch
+                {
+                    fileDeletionOk = false;
+                }
+
+                // If the file deletion has no errors...
+                if (fileDeletionOk)
+                {
+                    long id = _dataInstance.Id;
+                    string name = _dataInstance.Name;
+
+                    // Delete
+                    _uow.DataInstances.Delete(_dataInstance.Id);
+                    _uow.SaveChanges();
+
+                    // Go to Home page
+                    GoToHomePageCommandRoutine();
+
+                    // Log it
+                    _logger.LogInformationSource($"Data instance '{name}' ({id}) successfully deleted!");
+                }
+                // Otherwise, something went wrong during the file deletion...
+                else
+                {
+                    ConfigurationContext.FormErrorString = "Something went wrong during clearing data files.";
+                }
+
                 await Task.Delay(1);
             });
         }
