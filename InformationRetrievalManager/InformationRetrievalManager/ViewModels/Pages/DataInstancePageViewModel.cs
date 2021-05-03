@@ -835,7 +835,6 @@ namespace InformationRetrievalManager
 
                         // Reaload data
                         await LoadAsync(_dataInstance.Id);
-                        ToggleEditCrawlerConfigurationReadOnlyCommandRoutine(); // close form
 
                         // Log it
                         _logger.LogInformationSource($"Crawler configuration of '{_dataInstance.Name}' ({_dataInstance.Id}) successfully updated!");
@@ -907,7 +906,6 @@ namespace InformationRetrievalManager
 
                         // Reaload data
                         await LoadAsync(_dataInstance.Id);
-                        ToggleEditProcessingConfigurationReadOnlyCommandRoutine(); // close form
 
                         // Log it
                         _logger.LogInformationSource($"Index processing configuration of '{_dataInstance.Name}' ({_dataInstance.Id}) successfully updated!");
@@ -969,7 +967,6 @@ namespace InformationRetrievalManager
 
                     // Reaload data
                     await LoadAsync(_dataInstance.Id);
-                    ToggleEditDataInstanceNameReadOnlyCommandRoutine(); // close form
 
                     // Log it
                     _logger.LogInformationSource($"Data instance name of '{_dataInstance.Name}' ({_dataInstance.Id}) successfully updated!");

@@ -90,7 +90,7 @@ namespace InformationRetrievalManager
         /// <param name="processingConfiguration">Processing configuration form values.</param>
         public void Set(CrawlerConfigurationDataModel crawlerConfiguration, IndexProcessingConfigurationDataModel processingConfiguration, string dataInstanceName)
         {
-            CrawlerConfigurationReadOnlyFlag = ProcessingConfigurationReadOnlyFlag = true;
+            CrawlerConfigurationReadOnlyFlag = ProcessingConfigurationReadOnlyFlag = DataInstanceNameReadOnlyFlag = true;
             
             CrawlerConfigurationContext.ReadOnly(CrawlerConfigurationReadOnlyFlag).Set(
                 crawlerConfiguration.SiteAddress,
@@ -115,6 +115,7 @@ namespace InformationRetrievalManager
                 processingConfiguration.RemoveAccentsBeforeStemming,
                 processingConfiguration.RemoveAccentsAfterStemming
                 );
+            DataInstanceNameEntry.IsReadOnly = DataInstanceNameReadOnlyFlag;
             DataInstanceNameEntry.Value = dataInstanceName;
         }
 
