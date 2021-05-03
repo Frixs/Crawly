@@ -141,6 +141,11 @@ namespace InformationRetrievalManager
         /// </summary>
         public string[] CrawlerProgressUrls { get; protected set; } = new string[5];
 
+        /// <summary>
+        /// Gives query feedback to the user if error occurrs.
+        /// </summary>
+        public string QueryErrorString { get; protected set; }
+
         #endregion
 
         #region Flags
@@ -640,6 +645,7 @@ namespace InformationRetrievalManager
                 int select = QuerySelectLimitEntry.Value;
 
                 // Clear the previous results first
+                QueryErrorString = null;
                 ResultContext.ClearData();
                 // Fire update context property
                 OnPropertyChanged(nameof(ResultContext));
@@ -682,17 +688,22 @@ namespace InformationRetrievalManager
                     else
                     {
                         // Something went wrong...
-                        // TODO - user feedback + get total found and total documents
+                        QueryErrorString = "Something went wrong during searching.";
                         break;
                     }
                 }
-                ResultContext.TotalDocuments = 0;
-                ResultContext.FoundDocuments = 0;
-                // Fire update context property
-                OnPropertyChanged(nameof(ResultContext));
 
-                // Automatically move the user to the result view
-                CurrentView = View.Results;
+                // If no error occurred...
+                if (QueryErrorString != null)
+                {
+                    ResultContext.TotalDocuments = 0;
+                    ResultContext.FoundDocuments = 0;
+                    // Fire update context property
+                    OnPropertyChanged(nameof(ResultContext));
+
+                    // Automatically move the user to the result view
+                    CurrentView = View.Results;
+                }
             });
         }
 

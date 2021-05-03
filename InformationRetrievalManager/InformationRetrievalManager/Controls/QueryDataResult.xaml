@@ -11,6 +11,24 @@
     d:DesignWidth="830"
     mc:Ignorable="d">
     <Grid>
+        <!--  Data - no itemsindicator  -->
+        <TextBlock
+            HorizontalAlignment="Center"
+            VerticalAlignment="Top"
+            Text="No Results">
+            <TextBlock.Style>
+                <Style TargetType="{x:Type TextBlock}">
+                    <Setter Property="Visibility" Value="Collapsed" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding ResultContext.Data, Converter={local:CollectionHasAnyItemsConverter}, ElementName=this, Mode=OneWay}" Value="False">
+                            <Setter Property="Visibility" Value="Visible" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </TextBlock.Style>
+        </TextBlock>
+
+        <!--  Data  -->
         <ItemsControl d:ItemsSource="{Binding ResultContext.Data}" ItemsSource="{Binding ResultContext.Data, ElementName=this, Mode=OneWay}">
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
