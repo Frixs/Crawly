@@ -79,11 +79,24 @@
                     </Grid>
                 </Grid>
                 <Grid HorizontalAlignment="Left" VerticalAlignment="Center">
-                    <Button
-                        Command="{Binding GoToHomePageCommand, Mode=OneTime}"
-                        Content="GO BACK"
-                        IsEnabled="{Binding ConfigurationContext.DataInstanceDeleteCommandFlag, Converter={local:BooleanInvertConverter}, Mode=OneWay}"
-                        Style="{StaticResource DarkLightButton}" />
+                    <Button Command="{Binding GoToHomePageCommand, Mode=OneTime}" Content="GO BACK">
+                        <Button.Style>
+                            <Style BasedOn="{StaticResource DarkLightButton}" TargetType="{x:Type Button}">
+                                <Setter Property="IsEnabled" Value="False" />
+                                <Style.Triggers>
+                                    <MultiDataTrigger>
+                                        <MultiDataTrigger.Conditions>
+                                            <Condition Binding="{Binding ConfigurationContext.CrawlerConfigurationUpdateCommandFlag, Mode=OneWay}" Value="False" />
+                                            <Condition Binding="{Binding ConfigurationContext.ProcessingConfigurationUpdateCommandFlag, Mode=OneWay}" Value="False" />
+                                            <Condition Binding="{Binding ConfigurationContext.DataInstanceNameUpdateCommandFlag, Mode=OneWay}" Value="False" />
+                                            <Condition Binding="{Binding ConfigurationContext.DataInstanceDeleteCommandFlag, Mode=OneWay}" Value="False" />
+                                        </MultiDataTrigger.Conditions>
+                                        <Setter Property="IsEnabled" Value="True" />
+                                    </MultiDataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
                 </Grid>
             </Grid>
 
@@ -745,8 +758,24 @@
                     CommandParameter="0"
                     Content="{StaticResource FontAwesomeUndoAltIcon}"
                     FontFamily="{StaticResource FontAwesomeSolid}"
-                    FontSize="16"
-                    Style="{StaticResource DarkLightButton}" />
+                    FontSize="16">
+                    <Button.Style>
+                        <Style BasedOn="{StaticResource DarkLightButton}" TargetType="{x:Type Button}">
+                            <Setter Property="IsEnabled" Value="False" />
+                            <Style.Triggers>
+                                <MultiDataTrigger>
+                                    <MultiDataTrigger.Conditions>
+                                        <Condition Binding="{Binding ConfigurationContext.CrawlerConfigurationUpdateCommandFlag, Mode=OneWay}" Value="False" />
+                                        <Condition Binding="{Binding ConfigurationContext.ProcessingConfigurationUpdateCommandFlag, Mode=OneWay}" Value="False" />
+                                        <Condition Binding="{Binding ConfigurationContext.DataInstanceNameUpdateCommandFlag, Mode=OneWay}" Value="False" />
+                                        <Condition Binding="{Binding ConfigurationContext.DataInstanceDeleteCommandFlag, Mode=OneWay}" Value="False" />
+                                    </MultiDataTrigger.Conditions>
+                                    <Setter Property="IsEnabled" Value="True" />
+                                </MultiDataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                </Button>
 
                 <!--  Content  -->
                 <ScrollViewer

@@ -56,12 +56,12 @@
                 Grid.Row="2"
                 Height="36"
                 MinWidth="125"
-                Margin="0,15,0,0"
+                Margin="0,15,30,0"
                 Padding="15,0,15,0"
                 HorizontalAlignment="Center"
                 VerticalAlignment="Top"
                 local:IsBusyProperty.Value="{Binding ConfigurationContext.CrawlerConfigurationUpdateCommandFlag, ElementName=this}"
-                Command="{Binding ConfigurationContext.CrawlerConfigurationUpdateCommand, ElementName=this, Mode=OneTime}"
+                Command="{Binding ConfigurationContext.CrawlerConfigurationUpdateCommand, ElementName=this, Mode=OneWay}"
                 Content="UPDATE"
                 FontSize="16">
                 <Button.Style>
@@ -111,12 +111,12 @@
                 Grid.Row="2"
                 Height="36"
                 MinWidth="125"
-                Margin="0,15,0,0"
+                Margin="30,15,0,0"
                 Padding="15,0,15,0"
                 HorizontalAlignment="Center"
                 VerticalAlignment="Top"
                 local:IsBusyProperty.Value="{Binding ConfigurationContext.ProcessingConfigurationUpdateCommandFlag, ElementName=this}"
-                Command="{Binding ConfigurationContext.ProcessingConfigurationUpdateCommand, ElementName=this, Mode=OneTime}"
+                Command="{Binding ConfigurationContext.ProcessingConfigurationUpdateCommand, ElementName=this, Mode=OneWay}"
                 Content="UPDATE"
                 FontSize="16">
                 <Button.Style>
@@ -182,7 +182,7 @@
                 HorizontalAlignment="Center"
                 VerticalAlignment="Top"
                 local:IsBusyProperty.Value="{Binding ConfigurationContext.DataInstanceNameUpdateCommandFlag, ElementName=this}"
-                Command="{Binding ConfigurationContext.DataInstanceNameUpdateCommand, ElementName=this, Mode=OneTime}"
+                Command="{Binding ConfigurationContext.DataInstanceNameUpdateCommand, ElementName=this, Mode=OneWay}"
                 Content="UPDATE"
                 FontSize="16">
                 <Button.Style>

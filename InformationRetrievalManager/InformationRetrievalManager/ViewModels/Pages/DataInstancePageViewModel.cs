@@ -266,9 +266,14 @@ namespace InformationRetrievalManager
             DeleteIndexFileCommand = new RelayParameterizedCommand(async (parameter) => await DeleteIndexFileCommandRoutineAsync(parameter));
             StartQueryCommand = new RelayCommand(async () => await StartQueryCommandRoutineAsync());
             ShowViewCommand = new RelayParameterizedCommand((parameter) => ShowViewCommandRoutine(parameter));
+
             ConfigurationContext.ToggleEditCrawlerConfigurationReadOnlyCommand = new RelayCommand(ToggleEditCrawlerConfigurationReadOnlyCommandRoutine);
             ConfigurationContext.ToggleEditProcessingConfigurationReadOnlyCommand = new RelayCommand(ToggleEditProcessingConfigurationReadOnlyCommandRoutine);
             ConfigurationContext.ToggleEditDataInstanceNameReadOnlyCommand = new RelayCommand(ToggleEditDataInstanceNameReadOnlyCommandRoutine);
+            ConfigurationContext.CrawlerConfigurationUpdateCommand = new RelayCommand(async () => await CrawlerConfigurationUpdateCommandRoutineAsync());
+            ConfigurationContext.ProcessingConfigurationUpdateCommand = new RelayCommand(async () => await ProcessingConfigurationUpdateCommandRoutineAsync());
+            ConfigurationContext.DataInstanceNameUpdateCommand = new RelayCommand(async () => await DataInstanceNameUpdateCommandRoutineAsync());
+            ConfigurationContext.DataInstanceDeleteCommand = new RelayCommand(async () => await DataInstanceDeleteCommandRoutineAsync());
             
             // Create data selection with its entry.
             _dataFileSelection = new List<DataFileInfo>() { new DataFileInfo("< Select Data File >", null, default) };
@@ -726,20 +731,48 @@ namespace InformationRetrievalManager
                 ConfigurationContext.Set(_dataInstance.CrawlerConfiguration, _dataInstance.IndexProcessingConfiguration, _dataInstance.Name);
         }
 
-        private void ToggleEditDataInstanceNameReadOnlyCommandRoutine()
+        private void ToggleEditCrawlerConfigurationReadOnlyCommandRoutine()
         {
-            ConfigurationContext.DataInstanceNameReadOnlyFlag = !ConfigurationContext.DataInstanceNameReadOnlyFlag;
-            ConfigurationContext.DataInstanceNameEntry.IsReadOnly = ConfigurationContext.DataInstanceNameReadOnlyFlag;
+            ConfigurationContext.CrawlerConfigurationReadOnlyFlag = !ConfigurationContext.CrawlerConfigurationReadOnlyFlag;
+            ConfigurationContext.CrawlerConfigurationContext.ReadOnly(ConfigurationContext.CrawlerConfigurationReadOnlyFlag);
         }
         private void ToggleEditProcessingConfigurationReadOnlyCommandRoutine()
         {
             ConfigurationContext.ProcessingConfigurationReadOnlyFlag = !ConfigurationContext.ProcessingConfigurationReadOnlyFlag;
             ConfigurationContext.ProcessingConfigurationContext.ReadOnly(ConfigurationContext.ProcessingConfigurationReadOnlyFlag);
         }
-        private void ToggleEditCrawlerConfigurationReadOnlyCommandRoutine()
+        private void ToggleEditDataInstanceNameReadOnlyCommandRoutine()
         {
-            ConfigurationContext.CrawlerConfigurationReadOnlyFlag = !ConfigurationContext.CrawlerConfigurationReadOnlyFlag;
-            ConfigurationContext.CrawlerConfigurationContext.ReadOnly(ConfigurationContext.CrawlerConfigurationReadOnlyFlag);
+            ConfigurationContext.DataInstanceNameReadOnlyFlag = !ConfigurationContext.DataInstanceNameReadOnlyFlag;
+            ConfigurationContext.DataInstanceNameEntry.IsReadOnly = ConfigurationContext.DataInstanceNameReadOnlyFlag;
+        }
+        private async Task CrawlerConfigurationUpdateCommandRoutineAsync()
+        {
+            await RunCommandAsync(() => ConfigurationContext.CrawlerConfigurationUpdateCommandFlag, async () =>
+            {
+                await Task.Delay(1);
+            });
+        }
+        private async Task ProcessingConfigurationUpdateCommandRoutineAsync()
+        {
+            await RunCommandAsync(() => ConfigurationContext.ProcessingConfigurationUpdateCommandFlag, async () =>
+            {
+                await Task.Delay(1000);
+            });
+        }
+        private async Task DataInstanceNameUpdateCommandRoutineAsync()
+        {
+            await RunCommandAsync(() => ConfigurationContext.DataInstanceNameUpdateCommandFlag, async () =>
+            {
+                await Task.Delay(1);
+            });
+        }
+        private async Task DataInstanceDeleteCommandRoutineAsync()
+        {
+            await RunCommandAsync(() => ConfigurationContext.DataInstanceDeleteCommandFlag, async () =>
+            {
+                await Task.Delay(1);
+            });
         }
 
         #endregion
