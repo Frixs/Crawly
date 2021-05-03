@@ -348,7 +348,18 @@ namespace InformationRetrievalManager.Crawler
                         break;
 
                     // Load the document
-                    HtmlDocument doc = web.Load(FullSiteAddress.Replace("{0}", i.ToString()));
+                    HtmlDocument doc = null;
+                    try
+                    {
+                        doc = web.Load(FullSiteAddress.Replace("{0}", i.ToString()));
+                    }
+                    catch (System.Net.WebException)
+                    {
+                        // Log it
+                        _logger.LogWarningSource($"Crawler '{NameIdentifier}' has stopped due to invalid site address.");
+                        break;
+                    }
+
                     // Log it
                     _logger.LogTraceSource($"Crawler '{NameIdentifier}' is currently scanning '{web.ResponseUri}'.");
 
@@ -377,8 +388,9 @@ namespace InformationRetrievalManager.Crawler
                     await Task.Delay(SearchInterval);
                 }
 
-                // Save it to the file
-                await _fileManager.WriteLinesToFileAsync(result.ToList(), urlsFilePath, false);
+                if (result.Count > 0)
+                    // Save it to the file
+                    await _fileManager.WriteLinesToFileAsync(result.ToList(), urlsFilePath, false);
 
                 UpdateProgressMessageData("Article page URL scanning done!", invoke: true);
 
