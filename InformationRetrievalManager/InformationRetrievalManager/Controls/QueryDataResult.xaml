@@ -8,9 +8,9 @@
     x:Name="this"
     d:DataContext="{x:Static local:QueryDataResult.DesignInstance}"
     d:DesignHeight="450"
-    d:DesignWidth="800"
+    d:DesignWidth="830"
     mc:Ignorable="d">
-    <Grid Width="830">
+    <Grid>
         <ItemsControl d:ItemsSource="{Binding ResultContext.Data}" ItemsSource="{Binding ResultContext.Data, ElementName=this, Mode=OneWay}">
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
@@ -20,14 +20,101 @@
 
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <Button
-                        Margin="5"
-                        Padding="10,5,10,5"
-                        Command="{Binding OpenSourceUrlCommand, ElementName=this, Mode=OneTime}"
-                        CommandParameter="{Binding SourceUrl, Mode=OneWay}"
-                        Content="{Binding Title}"
-                        FontSize="18"
-                        Style="{StaticResource DarkLightButton}" />
+                    <Grid Margin="0,0,0,15">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+
+                        <WrapPanel
+                            Grid.Row="0"
+                            HorizontalAlignment="Left"
+                            Orientation="Horizontal">
+                            <!--  Category  -->
+                            <TextBox
+                                Height="26"
+                                Margin="0,0,5,0"
+                                Padding="10,0"
+                                VerticalAlignment="Top"
+                                VerticalContentAlignment="Center"
+                                Background="{StaticResource LightColorDryBrushKey}"
+                                BorderThickness="0"
+                                FontFamily="{StaticResource DosisBold}"
+                                FontSize="12"
+                                Foreground="{StaticResource LightColorAltBrushKey}"
+                                IsReadOnly="True"
+                                Text="{Binding Category, Mode=OneWay}">
+                                <TextBox.Style>
+                                    <Style BasedOn="{x:Null}" TargetType="{x:Type TextBox}">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Category, Mode=OneWay}" Value="{x:Null}">
+                                                <Setter Property="Visibility" Value="Collapsed" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBox.Style>
+                            </TextBox>
+
+                            <!--  Title  -->
+                            <TextBox
+                                VerticalAlignment="Center"
+                                Background="{x:Null}"
+                                BorderThickness="0"
+                                FontFamily="{StaticResource DosisBold}"
+                                FontSize="16"
+                                IsReadOnly="True"
+                                Style="{x:Null}"
+                                Text="{Binding Title, Mode=OneWay}"
+                                TextWrapping="WrapWithOverflow" />
+
+                            <!--  Source BTN  -->
+                            <Button
+                                Width="26"
+                                Height="26"
+                                Margin="5,0,0,0"
+                                Padding="0"
+                                HorizontalAlignment="Right"
+                                VerticalAlignment="Top"
+                                Command="{Binding OpenSourceUrlCommand, ElementName=this, Mode=OneTime}"
+                                CommandParameter="{Binding SourceUrl, Mode=OneWay}"
+                                Content="{StaticResource FontAwesomeExternalLinkAltIcon}"
+                                FontFamily="{StaticResource FontAwesomeSolid}"
+                                FontSize="12"
+                                Style="{StaticResource DarkLightButton}" />
+                        </WrapPanel>
+
+                        <!--  Content  -->
+                        <FlowDocumentScrollViewer
+                            Grid.Row="1"
+                            Margin="0,5,0,0"
+                            IsHitTestVisible="False"
+                            ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                            ScrollViewer.VerticalScrollBarVisibility="Disabled">
+                            <FlowDocument
+                                FontFamily="{StaticResource DosisRegular}"
+                                FontSize="14"
+                                FontStyle="Italic"
+                                Foreground="{StaticResource DarkColorBrushKey}"
+                                PagePadding="0">
+                                <Paragraph TextIndent="15">
+                                    <Run Text="{Binding Content, Mode=OneWay}" />
+                                </Paragraph>
+                            </FlowDocument>
+                        </FlowDocumentScrollViewer>
+
+                        <!--  Timestamp  -->
+                        <TextBlock
+                            Grid.Row="2"
+                            Margin="0,5,0,0"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Top"
+                            FontFamily="{StaticResource DosisBold}"
+                            FontSize="12"
+                            Text="{Binding Timestamp, Mode=OneWay}"
+                            TextWrapping="WrapWithOverflow" />
+                    </Grid>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>

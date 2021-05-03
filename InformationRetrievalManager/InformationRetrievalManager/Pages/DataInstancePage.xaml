@@ -624,10 +624,22 @@
 
                 <!--  Content  -->
                 <ScrollViewer
+                    Name="sv"
                     Grid.Row="1"
-                    Padding="0,15,0,0"
+                    MinWidth="830"
+                    MaxWidth="830"
                     VerticalScrollBarVisibility="Auto">
                     <local:QueryDataResult OpenSourceUrlCommand="{Binding OpenUrlCommand, Mode=OneTime}" ResultContext="{Binding ResultContext, Mode=OneWay}" />
+                    <ScrollViewer.Style>
+                        <Style TargetType="{x:Type ScrollViewer}">
+                            <Setter Property="Padding" Value="0,15,0,0" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding ComputedVerticalScrollBarVisibility, ElementName=sv}" Value="Visible">
+                                    <Setter Property="Padding" Value="0,15,30,0" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ScrollViewer.Style>
                 </ScrollViewer>
             </Grid>
 
@@ -688,7 +700,6 @@
                 <!--  Content  -->
                 <ScrollViewer
                     Grid.Row="1"
-                    Width="830"
                     Padding="30,15,30,0"
                     VerticalScrollBarVisibility="Auto">
                     <TextBlock Text="Configuration view" />

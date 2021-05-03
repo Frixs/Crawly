@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
@@ -541,7 +542,7 @@ namespace InformationRetrievalManager
                                 Category = data[i].Category,
                                 Timestamp = data[i].Timestamp,
                                 SourceUrl = data[i].SourceUrl,
-                                Content = StringHelpers.ShortenWithDots(data[i].Content, 160)
+                                Content = StringHelpers.ShortenWithDots(Regex.Replace(data[i].Content.Replace(Environment.NewLine, " "), @"[ ]+", " "), IndexedDocumentDataModel.Content_MaxLength - 3)
                             };
 
                             // Validate, if no errors...
@@ -639,7 +640,7 @@ namespace InformationRetrievalManager
                 await _taskManager.Run(async () =>
                 {
                     ii.Load();
-                    results = await _queryIndexManager.QueryAsync(query, ii.GetReadOnlyVocabulary(), queryModel, _dataInstance.IndexProcessingConfiguration, 10);
+                    results = await _queryIndexManager.QueryAsync(query, ii.GetReadOnlyVocabulary(), queryModel, _dataInstance.IndexProcessingConfiguration, 5);
                 });
 
                 // Go through the results...
