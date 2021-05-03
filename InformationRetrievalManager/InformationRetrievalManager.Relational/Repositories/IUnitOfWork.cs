@@ -38,6 +38,17 @@ namespace InformationRetrievalManager.Relational
         void Commit();
 
         /// <summary>
+        /// Undo database context changes.
+        /// </summary>
+        void UndoChanges();
+
+        /// <summary>
+        /// Undo database specific entity changes.
+        /// </summary>
+        /// <param name="entity">The entity.</param>
+        void UndoEntityChanges(object entity);
+
+        /// <summary>
         /// Begin database transaction.
         /// </summary>
         /// <remarks>

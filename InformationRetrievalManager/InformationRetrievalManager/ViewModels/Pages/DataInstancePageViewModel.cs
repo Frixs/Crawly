@@ -274,7 +274,7 @@ namespace InformationRetrievalManager
             ConfigurationContext.ProcessingConfigurationUpdateCommand = new RelayCommand(async () => await ProcessingConfigurationUpdateCommandRoutineAsync());
             ConfigurationContext.DataInstanceNameUpdateCommand = new RelayCommand(async () => await DataInstanceNameUpdateCommandRoutineAsync());
             ConfigurationContext.DataInstanceDeleteCommand = new RelayCommand(async () => await DataInstanceDeleteCommandRoutineAsync());
-            
+
             // Create data selection with its entry.
             _dataFileSelection = new List<DataFileInfo>() { new DataFileInfo("< Select Data File >", null, default) };
             DataFileEntry = new ComboEntryViewModel<DataFileInfo>
@@ -389,7 +389,7 @@ namespace InformationRetrievalManager
 
             // If the value is not set yet...
             if (_dataInstance == null)
-                _taskManager.RunAndForget(() => LoadAsync(id));
+                _taskManager.RunAndForget(() => LoadAsync(id, true));
             // Otherwise, it is already set...
             else
                 throw new InvalidOperationException(nameof(_dataInstance));
@@ -723,12 +723,16 @@ namespace InformationRetrievalManager
             if (parameter.GetType().Equals(typeof(View)))
                 CurrentView = (View)parameter;
             else
-                CurrentView = (View)Enum.ToObject(typeof(View),  int.Parse(parameter.ToString()));
+                CurrentView = (View)Enum.ToObject(typeof(View), int.Parse(parameter.ToString()));
 
             // If configuration, reload the data...
             if (CurrentView == View.Configuration)
+            {
+                // Re-initialize state values
+                ConfigurationContext.FormErrorString = null;
                 // Load data/values into the configuration context
                 ConfigurationContext.Set(_dataInstance.CrawlerConfiguration, _dataInstance.IndexProcessingConfiguration, _dataInstance.Name);
+            }
         }
 
         private void ToggleEditCrawlerConfigurationReadOnlyCommandRoutine()
@@ -746,31 +750,193 @@ namespace InformationRetrievalManager
             ConfigurationContext.DataInstanceNameReadOnlyFlag = !ConfigurationContext.DataInstanceNameReadOnlyFlag;
             ConfigurationContext.DataInstanceNameEntry.IsReadOnly = ConfigurationContext.DataInstanceNameReadOnlyFlag;
         }
+        /// <summary>
+        /// Update crawler configuration
+        /// </summary>
         private async Task CrawlerConfigurationUpdateCommandRoutineAsync()
         {
             await RunCommandAsync(() => ConfigurationContext.CrawlerConfigurationUpdateCommandFlag, async () =>
             {
-                await Task.Delay(1);
+                // Re-initialize state values
+                ConfigurationContext.FormErrorString = null;
+
+                if (CrawlerInWork || IndexProcessingInWorkFlag || QueryInWorkFlag)
+                {
+                    ConfigurationContext.FormErrorString = "Cannot update configuration during processing!";
+                    return;
+                }
+
+                // Assign updated data
+                _dataInstance.CrawlerConfiguration.SiteAddress = ConfigurationContext.CrawlerConfigurationContext.SiteAddressEntry.Value;
+                _dataInstance.CrawlerConfiguration.SiteSuffix = ConfigurationContext.CrawlerConfigurationContext.SiteSuffixEntry.Value;
+                _dataInstance.CrawlerConfiguration.StartPageNo = ConfigurationContext.CrawlerConfigurationContext.StartPageNoEntry.Value;
+                _dataInstance.CrawlerConfiguration.MaxPageNo = ConfigurationContext.CrawlerConfigurationContext.MaxPageNoEntry.Value;
+                _dataInstance.CrawlerConfiguration.PageNoModifier = ConfigurationContext.CrawlerConfigurationContext.PageNoModifierEntry.Value;
+                _dataInstance.CrawlerConfiguration.SearchInterval = ConfigurationContext.CrawlerConfigurationContext.SearchIntervalEntry.Value;
+                _dataInstance.CrawlerConfiguration.SiteUrlArticlesXPath = ConfigurationContext.CrawlerConfigurationContext.SiteUrlArticlesXPathEntry.Value;
+                _dataInstance.CrawlerConfiguration.SiteArticleContentAreaXPath = ConfigurationContext.CrawlerConfigurationContext.SiteArticleContentAreaXPathEntry.Value;
+                _dataInstance.CrawlerConfiguration.SiteArticleTitleXPath = ConfigurationContext.CrawlerConfigurationContext.SiteArticleTitleXPathEntry.Value;
+                _dataInstance.CrawlerConfiguration.SiteArticleCategoryXPath = ConfigurationContext.CrawlerConfigurationContext.SiteArticleCategoryXPathEntry.Value;
+                _dataInstance.CrawlerConfiguration.SiteArticleDateTimeXPath = ConfigurationContext.CrawlerConfigurationContext.SiteArticleDateTimeXPathEntry.Value;
+                _dataInstance.CrawlerConfiguration.SiteArticleDateTimeFormat = ConfigurationContext.CrawlerConfigurationContext.SiteArticleDateTimeFormatEntry.Value;
+                _dataInstance.CrawlerConfiguration.SiteArticleDateTimeCultureInfo = ConfigurationContext.CrawlerConfigurationContext.SiteArticleDateTimeCultureInfoEntry.Value;
+
+                // Validate data
+                var validationResults = ValidationHelpers.ValidateModel(_dataInstance.CrawlerConfiguration);
+
+                // Additional validation steps
+                // Culture info must be valid...
+                try
+                {
+                    _ = new CultureInfo(_dataInstance.CrawlerConfiguration.SiteArticleDateTimeCultureInfo);
+                }
+                catch
+                {
+                    validationResults.Add(new DataValidationError
+                    {
+                        Code = nameof(_dataInstance.CrawlerConfiguration.SiteArticleDateTimeCultureInfo),
+                        Description = "Invalid date-time culture."
+                    }); // TODO localization
+                }
+
+                // If any errors...
+                if (validationResults.Count > 0)
+                {
+                    _uow.UndoEntityChanges(_dataInstance.CrawlerConfiguration);
+                    ConfigurationContext.FormErrorString = validationResults.AggregateErrors();
+                }
+                // Otherwise valid results...
+                else
+                {
+                    // TODO if site has changes delete crawled data
+
+                    // Update
+                    _uow.CrawlerConfigurations.Update(_dataInstance.CrawlerConfiguration);
+                    _uow.Commit();
+
+                    // Reaload data
+                    await LoadAsync(_dataInstance.Id);
+                    ToggleEditCrawlerConfigurationReadOnlyCommandRoutine(); // close form
+
+                    // Log it
+                    _logger.LogInformationSource($"Crawler configuration of '{_dataInstance.Name}' successfully updated!");
+                }
             });
         }
+        /// <summary>
+        /// Update processing configuration
+        /// </summary>
         private async Task ProcessingConfigurationUpdateCommandRoutineAsync()
         {
             await RunCommandAsync(() => ConfigurationContext.ProcessingConfigurationUpdateCommandFlag, async () =>
             {
-                await Task.Delay(1000);
+                // Re-initialize state values
+                ConfigurationContext.FormErrorString = null;
+
+                if (CrawlerInWork || IndexProcessingInWorkFlag || QueryInWorkFlag)
+                {
+                    ConfigurationContext.FormErrorString = "Cannot update configuration during processing!";
+                    return;
+                }
+
+                // Assign updated data
+                _dataInstance.IndexProcessingConfiguration.Language = ConfigurationContext.ProcessingConfigurationContext.LanguageEntry.Value;
+                _dataInstance.IndexProcessingConfiguration.CustomRegex = ConfigurationContext.ProcessingConfigurationContext.CustomRegexEntry.Value;
+                _dataInstance.IndexProcessingConfiguration.CustomStopWords = new HashSet<string>(ConfigurationContext.ProcessingConfigurationContext.CustomStopWordsEntry.Value.Split(IndexProcessingConfiguration.CustomStopWords_Separator));
+                _dataInstance.IndexProcessingConfiguration.ToLowerCase = ConfigurationContext.ProcessingConfigurationContext.ToLowerCaseEntry.Value;
+                _dataInstance.IndexProcessingConfiguration.RemoveAccentsBeforeStemming = ConfigurationContext.ProcessingConfigurationContext.RemoveAccentsBeforeStemmingEntry.Value;
+                _dataInstance.IndexProcessingConfiguration.RemoveAccentsAfterStemming = ConfigurationContext.ProcessingConfigurationContext.RemoveAccentsAfterStemmingEntry.Value;
+
+                // Validate data
+                var validationResults = ValidationHelpers.ValidateModel(_dataInstance.IndexProcessingConfiguration);
+
+                // If any errors...
+                if (validationResults.Count > 0)
+                {
+                    _uow.UndoEntityChanges(_dataInstance.IndexProcessingConfiguration);
+                    ConfigurationContext.FormErrorString = validationResults.AggregateErrors();
+                }
+                // Otherwise valid results...
+                else
+                {
+                    // TODO delete indexes
+
+                    // Update
+                    _uow.IndexProcessingConfigurations.Update(_dataInstance.IndexProcessingConfiguration);
+                    _uow.Commit();
+
+                    // Reaload data
+                    await LoadAsync(_dataInstance.Id);
+                    ToggleEditProcessingConfigurationReadOnlyCommandRoutine(); // close form
+
+                    // Log it
+                    _logger.LogInformationSource($"Index processing configuration of '{_dataInstance.Name}' successfully updated!");
+                }
             });
         }
+        /// <summary>
+        /// Update data instance name
+        /// </summary>
         private async Task DataInstanceNameUpdateCommandRoutineAsync()
         {
             await RunCommandAsync(() => ConfigurationContext.DataInstanceNameUpdateCommandFlag, async () =>
             {
-                await Task.Delay(1);
+                // Re-initialize state values
+                ConfigurationContext.FormErrorString = null;
+
+                if (CrawlerInWork || IndexProcessingInWorkFlag || QueryInWorkFlag)
+                {
+                    ConfigurationContext.FormErrorString = "Cannot update configuration during processing!";
+                    return;
+                }
+
+                // Assign updated data
+                _dataInstance.Name = ConfigurationContext.DataInstanceNameEntry.Value;
+
+                // Validate data
+                var validationResults = ValidationHelpers.ValidateModel(_dataInstance);
+
+                // Additional validation steps
+                // Data instance name must be unique...
+                if (_uow.DataInstances.Get(o => o.Name.Equals(_dataInstance.Name)).Any())
+                {
+                    validationResults.Add(new DataValidationError
+                    {
+                        Code = nameof(_dataInstance.Name),
+                        Description = "Data Instance Name already exists."
+                    }); // TODO localization
+                }
+
+                // If any errors...
+                if (validationResults.Count > 0)
+                {
+                    _uow.UndoEntityChanges(_dataInstance);
+                    ConfigurationContext.FormErrorString = validationResults.AggregateErrors();
+                }
+                // Otherwise valid results...
+                else
+                {
+                    // Update
+                    _uow.DataInstances.Update(_dataInstance);
+                    _uow.Commit();
+
+                    // Reaload data
+                    await LoadAsync(_dataInstance.Id);
+                    ToggleEditDataInstanceNameReadOnlyCommandRoutine(); // close form
+
+                    // Log it
+                    _logger.LogInformationSource($"Data instance name of '{_dataInstance.Name}' successfully updated!");
+                }
             });
         }
+        /// <summary>
+        /// Delete the data instance
+        /// </summary>
         private async Task DataInstanceDeleteCommandRoutineAsync()
         {
             await RunCommandAsync(() => ConfigurationContext.DataInstanceDeleteCommandFlag, async () =>
             {
+                // TODO delete data instance - delete all files and then the instance data
                 await Task.Delay(1);
             });
         }
@@ -864,7 +1030,8 @@ namespace InformationRetrievalManager
         /// Loads necessary data structures according to data instance <paramref name="id"/>.
         /// </summary>
         /// <param name="id">The ID</param>
-        private async Task LoadAsync(long id)
+        /// <param name="loadToMainView">Indicates if the method should load main view.</param>
+        private async Task LoadAsync(long id, bool loadToMainView = false)
         {
             // Load data instance
             _dataInstance = _uow.DataInstances.Get(o => o.Id == id,
@@ -890,7 +1057,7 @@ namespace InformationRetrievalManager
             ConfigurationContext.Set(_dataInstance.CrawlerConfiguration, _dataInstance.IndexProcessingConfiguration, _dataInstance.Name);
 
             // Flag up data load is done
-            CurrentView = View.Main;
+            if (loadToMainView) CurrentView = View.Main;
             DataLoaded = true;
         }
 

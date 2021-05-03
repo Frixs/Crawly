@@ -26,6 +26,11 @@ namespace InformationRetrievalManager
         /// </summary>
         public TextEntryViewModel DataInstanceNameEntry { get; set; } //; ctor
 
+        /// <summary>
+        /// Error string as a feedback to the user.
+        /// </summary>
+        public string FormErrorString { get; set; }
+
         #endregion
 
         #region Flags
@@ -86,7 +91,7 @@ namespace InformationRetrievalManager
         public void Set(CrawlerConfigurationDataModel crawlerConfiguration, IndexProcessingConfigurationDataModel processingConfiguration, string dataInstanceName)
         {
             CrawlerConfigurationReadOnlyFlag = ProcessingConfigurationReadOnlyFlag = true;
-
+            
             CrawlerConfigurationContext.ReadOnly(CrawlerConfigurationReadOnlyFlag).Set(
                 crawlerConfiguration.SiteAddress,
                 crawlerConfiguration.SiteSuffix,

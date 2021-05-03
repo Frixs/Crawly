@@ -1,6 +1,8 @@
 ﻿using Ixs.DNA;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace InformationRetrievalManager.Relational
@@ -100,6 +102,46 @@ namespace InformationRetrievalManager.Relational
         {
             int n = _dbContext.SaveChanges();
             _logger.LogTraceSource($"Total of {n} database changes saved!");
+        }
+
+        /// <inheritdoc/>
+        public void UndoChanges()
+        {
+            foreach (var entry in _dbContext.ChangeTracker.Entries())
+            {
+                switch (entry.State)
+                {
+                    case EntityState.Modified:
+                        entry.State = EntityState.Unchanged;
+                        break;
+                    case EntityState.Added:
+                        entry.State = EntityState.Detached;
+                        break;
+                    case EntityState.Deleted:
+                        entry.Reload();
+                        break;
+                    default: break;
+                }
+            }
+        }
+
+        /// <inheritdoc/>
+        public void UndoEntityChanges(object entity)
+        {
+            var entry = _dbContext.Entry(entity);
+            switch (entry.State)
+            {
+                case EntityState.Modified:
+                    entry.State = EntityState.Unchanged;
+                    break;
+                case EntityState.Added:
+                    entry.State = EntityState.Detached;
+                    break;
+                case EntityState.Deleted:
+                    entry.Reload();
+                    break;
+                default: break;
+            }
         }
 
         /// <inheritdoc/>
