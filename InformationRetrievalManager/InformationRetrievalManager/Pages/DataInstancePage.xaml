@@ -627,7 +627,7 @@
                     Grid.Row="1"
                     Padding="0,15,0,0"
                     VerticalScrollBarVisibility="Auto">
-                    <local:QueryDataResult ResultContext="{Binding ResultContext, Mode=OneWay}" />
+                    <local:QueryDataResult OpenSourceUrlCommand="{Binding OpenUrlCommand, Mode=OneTime}" ResultContext="{Binding ResultContext, Mode=OneWay}" />
                 </ScrollViewer>
             </Grid>
 

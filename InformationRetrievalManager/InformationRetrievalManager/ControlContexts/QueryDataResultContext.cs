@@ -3,12 +3,15 @@
 namespace InformationRetrievalManager
 {
     /// <summary>
-    /// TODO-doc
+    /// Context for control <see cref="QueryDataResult"/>.
     /// </summary>
     public class QueryDataResultContext
     {
         #region Public Properties
 
+        /// <summary>
+        /// Data for view presentation of this context.
+        /// </summary>
         public ObservableCollection<Result> Data { get; set; } = new ObservableCollection<Result>();
 
         #endregion

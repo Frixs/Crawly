@@ -94,12 +94,12 @@ namespace InformationRetrievalManager
         /// <summary>
         /// Entry selection of available data files.
         /// </summary>
-        public ComboEntryViewModel<DataFileInfo> DataFileEntry { get; protected set; }
+        public ComboEntryViewModel<DataFileInfo> DataFileEntry { get; protected set; } //; ctor
 
         /// <summary>
         /// Entry selection of available indexed data files.
         /// </summary>
-        public ComboEntryViewModel<DataFileInfo> IndexFileEntry { get; protected set; }
+        public ComboEntryViewModel<DataFileInfo> IndexFileEntry { get; protected set; } //; ctor
 
         /// <summary>
         /// Entry for query
@@ -108,12 +108,12 @@ namespace InformationRetrievalManager
             pIsRequired: nameof(QueryEntry_IsRequired))]
         [ValidateBooleanExpressionString(nameof(QueryEntry), typeof(DataInstancePageViewModel),
             pIsRequired: nameof(QueryEntry_IsRequired))]
-        public TextEntryViewModel QueryEntry { get; protected set; }
+        public TextEntryViewModel QueryEntry { get; protected set; } //; ctor
 
         /// <summary>
         /// Query model radio entry array
         /// </summary>
-        public RadioEntryViewModel[] QueryModelEntryArray { get; protected set; }
+        public RadioEntryViewModel[] QueryModelEntryArray { get; protected set; } //; ctor
 
         /// <summary>
         /// Crawler processing progress feedback message to user.
@@ -642,11 +642,34 @@ namespace InformationRetrievalManager
                     results = await _queryIndexManager.QueryAsync(query, ii.GetReadOnlyVocabulary(), queryModel, _dataInstance.IndexProcessingConfiguration, 10);
                 });
 
-                // TODO - continue here
-                //QueryTempResults = "Results: [" + string.Join(",", results) + "]";
-                ResultContext.Data.Add(new QueryDataResultContext.Result());
+                // Go through the results...
+                for (int i = 0; i < results.Length; ++i)
+                {
+                    var doc = _uow.IndexedDocuments.GetByID(results[i]);
+                    if (doc != null)
+                    {
+                        ResultContext.Data.Add(new QueryDataResultContext.Result
+                        {
+                            Title = doc.Title,
+                            Category = doc.Category,
+                            Timestamp = doc.Timestamp.ToString("yyyy-MM-dd hh:mm"),
+                            SourceUrl = doc.SourceUrl,
+                            Content = doc.Content
+                        });
+                    }
+                    else
+                    {
+                        // Something went wrong...
+                        // TODO - user feedback + get total found and total documents + select input
+                        break;
+                    }
+                }
+
+                // Fire update context property
                 OnPropertyChanged(nameof(ResultContext));
-                ShowViewCommandRoutine(View.Results);
+
+                // Automatically move the user to the result view
+                CurrentView = View.Results;
             });
         }
 
