@@ -83,14 +83,9 @@ namespace InformationRetrievalManager
         public QueryDataResultViewContext ResultContext { get; } = new QueryDataResultViewContext();
 
         /// <summary>
-        /// <see cref="View.Configuration"/> context of the <see cref="CrawlerConfigurationForm"/> control.
+        /// <see cref="View.Configuration"/> context
         /// </summary>
-        public CrawlerConfigurationFormContext CrawlerConfigurationContext { get; } = new CrawlerConfigurationFormContext();
-
-        /// <summary>
-        /// <see cref="View.Configuration"/> context of the <see cref="ProcessingConfigurationForm"/> control.
-        /// </summary>
-        public ProcessingConfigurationFormContext ProcessingConfigurationContext { get; } = new ProcessingConfigurationFormContext();
+        public DataInstanceConfigurationViewContext ConfigurationContext { get; } = new DataInstanceConfigurationViewContext();
 
         /// <summary>
         /// Entry selection of available data files.

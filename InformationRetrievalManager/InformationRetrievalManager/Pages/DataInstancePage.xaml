@@ -673,22 +673,23 @@
 
                 <!--  Content  -->
                 <ScrollViewer
-                    Name="sv"
+                    Name="sv_qrv"
                     Grid.Row="1"
                     MinWidth="830"
                     MaxWidth="830"
                     VerticalScrollBarVisibility="Auto">
-                    <local:QueryDataResultView OpenSourceUrlCommand="{Binding OpenUrlCommand, Mode=OneTime}" ResultContext="{Binding ResultContext, Mode=OneWay}" />
                     <ScrollViewer.Style>
                         <Style TargetType="{x:Type ScrollViewer}">
                             <Setter Property="Padding" Value="0,15,0,0" />
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding ComputedVerticalScrollBarVisibility, ElementName=sv}" Value="Visible">
+                                <DataTrigger Binding="{Binding ComputedVerticalScrollBarVisibility, ElementName=sv_qrv}" Value="Visible">
                                     <Setter Property="Padding" Value="0,15,30,0" />
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
                     </ScrollViewer.Style>
+
+                    <local:QueryDataResultView OpenSourceUrlCommand="{Binding OpenUrlCommand, Mode=OneTime}" ResultContext="{Binding ResultContext, Mode=OneWay}" />
                 </ScrollViewer>
             </Grid>
 
@@ -748,10 +749,22 @@
 
                 <!--  Content  -->
                 <ScrollViewer
+                    Name="sv_cv"
                     Grid.Row="1"
                     Padding="30,15,30,0"
                     VerticalScrollBarVisibility="Auto">
-                    <TextBlock Text="todo" />
+                    <ScrollViewer.Style>
+                        <Style TargetType="{x:Type ScrollViewer}">
+                            <Setter Property="Padding" Value="0,15,0,0" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding ComputedVerticalScrollBarVisibility, ElementName=sv_cv}" Value="Visible">
+                                    <Setter Property="Padding" Value="0,15,30,0" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ScrollViewer.Style>
+
+                    <local:DataInstanceConfigurationView ConfigurationContext="{Binding ConfigurationContext, Mode=OneWay}" />
                 </ScrollViewer>
             </Grid>
         </Grid>

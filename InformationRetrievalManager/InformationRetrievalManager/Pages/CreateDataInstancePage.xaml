@@ -178,7 +178,7 @@
                             <local:TextEntry
                                 Grid.Row="0"
                                 MinWidth="190"
-                                DataContext="{Binding DataInstanceNameEntry}"
+                                DataContext="{Binding DataInstanceNameEntry, Mode=OneWay}"
                                 TextAlignment="Center" />
 
                             <!--  Submit BTN  -->
