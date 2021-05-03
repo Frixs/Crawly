@@ -36,6 +36,7 @@ namespace InformationRetrievalManager
         {
             DataInstanceNameEntry = new TextEntryViewModel
             {
+                IsReadOnly = true,
                 Label = null,
                 Description = null,
                 Validation = ValidationHelpers.GetPropertyValidateAttribute<DataInstanceDataModel, string, ValidateStringAttribute>(o => o.Name),
@@ -43,6 +44,42 @@ namespace InformationRetrievalManager
                 Placeholder = "Data Instance Name",
                 MaxLength = DataInstanceDataModel.Name_MaxLength
             };
+        }
+
+        #endregion
+
+        #region Public Methods
+
+        /// <summary>
+        /// Set values into the context forms.
+        /// </summary>
+        /// <param name="crawlerConfiguration">Crawler configuration form values.</param>
+        /// <param name="processingConfiguration">Processing configuration form values.</param>
+        public void Set(CrawlerConfigurationDataModel crawlerConfiguration, IndexProcessingConfigurationDataModel processingConfiguration)
+        {
+            CrawlerConfigurationContext.ReadOnly(true).Set(
+                crawlerConfiguration.SiteAddress,
+                crawlerConfiguration.SiteSuffix,
+                crawlerConfiguration.StartPageNo,
+                crawlerConfiguration.MaxPageNo,
+                crawlerConfiguration.PageNoModifier,
+                crawlerConfiguration.SearchInterval,
+                crawlerConfiguration.SiteUrlArticlesXPath,
+                crawlerConfiguration.SiteArticleContentAreaXPath,
+                crawlerConfiguration.SiteArticleTitleXPath,
+                crawlerConfiguration.SiteArticleCategoryXPath,
+                crawlerConfiguration.SiteArticleDateTimeXPath,
+                crawlerConfiguration.SiteArticleDateTimeFormat,
+                crawlerConfiguration.SiteArticleDateTimeCultureInfo
+                );
+            ProcessingConfigurationContext.ReadOnly(true).Set(
+                processingConfiguration.Language,
+                processingConfiguration.CustomRegex,
+                string.Join(IndexProcessingConfiguration.CustomStopWords_Separator.ToString(), processingConfiguration.CustomStopWords),
+                processingConfiguration.ToLowerCase,
+                processingConfiguration.RemoveAccentsBeforeStemming,
+                processingConfiguration.RemoveAccentsAfterStemming
+                );
         }
 
         #endregion

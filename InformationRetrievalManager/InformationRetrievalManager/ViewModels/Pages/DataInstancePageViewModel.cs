@@ -309,7 +309,7 @@ namespace InformationRetrievalManager
                 MaxValue = 100
             };
 
-            // Create query model entries
+            // Create query model entry(ies)
             _selectedQueryModel = QueryModelType.TfIdf; // Set default selection
             QueryEntry.Validation = new ValidateStringAttribute("Query", typeof(DataInstancePageViewModel), nameof(QueryEntry_IsRequired));
             QueryModelEntryArray = new RadioEntryViewModel[2]
@@ -825,6 +825,8 @@ namespace InformationRetrievalManager
             LoadDataFiles(true);
             // Load index files
             LoadIndexFiles(true);
+            // Load data/values into the configuration context
+            ConfigurationContext.Set(_dataInstance.CrawlerConfiguration, _dataInstance.IndexProcessingConfiguration);
 
             // Flag up data load is done
             CurrentView = View.Main;

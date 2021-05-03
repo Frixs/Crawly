@@ -186,6 +186,29 @@ namespace InformationRetrievalManager
             return this;
         }
 
+        /// <summary>
+        /// Set the context readonly access to each entry in this context.
+        /// </summary>
+        /// <returns>Return self for chaining.</returns>
+        public CrawlerConfigurationFormContext ReadOnly(bool readOnlyInputs)
+        {
+            SiteAddressEntry.IsReadOnly =
+            SiteSuffixEntry.IsReadOnly =
+            StartPageNoEntry.IsReadOnly =
+            MaxPageNoEntry.IsReadOnly =
+            PageNoModifierEntry.IsReadOnly =
+            SearchIntervalEntry.IsReadOnly =
+            SiteUrlArticlesXPathEntry.IsReadOnly =
+            SiteArticleContentAreaXPathEntry.IsReadOnly =
+            SiteArticleTitleXPathEntry.IsReadOnly =
+            SiteArticleCategoryXPathEntry.IsReadOnly =
+            SiteArticleDateTimeXPathEntry.IsReadOnly =
+            SiteArticleDateTimeFormatEntry.IsReadOnly =
+            SiteArticleDateTimeCultureInfoEntry.IsReadOnly = readOnlyInputs;
+
+            return this;
+        }
+
         #endregion
     }
 }

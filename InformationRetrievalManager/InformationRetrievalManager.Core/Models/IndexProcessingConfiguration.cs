@@ -15,7 +15,9 @@ namespace InformationRetrievalManager.Core
         public static readonly short CustomRegex_MaxLength = 255;
         public static readonly string CustomRegex_DefaultValue = "";
 
-        public static readonly bool ToLowerCasex_DefaultValue = true;
+        public static readonly char CustomStopWords_Separator = ',';
+
+        public static readonly bool ToLowerCase_DefaultValue = true;
 
         public static readonly bool RemoveAccentsBeforeStemming_DefaultValue = true;
 
@@ -47,7 +49,7 @@ namespace InformationRetrievalManager.Core
         /// Should the toknes be lowercased?
         /// </summary>
         [ValidateIgnore]
-        public bool ToLowerCase { get; set; } = ToLowerCasex_DefaultValue;
+        public bool ToLowerCase { get; set; } = ToLowerCase_DefaultValue;
 
         /// <summary>
         /// Should we remove accents from tokens before stemming?

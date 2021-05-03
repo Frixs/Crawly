@@ -145,7 +145,7 @@ namespace InformationRetrievalManager
                 {
                     Language = ProcessingConfigurationContext.LanguageEntry.Value,
                     CustomRegex = ProcessingConfigurationContext.CustomRegexEntry.Value,
-                    CustomStopWords = new HashSet<string>(ProcessingConfigurationContext.CustomStopWordsEntry.Value.Split(',')),
+                    CustomStopWords = new HashSet<string>(ProcessingConfigurationContext.CustomStopWordsEntry.Value.Split(IndexProcessingConfiguration.CustomStopWords_Separator)),
                     ToLowerCase = ProcessingConfigurationContext.ToLowerCaseEntry.Value,
                     RemoveAccentsBeforeStemming = ProcessingConfigurationContext.RemoveAccentsBeforeStemmingEntry.Value,
                     RemoveAccentsAfterStemming = ProcessingConfigurationContext.RemoveAccentsAfterStemmingEntry.Value,

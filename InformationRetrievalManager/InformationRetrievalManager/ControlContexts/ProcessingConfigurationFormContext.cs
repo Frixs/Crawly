@@ -60,7 +60,7 @@ namespace InformationRetrievalManager
                 Label = "To Lower Case",
                 Description = "",
                 Validation = null,
-                Value = IndexProcessingConfigurationDataModel.ToLowerCasex_DefaultValue
+                Value = IndexProcessingConfigurationDataModel.ToLowerCase_DefaultValue
             };
             RemoveAccentsBeforeStemmingEntry = new CheckEntryViewModel
             {
@@ -96,6 +96,22 @@ namespace InformationRetrievalManager
             ToLowerCaseEntry.Value = toLowerCase;
             RemoveAccentsBeforeStemmingEntry.Value = removeAccentsBeforeStemming;
             RemoveAccentsAfterStemmingEntry.Value = removeAccentsAfterStemming;
+
+            return this;
+        }
+
+        /// <summary>
+        /// Set the context readonly access to each entry in this context.
+        /// </summary>
+        /// <returns>Return self for chaining.</returns>
+        public ProcessingConfigurationFormContext ReadOnly(bool readOnlyInputs)
+        {
+            LanguageEntry.IsReadOnly =
+            CustomRegexEntry.IsReadOnly =
+            CustomStopWordsEntry.IsReadOnly =
+            ToLowerCaseEntry.IsReadOnly =
+            RemoveAccentsBeforeStemmingEntry.IsReadOnly =
+            RemoveAccentsAfterStemmingEntry.IsReadOnly = readOnlyInputs;
 
             return this;
         }
