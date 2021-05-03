@@ -28,12 +28,12 @@ namespace InformationRetrievalManager
         /// <summary>
         /// Context of the <see cref="CrawlerConfigurationForm"/> control.
         /// </summary>
-        public CrawlerConfigurationFormContext CrawlerConfigurationContext { get; set; } = new CrawlerConfigurationFormContext();
+        public CrawlerConfigurationFormContext CrawlerConfigurationContext { get; } = new CrawlerConfigurationFormContext();
 
         /// <summary>
         /// Context of the <see cref="ProcessingConfigurationForm"/> control.
         /// </summary>
-        public ProcessingConfigurationFormContext ProcessingConfigurationContext { get; set; } = new ProcessingConfigurationFormContext();
+        public ProcessingConfigurationFormContext ProcessingConfigurationContext { get; } = new ProcessingConfigurationFormContext();
 
         /// <summary>
         /// Property for input field to set data instance name.
@@ -145,7 +145,7 @@ namespace InformationRetrievalManager
                 {
                     Language = ProcessingConfigurationContext.LanguageEntry.Value,
                     CustomRegex = ProcessingConfigurationContext.CustomRegexEntry.Value,
-                    CustomStopWords = new HashSet<string>(ProcessingConfigurationContext.CustomStopWordsEntry.Value.Split(',')),
+                    CustomStopWords = new HashSet<string>(ProcessingConfigurationContext.CustomStopWordsEntry.Value.Split(IndexProcessingConfiguration.CustomStopWords_Separator)),
                     ToLowerCase = ProcessingConfigurationContext.ToLowerCaseEntry.Value,
                     RemoveAccentsBeforeStemming = ProcessingConfigurationContext.RemoveAccentsBeforeStemmingEntry.Value,
                     RemoveAccentsAfterStemming = ProcessingConfigurationContext.RemoveAccentsAfterStemmingEntry.Value,
@@ -163,6 +163,7 @@ namespace InformationRetrievalManager
                 validationResults.Concat(ValidationHelpers.ValidateModel(dataInstance));
 
                 // Additional validation steps
+                // Culture info must be valid...
                 try
                 {
                     _ = new CultureInfo(crawlerConfiguration.SiteArticleDateTimeCultureInfo);
@@ -173,6 +174,15 @@ namespace InformationRetrievalManager
                     {
                         Code = nameof(crawlerConfiguration.SiteArticleDateTimeCultureInfo),
                         Description = "Invalid date-time culture."
+                    }); // TODO localization
+                }
+                // Data instance name must be unique...
+                if (_uow.DataInstances.Get(o => o.Name.Equals(dataInstance.Name)).Any())
+                {
+                    validationResults.Add(new DataValidationError
+                    {
+                        Code = nameof(dataInstance.Name),
+                        Description = "Data Instance Name already exists."
                     }); // TODO localization
                 }
 
@@ -186,7 +196,7 @@ namespace InformationRetrievalManager
                 {
                     // Insert
                     _uow.DataInstances.Insert(dataInstance);
-                    _uow.Commit();
+                    _uow.SaveChanges();
 
                     // Log it
                     _logger.LogInformationSource($"Data Instance '{dataInstance.Name}' successfully created!");

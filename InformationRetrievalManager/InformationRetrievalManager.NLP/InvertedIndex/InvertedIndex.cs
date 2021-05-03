@@ -28,7 +28,12 @@ namespace InformationRetrievalManager.NLP
         ///     SortedDictionary { Key=term, Value=posting list },
         ///     posting list aka Dictionary { Key=DocumentId, Value=TermInfo obj }
         /// </remarks>
-        private readonly SortedDictionary<string, Dictionary<int, TermInfo>> _vocabulary = new SortedDictionary<string, Dictionary<int, TermInfo>>();
+        private readonly SortedDictionary<string, Dictionary<long, TermInfo>> _vocabulary = new SortedDictionary<string, Dictionary<long, TermInfo>>();
+
+        /// <summary>
+        /// Timestamp as an additional identifier for indexation.
+        /// </summary>
+        private readonly DateTime _timestamp; //; ctor
 
         #endregion
 
@@ -44,10 +49,10 @@ namespace InformationRetrievalManager.NLP
         /// <summary>
         /// Default constructor
         /// </summary>
-        public InvertedIndex(string name, IFileManager fileManager = null, ILogger logger = null)
+        public InvertedIndex(string name, DateTime timestamp, IFileManager fileManager = null, ILogger logger = null)
         {
-            // TODO: check name allowed characters
             Name = name;
+            _timestamp = timestamp;
 
             _fileManager = fileManager;
             _logger = logger;
@@ -61,13 +66,13 @@ namespace InformationRetrievalManager.NLP
         /// <inheritdoc/>
         /// </summary>
         /// <remarks>O(n^2)</remarks>
-        public IReadOnlyDictionary<string, IReadOnlyDictionary<int, IReadOnlyTermInfo>> GetReadOnlyVocabulary()
+        public IReadOnlyDictionary<string, IReadOnlyDictionary<long, IReadOnlyTermInfo>> GetReadOnlyVocabulary()
         {
-            return _vocabulary.ToDictionary(o => o.Key, o => (IReadOnlyDictionary<int, IReadOnlyTermInfo>)o.Value.ToDictionary(x => x.Key, x => (IReadOnlyTermInfo)x.Value));
+            return _vocabulary.ToDictionary(o => o.Key, o => (IReadOnlyDictionary<long, IReadOnlyTermInfo>)o.Value.ToDictionary(x => x.Key, x => (IReadOnlyTermInfo)x.Value));
         }
 
         /// <inheritdoc/>
-        public void Put(string term, int documentId)
+        public void Put(string term, long documentId)
         {
             if (string.IsNullOrEmpty(term) || documentId < 0)
                 throw new ArgumentNullException("Invalid parameters for indexing!");
@@ -89,7 +94,7 @@ namespace InformationRetrievalManager.NLP
             // Otherwise, create a new record...
             else
             {
-                _vocabulary.Add(term, new Dictionary<int, TermInfo>()
+                _vocabulary.Add(term, new Dictionary<long, TermInfo>()
                 {
                     { documentId, new TermInfo(frequency: 1) }
                 });
@@ -108,7 +113,7 @@ namespace InformationRetrievalManager.NLP
             bool ok = false;
 
             // Deserialize
-            var result = _fileManager.DeserializeObjectFromBinFileAsync($"{Constants.IndexDataStorageDir}/{Name}.idx").Result;
+            var result = _fileManager.DeserializeObjectFromBinFileAsync($"{Constants.IndexDataStorageDir}/{Name}/{MakeFilename()}").Result;
             short status = result.Item1;
             object obj = result.Item2;
 
@@ -121,7 +126,7 @@ namespace InformationRetrievalManager.NLP
             if (status == 0 && obj != null)
             {
                 // Try to load vocabulary
-                var newVocabulary = obj as SortedDictionary<string, Dictionary<int, TermInfo>>;
+                var newVocabulary = obj as SortedDictionary<string, Dictionary<long, TermInfo>>;
                 if (newVocabulary != null)
                 {
                     ok = true;
@@ -151,7 +156,7 @@ namespace InformationRetrievalManager.NLP
             bool ok = false;
 
             // Serialize
-            short status = _fileManager.SerializeObjectToBinFileAsync(_vocabulary, $"{Constants.IndexDataStorageDir}/{Name}.idx").Result;
+            short status = _fileManager.SerializeObjectToBinFileAsync(_vocabulary, $"{Constants.IndexDataStorageDir}/{Name}/{MakeFilename()}").Result;
 
             // Check serialization result
             if (status == 0)
@@ -166,6 +171,19 @@ namespace InformationRetrievalManager.NLP
                 _vocabulary.Clear();
 
             return ok;
+        }
+
+        #endregion
+
+        #region Private Methods
+
+        /// <summary>
+        /// Generates filename specific for this index instance.
+        /// </summary>
+        /// <returns>The filename</returns>
+        private string MakeFilename()
+        {
+            return $"{Name}_{_timestamp.Year}_{_timestamp.Month}_{_timestamp.Day}_{_timestamp.Hour}_{_timestamp.Minute}_{_timestamp.Second}.idx";
         }
 
         #endregion

@@ -18,6 +18,10 @@
         /// </summary>
         public DataInstancePageDesignModel()
         {
+            DataLoaded = true;
+            CrawlerInWork = true;
+            IndexProcessingInWorkFlag = true;
+            CurrentView = View.Configuration;
         }
 
         #endregion

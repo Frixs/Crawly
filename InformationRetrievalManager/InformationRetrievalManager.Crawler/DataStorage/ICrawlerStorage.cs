@@ -30,10 +30,24 @@ namespace InformationRetrievalManager.Crawler
         /// Find all data files related to specific crawler. 
         /// It is not possible to get the data if the crawler is currently processing.
         /// </summary>
-        /// <param name="crawler">The crawler</param>
-        /// <returns>Array of all data files (file paths) - if the crawler is processing, it returns <see langword="null"/>.</returns>
-        /// <exception cref="ArgumentNullException">Crawler is not defined.</exception>
-        string[] GetDataFiles(ICrawlerEngine crawler);
+        /// <param name="cid">The crawler identifier</param>
+        /// <returns>Array of all data files (file paths).</returns>
+        /// <exception cref="ArgumentNullException">Crawler ID is not defined.</exception>
+        /// <remarks>
+        ///     Make sure to check the crawler is not crawling at the moment of getting data files.
+        /// </remarks>
+        string[] GetAllDataFiles(string cid);
+
+        /// <summary>
+        /// Delete files according to crawler identifier and file timestmap.
+        /// </summary>
+        /// <param name="cid">The crawler identifier.</param>
+        /// <param name="fileTimestamp">The file timestamp.</param>
+        /// <exception cref="ArgumentNullException">Crawler ID is not defined.</exception>
+        /// <remarks>
+        ///     Make sure to check the crawler is not crawling at the moment of deleting data files.
+        /// </remarks>
+        void DeleteDataFiles(string cid, DateTime fileTimestamp);
 
         #endregion
     }

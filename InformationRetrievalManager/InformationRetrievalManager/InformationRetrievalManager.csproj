@@ -410,6 +410,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Controls\DataInstanceConfigurationView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Controls\DataInstanceView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -426,11 +430,19 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Controls\Inputs\RadioEntry.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Controls\Inputs\TextEntry.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Controls\ProcessingConfigurationForm.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\QueryDataResultView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -497,9 +509,14 @@
     <Compile Include="AttachedProperties\NoFrameHistory.cs" />
     <Compile Include="AttachedProperties\TextAttachedProperties.cs" />
     <Compile Include="ControlContexts\CrawlerConfigurationFormContext.cs" />
+    <Compile Include="ControlContexts\DataInstanceConfigurationViewContext.cs" />
     <Compile Include="ControlContexts\ProcessingConfigurationFormContext.cs" />
+    <Compile Include="ControlContexts\QueryDataResultViewContext.cs" />
     <Compile Include="Controls\CrawlerConfigurationForm.xaml.cs">
       <DependentUpon>CrawlerConfigurationForm.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\DataInstanceConfigurationView.xaml.cs">
+      <DependentUpon>DataInstanceConfigurationView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Controls\Inputs\CheckEntry.xaml.cs">
       <DependentUpon>CheckEntry.xaml</DependentUpon>
@@ -510,11 +527,17 @@
     <Compile Include="Controls\Inputs\IntegerEntry.xaml.cs">
       <DependentUpon>IntegerEntry.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\Inputs\RadioEntry.xaml.cs">
+      <DependentUpon>RadioEntry.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Controls\Inputs\TextEntry.xaml.cs">
       <DependentUpon>TextEntry.xaml</DependentUpon>
     </Compile>
     <Compile Include="Controls\ProcessingConfigurationForm.xaml.cs">
       <DependentUpon>ProcessingConfigurationForm.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\QueryDataResultView.xaml.cs">
+      <DependentUpon>QueryDataResultView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Controls\Structure\AlignableWrapPanel.cs" />
     <Compile Include="Controls\Base\PageHost.xaml.cs">
@@ -524,9 +547,15 @@
       <DependentUpon>DataInstanceView.xaml</DependentUpon>
     </Compile>
     <Compile Include="DataTypes\ApplicationPage.cs" />
+    <Compile Include="DataTypes\DataFileInfo.cs" />
     <Compile Include="DI\DI.cs" />
     <Compile Include="DI\FrameworkConstructionExtensions.cs" />
     <Compile Include="Extensions\CrawlerExtensions.cs" />
+    <Compile Include="Localization\Resource.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resource.resx</DependentUpon>
+    </Compile>
     <Compile Include="Pages\Base\BasePage.cs" />
     <Compile Include="Pages\CreateDataInstancePage.xaml.cs">
       <DependentUpon>CreateDataInstancePage.xaml</DependentUpon>
@@ -560,6 +589,8 @@
     <Compile Include="ViewModels\Base\BaseViewModel.cs" />
     <Compile Include="ViewModels\Base\RelayCommand.cs" />
     <Compile Include="ViewModels\Base\RelayParameterizedCommand.cs" />
+    <Compile Include="ViewModels\Inputs\Design\RadioEntryDesignModel.cs" />
+    <Compile Include="ViewModels\Inputs\RadioEntryViewModel.cs" />
     <Compile Include="ViewModels\Inputs\CheckEntryViewModel.cs" />
     <Compile Include="ViewModels\Inputs\ComboEntryViewModel.cs" />
     <Compile Include="ViewModels\Inputs\Design\CheckEntryDesignModel.cs" />
@@ -595,6 +626,10 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <EmbeddedResource Include="Localization\Resource.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resource.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -699,6 +734,8 @@ RD /S /Q "$(TargetDir)ru\"
 RD /S /Q "$(TargetDir)sv\"
 RD /S /Q "$(TargetDir)tr\"
 RD /S /Q "$(TargetDir)zh-CN\"
-RD /S /Q "$(TargetDir)zh-Hans\"</PostBuildEvent>
+RD /S /Q "$(TargetDir)zh-Hans\"
+RD /S /Q "$(TargetDir)ja-JP\"
+RD /S /Q "$(TargetDir)cs-CZ\"</PostBuildEvent>
   </PropertyGroup>
 </Project>

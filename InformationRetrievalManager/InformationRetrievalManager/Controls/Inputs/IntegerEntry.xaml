@@ -12,7 +12,7 @@
     <Grid Margin="0,0,0,5">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="42" />
+            <RowDefinition Height="39" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
@@ -20,23 +20,36 @@
         <TextBlock
             Name="Label"
             Grid.Row="0"
+            Margin="0,0,0,3"
             HorizontalAlignment="Left"
             VerticalAlignment="Center"
             FontFamily="{StaticResource DosisBold}"
             FontSize="15"
-            Text="{Binding Label, Mode=OneWay}" />
+            Text="{Binding Label, Mode=OneWay}">
+            <TextBlock.Style>
+                <Style TargetType="{x:Type TextBlock}">
+                    <Setter Property="Visibility" Value="Visible" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Label, Mode=OneWay}" Value="{x:Null}">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </TextBlock.Style>
+        </TextBlock>
 
         <!--  Value Input  -->
         <xctk:IntegerUpDown
             Grid.Row="1"
             Width="Auto"
             Height="36"
-            Margin="0,3"
+            Margin="0,0,0,3"
             Padding="10,8"
             VerticalAlignment="Center"
             FontSize="14"
             FormatString="N0"
             Increment="{Binding Increment, Mode=OneWay}"
+            IsReadOnly="{Binding IsReadOnly, Mode=OneWay}"
             Maximum="{Binding MaxValue, Mode=OneWay}"
             Minimum="{Binding MinValue, Mode=OneWay}"
             TextAlignment="Left">

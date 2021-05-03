@@ -61,7 +61,10 @@ namespace InformationRetrievalManager
             construction.Services.AddSingleton<ICrawlerManager, CrawlerManager>();
 
             // Bind a crawler storage
-            construction.Services.AddSingleton<ICrawlerStorage, CrawlerStorage>();
+            construction.Services.AddTransient<ICrawlerStorage, CrawlerStorage>();
+
+            // Bind a index storage
+            construction.Services.AddTransient<IIndexStorage, IndexStorage>();
 
             // Bind a query index manager
             construction.Services.AddSingleton<IQueryIndexManager, QueryIndexManager>();

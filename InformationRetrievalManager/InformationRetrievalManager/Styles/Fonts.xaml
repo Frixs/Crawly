@@ -42,5 +42,9 @@
     <system:String x:Key="FontAwesomeCircleNotchIcon">&#xf1ce;</system:String>
     <system:String x:Key="FontAwesomeExclamationCircleIcon">&#xf06a;</system:String>
     <system:String x:Key="FontAwesomeQuestionmarkIcon">&#xf128;</system:String>
+    <system:String x:Key="FontAwesomeCodeIcon">&#xf121;</system:String>
+    <system:String x:Key="FontAwesomeTrashAltIcon">&#xf2ed;</system:String>
+    <system:String x:Key="FontAwesomeUndoAltIcon">&#xf2ea;</system:String>
+    <system:String x:Key="FontAwesomeExternalLinkAltIcon">&#xf35d;</system:String>
 
 </ResourceDictionary>

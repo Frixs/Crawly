@@ -7,10 +7,14 @@ namespace InformationRetrievalManager
     /// <summary>
     public class CheckEntryViewModel : BaseEntryViewModel<bool>
     {
-        #region Public Properties
+        #region Protected Members
 
         /// <inheritdoc/>
         protected override Func<bool, bool> ValueCustomSetterProcess => null;
+
+        #endregion
+
+        #region Public Properties
 
         #endregion
 

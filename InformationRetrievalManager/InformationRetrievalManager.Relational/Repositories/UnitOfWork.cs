@@ -1,13 +1,15 @@
 ﻿using Ixs.DNA;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace InformationRetrievalManager.Relational
 {
     /// <summary>
     /// The unit of work class serves one purpose: to make sure that when you use multiple repositories, they share a single database context. 
-    /// That way, when a unit of work is complete you can call the <see cref="Commit"/> method on that instance of the context and be assured that all related changes will be coordinated.
+    /// That way, when a unit of work is complete you can call the <see cref="SaveChanges"/> method on that instance of the context and be assured that all related changes will be coordinated.
     /// </summary>
     internal sealed class UnitOfWork : IUnitOfWork
     {
@@ -96,10 +98,80 @@ namespace InformationRetrievalManager.Relational
         #region Interface Methods
 
         /// <inheritdoc/>
-        public void Commit()
+        public void SaveChanges()
         {
             int n = _dbContext.SaveChanges();
-            _logger.LogDebugSource($"Total of {n} database changes saved!");
+            _logger.LogTraceSource($"Total of {n} database changes saved!");
+        }
+
+        /// <inheritdoc/>
+        public void UndoChanges()
+        {
+            foreach (var entry in _dbContext.ChangeTracker.Entries())
+            {
+                switch (entry.State)
+                {
+                    case EntityState.Modified:
+                        entry.State = EntityState.Unchanged;
+                        break;
+                    case EntityState.Added:
+                        entry.State = EntityState.Detached;
+                        break;
+                    case EntityState.Deleted:
+                        entry.Reload();
+                        break;
+                    default: break;
+                }
+            }
+        }
+
+        /// <inheritdoc/>
+        public void UndoEntityChanges(object entity)
+        {
+            var entry = _dbContext.Entry(entity);
+            switch (entry.State)
+            {
+                case EntityState.Modified:
+                    entry.State = EntityState.Unchanged;
+                    break;
+                case EntityState.Added:
+                    entry.State = EntityState.Detached;
+                    break;
+                case EntityState.Deleted:
+                    entry.Reload();
+                    break;
+                default: break;
+            }
+        }
+
+        /// <inheritdoc/>
+        public void BeginTransaction()
+        {
+            if (_dbContext.Database.CurrentTransaction != null)
+                return;
+
+            _dbContext.Database.BeginTransaction();
+            _logger.LogDebugSource($"Database transaction has started!");
+        }
+
+        /// <inheritdoc/>
+        public void CommitTransaction()
+        {
+            if (_dbContext.Database.CurrentTransaction == null)
+                return;
+
+            _dbContext.Database.CommitTransaction();
+            _logger.LogDebugSource($"Database transaction committed!");
+        }
+
+        /// <inheritdoc/>
+        public void RollbackTransaction()
+        {
+            if (_dbContext.Database.CurrentTransaction == null)
+                return;
+
+            _dbContext.Database.RollbackTransaction();
+            _logger.LogDebugSource($"Database transaction roll-backed!");
         }
 
         /// <inheritdoc/>

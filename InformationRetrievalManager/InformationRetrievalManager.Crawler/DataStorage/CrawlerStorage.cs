@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace InformationRetrievalManager.Crawler
@@ -118,13 +119,10 @@ namespace InformationRetrievalManager.Crawler
         }
 
         /// <inheritdoc/>
-        public string[] GetDataFiles(ICrawlerEngine crawler)
+        public string[] GetAllDataFiles(string cid)
         {
-            if (crawler == null)
-                throw new ArgumentNullException("Crawler is not defined!");
-
-            if (crawler.IsCurrentlyCrawling)
-                return null;
+            if (cid == null)
+                throw new ArgumentNullException("Crawler ID is not defined!");
 
             var result = new List<string>();
 
@@ -134,7 +132,7 @@ namespace InformationRetrievalManager.Crawler
                 string[] dirs = Directory.GetDirectories(Constants.CrawlerDataStorageDir);
                 for (int i = 0; i < dirs.Length; ++i)
                     // Find the one specific for the searched crawler...
-                    if (Path.GetFileName(dirs[i]).StartsWith(crawler.NameIdentifier))
+                    if (Path.GetFileName(dirs[i]).StartsWith(cid))
                     {
                         result.AddRange(
                             Directory.GetFiles(dirs[i])
@@ -143,6 +141,27 @@ namespace InformationRetrievalManager.Crawler
             }
 
             return result.ToArray();
+        }
+
+        /// <inheritdoc/>
+        public void DeleteDataFiles(string cid, DateTime fileTimestamp)
+        {
+            if (cid == null)
+                throw new ArgumentNullException("Crawler ID is not defined!");
+
+            if (Directory.Exists(Constants.CrawlerDataStorageDir))
+            {
+                // Get all crawler directories...
+                string[] dirs = Directory.GetDirectories(Constants.CrawlerDataStorageDir);
+                for (int i = 0; i < dirs.Length; ++i)
+                    // Find the one specific for the searched crawler...
+                    if (Path.GetFileName(dirs[i]).StartsWith(cid))
+                    {
+                        var filesToDelete = Directory.GetFiles(dirs[i]).Where(o => o.Contains(MakeFilename("", fileTimestamp, ""))).ToList();
+                        foreach (var file in filesToDelete)
+                            File.Delete(file);
+                    }
+            }
         }
 
         #endregion

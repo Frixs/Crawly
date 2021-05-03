@@ -5,21 +5,798 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:InformationRetrievalManager"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    x:Name="thispage"
     Title="DataInstancePage"
     d:Background="{StaticResource BackgroundBrushKey}"
     d:DataContext="{x:Static local:DataInstancePageDesignModel.Instance}"
-    d:DesignHeight="450"
-    d:DesignWidth="800"
+    d:DesignHeight="1200"
+    d:DesignWidth="960"
     x:TypeArguments="local:DataInstancePageViewModel"
     mc:Ignorable="d">
 
-    <Grid>
-        <TextBlock Text="Data Instance Page" />
-        <TextBlock Margin="0,30,0,0" Text="{Binding DataInstanceId}" />
+    <Border Padding="15">
+        <!--  Texture  -->
+        <Border.Background>
+            <VisualBrush
+                Opacity="0.7"
+                TileMode="Tile"
+                Viewport="0,0,0.5,0.5">
+                <VisualBrush.Visual>
+                    <Image Source="/Resources/Images/texture_data_seamless.png" />
+                </VisualBrush.Visual>
+            </VisualBrush>
+        </Border.Background>
 
-        <Button
-            VerticalAlignment="Bottom"
-            Command="{Binding GoToHomePageCommand, Mode=OneTime}"
-            Content="GO BACK" />
-    </Grid>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <!--  Title Wrapper  -->
+            <Grid Grid.Row="0" Margin="0,0,0,15">
+                <Grid HorizontalAlignment="Center">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <!--  Logo  -->
+                    <Image
+                        Grid.Column="0"
+                        Height="46"
+                        Source="/Resources/Images/logo_crawly_bold.png" />
+                    <Grid Grid.Column="1" local:AnimateSlideInFromRightProperty.Value="{Binding DataLoaded, Mode=OneWay}">
+                        <Grid.Style>
+                            <Style TargetType="{x:Type Grid}">
+                                <Setter Property="Width" Value="0" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding DataLoaded, Mode=OneWay}" Value="True">
+                                        <Setter Property="Width" Value="Auto" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Grid.Style>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <!--  Spacer  -->
+                        <TextBlock
+                            Grid.Column="0"
+                            Margin="5,0,8,0"
+                            VerticalAlignment="Center"
+                            FontFamily="{StaticResource DosisMedium}"
+                            FontSize="36"
+                            Text="|" />
+                        <!--  Title  -->
+                        <TextBlock
+                            Grid.Column="1"
+                            VerticalAlignment="Center"
+                            d:Text="MyDataInstance"
+                            FontFamily="{StaticResource DosisBold}"
+                            FontSize="18"
+                            Text="{Binding DataInstance.Name, Mode=OneWay}" />
+                    </Grid>
+                </Grid>
+                <Grid HorizontalAlignment="Left" VerticalAlignment="Center">
+                    <Button Command="{Binding GoToHomePageCommand, Mode=OneTime}" Content="GO BACK">
+                        <Button.Style>
+                            <Style BasedOn="{StaticResource DarkLightButton}" TargetType="{x:Type Button}">
+                                <Setter Property="IsEnabled" Value="False" />
+                                <Style.Triggers>
+                                    <MultiDataTrigger>
+                                        <MultiDataTrigger.Conditions>
+                                            <Condition Binding="{Binding ConfigurationContext.CrawlerConfigurationUpdateCommandFlag, Mode=OneWay}" Value="False" />
+                                            <Condition Binding="{Binding ConfigurationContext.ProcessingConfigurationUpdateCommandFlag, Mode=OneWay}" Value="False" />
+                                            <Condition Binding="{Binding ConfigurationContext.DataInstanceNameUpdateCommandFlag, Mode=OneWay}" Value="False" />
+                                            <Condition Binding="{Binding ConfigurationContext.DataInstanceDeleteCommandFlag, Mode=OneWay}" Value="False" />
+                                        </MultiDataTrigger.Conditions>
+                                        <Setter Property="IsEnabled" Value="True" />
+                                    </MultiDataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+                </Grid>
+            </Grid>
+
+            <!--  Loading Wrapper  -->
+            <Grid
+                Grid.Row="1"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                local:AnimateSlideInFromTopGoneProperty.Value="{Binding DataLoaded, Converter={local:BooleanInvertConverter}, Mode=OneWay}">
+                <!--  Spinner  -->
+                <TextBlock
+                    FontSize="42"
+                    Foreground="{StaticResource LightColorAlt2BrushKey}"
+                    Opacity="0.4"
+                    Style="{StaticResource SpinningText}" />
+            </Grid>
+
+            <!--  Main Content View  -->
+            <Grid
+                Grid.Row="1"
+                HorizontalAlignment="Center"
+                Visibility="Collapsed">
+                <Grid.Style>
+                    <Style TargetType="{x:Type Grid}">
+                        <Setter Property="local:AnimateSlideInFromTopGoneProperty.Value" Value="False" />
+                        <Style.Triggers>
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding DataLoaded, Mode=OneWay}" Value="True" />
+                                    <Condition Binding="{Binding CurrentView, Mode=OneWay}" Value="0" />
+                                </MultiDataTrigger.Conditions>
+                                <Setter Property="local:AnimateSlideInFromTopGoneProperty.Value" Value="True" />
+                            </MultiDataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Grid.Style>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <!--  Titles  -->
+                <Grid Grid.Row="0" Margin="0,0,0,15">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="2*" />
+                        <ColumnDefinition Width="2*" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock
+                        Grid.Column="0"
+                        HorizontalAlignment="Center"
+                        FontFamily="{StaticResource DosisRegular}"
+                        FontSize="15"
+                        Text="Configuration" />
+
+                    <TextBlock
+                        Grid.Column="1"
+                        HorizontalAlignment="Center"
+                        FontFamily="{StaticResource DosisRegular}"
+                        FontSize="15"
+                        Text="Query" />
+                </Grid>
+
+                <!--  Content  -->
+                <ScrollViewer
+                    Grid.Row="1"
+                    Padding="30,15,30,0"
+                    VerticalScrollBarVisibility="Auto">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*" />
+                            <ColumnDefinition Width="2*" />
+                        </Grid.ColumnDefinitions>
+
+                        <!--  Configuration  -->
+                        <Grid
+                            Grid.Column="0"
+                            MinWidth="385"
+                            MaxWidth="385"
+                            Margin="0,0,30,0"
+                            HorizontalAlignment="Right">
+
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+
+                            <!--  Crawler  -->
+                            <Grid Grid.Row="0">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+
+                                <!--  Start Crawler BTN  -->
+                                <Button
+                                    Grid.Row="0"
+                                    Height="36"
+                                    MinWidth="205"
+                                    Padding="15,0,15,0"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Top"
+                                    local:IsBusyProperty.Value="{Binding CrawlerInWork, Mode=OneWay}"
+                                    Command="{Binding StartCrawlerCommand, Mode=OneTime}"
+                                    Content="START CRAWLER"
+                                    FontSize="16"
+                                    Style="{StaticResource LightColorButton}" />
+
+                                <!--  Progress Wrapper  -->
+                                <Grid Grid.Row="1" local:AnimateFadeInProperty.Value="{Binding CrawlerInWork, Mode=OneWay}">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+
+                                    <!--  Cancel BTN  -->
+                                    <Border
+                                        Grid.Row="0"
+                                        Width="205"
+                                        Margin="0,2,0,0"
+                                        VerticalAlignment="Top">
+                                        <Button
+                                            HorizontalAlignment="Right"
+                                            Command="{Binding CancelCrawlerCommand, Mode=OneTime}"
+                                            Content="CANCEL"
+                                            FontSize="12"
+                                            Style="{StaticResource LightDarkTextButton}" />
+                                    </Border>
+
+                                    <!--  Progress (bar) Status  -->
+                                    <TextBlock
+                                        Grid.Row="0"
+                                        Margin="0,5,0,0"
+                                        HorizontalAlignment="Center"
+                                        FontFamily="{StaticResource DosisExtraBold}"
+                                        FontSize="15"
+                                        Text="{Binding CrawlerProgress}" />
+
+                                    <!--  Progress Verbose  -->
+                                    <Grid
+                                        Grid.Row="1"
+                                        Margin="0,4,0,0"
+                                        HorizontalAlignment="Center">
+                                        <Grid.Resources>
+                                            <Style TargetType="{x:Type StackPanel}">
+                                                <Setter Property="Orientation" Value="Horizontal" />
+                                                <Setter Property="Height" Value="15.5" />
+                                                <Setter Property="HorizontalAlignment" Value="Center" />
+                                                <Setter Property="VerticalAlignment" Value="Center" />
+                                            </Style>
+                                            <Style TargetType="{x:Type TextBlock}">
+                                                <Setter Property="HorizontalAlignment" Value="Center" />
+                                                <Setter Property="FontSize" Value="12" />
+                                                <Setter Property="FontFamily" Value="{StaticResource DosisMedium}" />
+                                            </Style>
+                                            <Style BasedOn="{StaticResource LightDarkTextButton}" TargetType="{x:Type Button}">
+                                                <Setter Property="Visibility" Value="Visible" />
+                                                <Setter Property="FontSize" Value="12" />
+                                                <Setter Property="Padding" Value="0" />
+                                                <Setter Property="Margin" Value="5,0,0,0" />
+                                                <Setter Property="Command" Value="{Binding OpenUrlCommand, Mode=OneTime}" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding CommandParameter, Converter={local:StringEmptyConverter}, RelativeSource={RelativeSource Self}}" Value="True">
+                                                        <Setter Property="Visibility" Value="Collapsed" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Grid.Resources>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                        </Grid.RowDefinitions>
+                                        <StackPanel Grid.Row="0" Opacity="1.0">
+                                            <TextBlock Text="{Binding CrawlerProgressMsgs[0], Mode=OneWay}" />
+                                            <Button CommandParameter="{Binding CrawlerProgressUrls[0], Mode=OneWay}" Content="(link)" />
+                                        </StackPanel>
+                                        <StackPanel Grid.Row="1" Opacity="0.9">
+                                            <TextBlock Text="{Binding CrawlerProgressMsgs[1], Mode=OneWay}" />
+                                            <Button CommandParameter="{Binding CrawlerProgressUrls[1], Mode=OneWay}" Content="(link)" />
+                                        </StackPanel>
+                                        <StackPanel Grid.Row="2" Opacity="0.75">
+                                            <TextBlock Text="{Binding CrawlerProgressMsgs[2], Mode=OneWay}" />
+                                            <Button CommandParameter="{Binding CrawlerProgressUrls[2], Mode=OneWay}" Content="(link)" />
+                                        </StackPanel>
+                                        <StackPanel Grid.Row="3" Opacity="0.5">
+                                            <TextBlock Text="{Binding CrawlerProgressMsgs[3], Mode=OneWay}" />
+                                            <Button CommandParameter="{Binding CrawlerProgressUrls[3], Mode=OneWay}" Content="(link)" />
+                                        </StackPanel>
+                                        <StackPanel Grid.Row="4" Opacity="0.25">
+                                            <TextBlock Text="{Binding CrawlerProgressMsgs[4], Mode=OneWay}" />
+                                            <Button CommandParameter="{Binding CrawlerProgressUrls[4], Mode=OneWay}" Content="(link)" />
+                                        </StackPanel>
+                                    </Grid>
+                                </Grid>
+
+                                <!--  View Configuration BTN  -->
+                                <Button
+                                    Grid.Row="2"
+                                    Margin="0,15,0,0"
+                                    HorizontalAlignment="Center"
+                                    Command="{Binding ShowViewCommand, Mode=OneTime}"
+                                    CommandParameter="2"
+                                    Content="&gt;&gt; View Crawler Configuration &lt;&lt;"
+                                    FontFamily="{StaticResource DosisLight}"
+                                    FontSize="13"
+                                    Style="{StaticResource LightDarkTextButton}" />
+                            </Grid>
+
+                            <Border
+                                Grid.Row="1"
+                                Margin="0,30,0,30"
+                                Style="{StaticResource LineSeparator}" />
+
+                            <!--  Index Processing  -->
+                            <Grid Grid.Row="2">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+
+                                <!--  Crawled Data Selection  -->
+                                <Grid
+                                    Grid.Row="0"
+                                    Margin="0,0,0,10"
+                                    IsEnabled="{Binding IndexProcessingInWorkFlag, Converter={local:BooleanInvertConverter}, Mode=OneWay}">
+                                    <!--  Open Raw BTN  -->
+                                    <Button
+                                        Width="34"
+                                        Height="34"
+                                        Margin="0,0,258,0"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Top"
+                                        Command="{Binding OpenRawDataCommand, Mode=OneTime}"
+                                        CommandParameter="{Binding DataFileEntry.Value, Mode=OneWay}"
+                                        Content="{StaticResource FontAwesomeCodeIcon}"
+                                        FontFamily="{StaticResource FontAwesomeSolid}"
+                                        ToolTip="Open Raw Data">
+                                        <Button.Style>
+                                            <Style BasedOn="{StaticResource DarkLightButton}" TargetType="{x:Type Button}">
+                                                <Setter Property="Visibility" Value="Visible" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding DataFileEntry.Value.FilePath, Mode=OneWay}" Value="{x:Null}">
+                                                        <Setter Property="Visibility" Value="Collapsed" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Button.Style>
+                                    </Button>
+                                    <!--  Data File Entry  -->
+                                    <local:ComboEntry
+                                        Width="205"
+                                        VerticalAlignment="Center"
+                                        DataContext="{Binding DataFileEntry, Mode=OneWay}" />
+                                    <!--  Delete BTN  -->
+                                    <Button
+                                        Width="34"
+                                        Height="34"
+                                        Margin="258,0,0,0"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Top"
+                                        Command="{Binding DeleteDataFileCommand, Mode=OneTime}"
+                                        CommandParameter="{Binding DataFileEntry.Value, Mode=OneWay}"
+                                        Content="{StaticResource FontAwesomeTrashAltIcon}"
+                                        FontFamily="{StaticResource FontAwesomeSolid}"
+                                        IsEnabled="{Binding CrawlerInWork, Converter={local:BooleanInvertConverter}, Mode=OneWay}"
+                                        ToolTip="Delete Data">
+                                        <Button.Style>
+                                            <Style BasedOn="{StaticResource DarkLightButton}" TargetType="{x:Type Button}">
+                                                <Setter Property="Visibility" Value="Visible" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding DataFileEntry.Value.FilePath, Mode=OneWay}" Value="{x:Null}">
+                                                        <Setter Property="Visibility" Value="Collapsed" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Button.Style>
+                                    </Button>
+                                </Grid>
+
+                                <!--  Start Index Processing BTN  -->
+                                <Button
+                                    Grid.Row="1"
+                                    Height="36"
+                                    MinWidth="205"
+                                    Padding="15,0,15,0"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Top"
+                                    local:IsBusyProperty.Value="{Binding IndexProcessingInWorkFlag, Mode=OneWay}"
+                                    Command="{Binding StartIndexProcessingCommand, Mode=OneTime}"
+                                    Content="START INDEX PROCESSING"
+                                    FontSize="16">
+                                    <Button.Style>
+                                        <Style BasedOn="{StaticResource LightColorButton}" TargetType="{x:Type Button}">
+                                            <Setter Property="IsEnabled" Value="False" />
+                                            <Style.Triggers>
+                                                <MultiDataTrigger>
+                                                    <MultiDataTrigger.Conditions>
+                                                        <Condition Binding="{Binding DataFileEntry.Value.FilePath, Converter={local:StringEmptyConverter}, Mode=OneWay}" Value="False" />
+                                                        <Condition Binding="{Binding CrawlerInWork, Mode=OneWay}" Value="False" />
+                                                        <Condition Binding="{Binding QueryInWorkFlag, Mode=OneWay}" Value="False" />
+                                                    </MultiDataTrigger.Conditions>
+                                                    <Setter Property="IsEnabled" Value="True" />
+                                                </MultiDataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Button.Style>
+                                </Button>
+
+                                <!--  Progress Wrapper  -->
+                                <Grid Grid.Row="2" local:AnimateFadeInProperty.Value="{Binding IndexProcessingInWorkFlag, Mode=OneWay}">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+
+                                    <!--  Progress (bar) Status  -->
+                                    <TextBlock
+                                        Grid.Row="0"
+                                        Margin="0,5,0,0"
+                                        HorizontalAlignment="Center"
+                                        FontFamily="{StaticResource DosisExtraBold}"
+                                        FontSize="15"
+                                        Text="{Binding IndexProcessingProgress, Mode=OneWay}" />
+                                </Grid>
+
+                                <!--  View Configuration BTN  -->
+                                <Button
+                                    Grid.Row="3"
+                                    Margin="0,15,0,0"
+                                    HorizontalAlignment="Center"
+                                    Command="{Binding ShowViewCommand, Mode=OneTime}"
+                                    CommandParameter="2"
+                                    Content="&gt;&gt; View Processing Configuration &lt;&lt;"
+                                    FontFamily="{StaticResource DosisLight}"
+                                    FontSize="13"
+                                    Style="{StaticResource LightDarkTextButton}" />
+                            </Grid>
+                        </Grid>
+
+                        <!--  Query  -->
+                        <Grid
+                            Grid.Column="1"
+                            MinWidth="385"
+                            MaxWidth="385"
+                            Margin="30,0,0,0"
+                            HorizontalAlignment="Left">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+
+                            <Grid Grid.Row="0">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="*" />
+                                </Grid.RowDefinitions>
+
+                                <Grid Grid.Row="0">
+                                    <Grid.Style>
+                                        <Style TargetType="{x:Type Grid}">
+                                            <Setter Property="IsEnabled" Value="False" />
+                                            <Style.Triggers>
+                                                <MultiDataTrigger>
+                                                    <MultiDataTrigger.Conditions>
+                                                        <Condition Binding="{Binding IndexProcessingInWorkFlag, Mode=OneWay}" Value="False" />
+                                                        <Condition Binding="{Binding QueryInWorkFlag, Mode=OneWay}" Value="False" />
+                                                    </MultiDataTrigger.Conditions>
+                                                    <Setter Property="IsEnabled" Value="True" />
+                                                </MultiDataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Grid.Style>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+                                    <!--  Index Selection  -->
+                                    <Grid Grid.Row="0" Margin="0,0,0,10">
+                                        <!--  Index File Entry  -->
+                                        <local:ComboEntry
+                                            Width="205"
+                                            VerticalAlignment="Top"
+                                            DataContext="{Binding IndexFileEntry, Mode=OneWay}" />
+                                        <!--  Delete BTN  -->
+                                        <Button
+                                            Width="34"
+                                            Height="34"
+                                            Margin="258,0,0,0"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Top"
+                                            Command="{Binding DeleteIndexFileCommand, Mode=OneTime}"
+                                            CommandParameter="{Binding IndexFileEntry.Value, Mode=OneWay}"
+                                            Content="{StaticResource FontAwesomeTrashAltIcon}"
+                                            FontFamily="{StaticResource FontAwesomeSolid}"
+                                            ToolTip="Delete Data">
+                                            <Button.Style>
+                                                <Style BasedOn="{StaticResource DarkLightButton}" TargetType="{x:Type Button}">
+                                                    <Setter Property="Visibility" Value="Visible" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IndexFileEntry.Value.FilePath, Mode=OneWay}" Value="{x:Null}">
+                                                            <Setter Property="Visibility" Value="Collapsed" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Button.Style>
+                                        </Button>
+                                    </Grid>
+
+                                    <!--  Search Model Radio Selection  -->
+                                    <Grid Grid.Row="1">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                        </Grid.RowDefinitions>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="2*" />
+                                            <ColumnDefinition Width="2*" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock
+                                            Grid.Row="0"
+                                            Grid.ColumnSpan="4"
+                                            HorizontalAlignment="Center"
+                                            FontFamily="{StaticResource DosisBold}"
+                                            FontSize="15"
+                                            Text="Query Search Model" />
+                                        <local:RadioEntry
+                                            Grid.Row="1"
+                                            Grid.Column="0"
+                                            DataContext="{Binding QueryModelEntryArray[0], Mode=OneWay}" />
+                                        <local:RadioEntry
+                                            Grid.Row="1"
+                                            Grid.Column="1"
+                                            DataContext="{Binding QueryModelEntryArray[1], Mode=OneWay}" />
+                                    </Grid>
+
+                                    <!--  Index File Entry  -->
+                                    <local:TextEntry
+                                        Grid.Row="2"
+                                        Width="385"
+                                        VerticalAlignment="Center"
+                                        DataContext="{Binding QueryEntry, Mode=OneWay}"
+                                        TextAlignment="Center" />
+                                </Grid>
+
+                                <!--  Search BTN  -->
+                                <Button
+                                    Grid.Row="1"
+                                    Width="102"
+                                    Height="36"
+                                    Padding="15,0,15,0"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Top"
+                                    local:IsBusyProperty.Value="{Binding QueryInWorkFlag}"
+                                    Command="{Binding StartQueryCommand, Mode=OneTime}"
+                                    Content="SEARCH"
+                                    FontSize="16">
+                                    <Button.Style>
+                                        <Style BasedOn="{StaticResource LightColorButton}" TargetType="{x:Type Button}">
+                                            <Setter Property="IsEnabled" Value="False" />
+                                            <Style.Triggers>
+                                                <MultiDataTrigger>
+                                                    <MultiDataTrigger.Conditions>
+                                                        <Condition Binding="{Binding IndexFileEntry.Value.FilePath, Converter={local:StringEmptyConverter}, Mode=OneWay}" Value="False" />
+                                                        <Condition Binding="{Binding QueryEntry.Value, Converter={local:StringEmptyConverter}, Mode=OneWay}" Value="False" />
+                                                        <Condition Binding="{Binding IndexProcessingInWorkFlag, Mode=OneWay}" Value="False" />
+                                                    </MultiDataTrigger.Conditions>
+                                                    <Setter Property="IsEnabled" Value="True" />
+                                                </MultiDataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Button.Style>
+                                </Button>
+
+                                <!--  Limit Select Entry  -->
+                                <local:IntegerEntry
+                                    Grid.Row="1"
+                                    Width="65"
+                                    Margin="182,0,0,0"
+                                    HorizontalAlignment="Center"
+                                    DataContext="{Binding QuerySelectLimitEntry, Mode=OneWay}"
+                                    ToolTip="Result Selection Limit">
+                                    <local:IntegerEntry.Style>
+                                        <Style TargetType="{x:Type local:IntegerEntry}">
+                                            <Setter Property="IsEnabled" Value="False" />
+                                            <Style.Triggers>
+                                                <MultiDataTrigger>
+                                                    <MultiDataTrigger.Conditions>
+                                                        <Condition Binding="{Binding DataContext.IndexFileEntry.Value.FilePath, Converter={local:StringEmptyConverter}, ElementName=thispage, Mode=OneWay}" Value="False" />
+                                                        <Condition Binding="{Binding DataContext.IndexProcessingInWorkFlag, ElementName=thispage, Mode=OneWay}" Value="False" />
+                                                        <Condition Binding="{Binding DataContext.QueryInWorkFlag, ElementName=thispage, Mode=OneWay}" Value="False" />
+                                                    </MultiDataTrigger.Conditions>
+                                                    <Setter Property="IsEnabled" Value="True" />
+                                                </MultiDataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </local:IntegerEntry.Style>
+                                </local:IntegerEntry>
+
+                                <!--  Query Error Message  -->
+                                <TextBlock
+                                    Grid.Row="2"
+                                    Margin="0,10,0,0"
+                                    HorizontalAlignment="Center"
+                                    FontFamily="{StaticResource DosisMedium}"
+                                    FontSize="15"
+                                    Foreground="{StaticResource LightColorShinyBrushKey}"
+                                    Text="{Binding QueryErrorString, Mode=OneWay}"
+                                    TextAlignment="Center">
+                                    <TextBlock.Style>
+                                        <Style TargetType="{x:Type TextBlock}">
+                                            <Setter Property="Visibility" Value="Visible" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding QueryErrorString, Mode=OneWay}" Value="{x:Null}">
+                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+
+                                <!--  View Results BTN  -->
+                                <Button
+                                    Grid.Row="3"
+                                    Margin="0,15,0,0"
+                                    HorizontalAlignment="Center"
+                                    Command="{Binding ShowViewCommand, Mode=OneTime}"
+                                    CommandParameter="1"
+                                    Content="&gt;&gt; View Results &lt;&lt;"
+                                    FontFamily="{StaticResource DosisLight}"
+                                    FontSize="13">
+                                    <Button.Style>
+                                        <Style BasedOn="{StaticResource LightDarkTextButton}" TargetType="{x:Type Button}">
+                                            <Setter Property="local:AnimateFadeInNoWaitProperty.Value" Value="True" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding ResultContext.TotalDocuments, Mode=OneWay}" Value="-1">
+                                                    <Setter Property="local:AnimateFadeInNoWaitProperty.Value" Value="False" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Button.Style>
+                                </Button>
+                            </Grid>
+                        </Grid>
+                    </Grid>
+                </ScrollViewer>
+            </Grid>
+
+            <!--  Query Result View  -->
+            <Grid
+                Grid.Row="1"
+                HorizontalAlignment="Center"
+                Visibility="Collapsed">
+                <Grid.Style>
+                    <Style TargetType="{x:Type Grid}">
+                        <Setter Property="local:AnimateSlideInFromRightMarginGoneProperty.Value" Value="False" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding CurrentView, Mode=OneWay}" Value="1">
+                                <Setter Property="local:AnimateSlideInFromRightMarginGoneProperty.Value" Value="True" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Grid.Style>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <!--  Back to Main View BTN  -->
+                <Button
+                    Grid.Row="0"
+                    Width="34"
+                    Height="34"
+                    Command="{Binding ShowViewCommand, Mode=OneTime}"
+                    CommandParameter="0"
+                    Content="{StaticResource FontAwesomeUndoAltIcon}"
+                    FontFamily="{StaticResource FontAwesomeSolid}"
+                    FontSize="16"
+                    Style="{StaticResource DarkLightButton}" />
+
+                <!--  Content  -->
+                <ScrollViewer
+                    Name="sv_qrv"
+                    Grid.Row="1"
+                    MinWidth="830"
+                    MaxWidth="830"
+                    VerticalScrollBarVisibility="Auto">
+                    <ScrollViewer.Style>
+                        <Style TargetType="{x:Type ScrollViewer}">
+                            <Setter Property="Padding" Value="0,15,0,0" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding ComputedVerticalScrollBarVisibility, ElementName=sv_qrv}" Value="Visible">
+                                    <Setter Property="Padding" Value="0,15,30,0" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ScrollViewer.Style>
+
+                    <local:QueryDataResultView OpenSourceUrlCommand="{Binding OpenUrlCommand, Mode=OneTime}" ResultContext="{Binding ResultContext, Mode=OneWay}" />
+                </ScrollViewer>
+            </Grid>
+
+            <!--  Configuration View  -->
+            <Grid
+                Grid.Row="1"
+                HorizontalAlignment="Center"
+                Visibility="Collapsed">
+                <Grid.Style>
+                    <Style TargetType="{x:Type Grid}">
+                        <Setter Property="local:AnimateSlideInFromLeftMarginGoneProperty.Value" Value="False" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding CurrentView, Mode=OneWay}" Value="2">
+                                <Setter Property="local:AnimateSlideInFromLeftMarginGoneProperty.Value" Value="True" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Grid.Style>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <!--  Titles  -->
+                <Grid Grid.Row="0" Margin="0,0,0,15">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="2*" />
+                        <ColumnDefinition Width="2*" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock
+                        Grid.Column="0"
+                        HorizontalAlignment="Center"
+                        FontFamily="{StaticResource DosisRegular}"
+                        FontSize="15"
+                        Text="Crawler Configuration" />
+
+                    <TextBlock
+                        Grid.Column="1"
+                        HorizontalAlignment="Center"
+                        FontFamily="{StaticResource DosisRegular}"
+                        FontSize="15"
+                        Text="Processing Configuration" />
+                </Grid>
+
+                <!--  Back to Main View BTN  -->
+                <Button
+                    Grid.Row="0"
+                    Width="34"
+                    Height="34"
+                    Command="{Binding ShowViewCommand, Mode=OneTime}"
+                    CommandParameter="0"
+                    Content="{StaticResource FontAwesomeUndoAltIcon}"
+                    FontFamily="{StaticResource FontAwesomeSolid}"
+                    FontSize="16">
+                    <Button.Style>
+                        <Style BasedOn="{StaticResource DarkLightButton}" TargetType="{x:Type Button}">
+                            <Setter Property="IsEnabled" Value="False" />
+                            <Style.Triggers>
+                                <MultiDataTrigger>
+                                    <MultiDataTrigger.Conditions>
+                                        <Condition Binding="{Binding ConfigurationContext.CrawlerConfigurationUpdateCommandFlag, Mode=OneWay}" Value="False" />
+                                        <Condition Binding="{Binding ConfigurationContext.ProcessingConfigurationUpdateCommandFlag, Mode=OneWay}" Value="False" />
+                                        <Condition Binding="{Binding ConfigurationContext.DataInstanceNameUpdateCommandFlag, Mode=OneWay}" Value="False" />
+                                        <Condition Binding="{Binding ConfigurationContext.DataInstanceDeleteCommandFlag, Mode=OneWay}" Value="False" />
+                                    </MultiDataTrigger.Conditions>
+                                    <Setter Property="IsEnabled" Value="True" />
+                                </MultiDataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                </Button>
+
+                <!--  Content  -->
+                <ScrollViewer
+                    Name="sv_cv"
+                    Grid.Row="1"
+                    Padding="30,15,30,0"
+                    VerticalScrollBarVisibility="Auto">
+                    <ScrollViewer.Style>
+                        <Style TargetType="{x:Type ScrollViewer}">
+                            <Setter Property="Padding" Value="0,15,0,0" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding ComputedVerticalScrollBarVisibility, ElementName=sv_cv}" Value="Visible">
+                                    <Setter Property="Padding" Value="0,15,30,0" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ScrollViewer.Style>
+
+                    <local:DataInstanceConfigurationView ConfigurationContext="{Binding ConfigurationContext, Mode=OneWay}" />
+                </ScrollViewer>
+            </Grid>
+        </Grid>
+    </Border>
 </local:BasePage>

@@ -22,6 +22,6 @@ namespace InformationRetrievalManager.NLP
         /// <remarks>
         ///     <see cref="InvertedIndex._vocabulary"/>
         /// </remarks>
-        IReadOnlyDictionary<string, IReadOnlyDictionary<int, IReadOnlyTermInfo>> GetReadOnlyVocabulary();
+        IReadOnlyDictionary<string, IReadOnlyDictionary<long, IReadOnlyTermInfo>> GetReadOnlyVocabulary();
     }
 }

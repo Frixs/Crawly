@@ -33,9 +33,44 @@ namespace InformationRetrievalManager.Relational
         IRepository<IndexedDocumentDataModel> IndexedDocuments { get; }
 
         /// <summary>
-        /// Commit database context changes
+        /// Commit database context changes.
         /// </summary>
-        void Commit();
+        void SaveChanges();
+
+        /// <summary>
+        /// Undo database context changes.
+        /// </summary>
+        void UndoChanges();
+
+        /// <summary>
+        /// Undo database specific entity changes.
+        /// </summary>
+        /// <param name="entity">The entity.</param>
+        void UndoEntityChanges(object entity);
+
+        /// <summary>
+        /// Begin database transaction.
+        /// </summary>
+        /// <remarks>
+        ///     If the transaction already exists, this all will be ignored.
+        /// </remarks>
+        void BeginTransaction();
+
+        /// <summary>
+        /// Commit current database transaction.
+        /// </summary>
+        /// <remarks>
+        ///     If the transaction does not exist, this all will be ignored.
+        /// </remarks>
+        void CommitTransaction();
+
+        /// <summary>
+        /// Rollback current database transaction.
+        /// </summary>
+        /// <remarks>
+        ///     If the transaction does not exist, this all will be ignored.
+        /// </remarks>
+        void RollbackTransaction();
 
         /// <summary>
         /// Makes sure the database of the context is correctly set up

@@ -56,7 +56,7 @@ namespace InformationRetrievalManager.NLP.Test
         {
             #region Arrange
 
-            _processing = new IndexProcessing(_processingName, new Tokenizer(), new Stemmer(ProcessingLanguage.CZ), null, null, null, false, true, true);
+            _processing = new IndexProcessing(_processingName, default, new Tokenizer(), new Stemmer(ProcessingLanguage.CZ), null, null, null, false, true, true);
 
             var text = new IndexDocument(0, string.Empty, string.Empty, string.Empty, default, "Æauík");
 
@@ -85,7 +85,7 @@ namespace InformationRetrievalManager.NLP.Test
         {
             #region Arrange
 
-            _processing = new IndexProcessing(_processingName, new Tokenizer(), new Stemmer(), null, null, null, false, true, true);
+            _processing = new IndexProcessing(_processingName, default, new Tokenizer(), new Stemmer(), null, null, null, false, true, true);
 
             var text = new IndexDocument(0, string.Empty, string.Empty, string.Empty, default, "<li>");
 
@@ -114,7 +114,7 @@ namespace InformationRetrievalManager.NLP.Test
         {
             #region Arrange
 
-            _processing = new IndexProcessing(_processingName, new Tokenizer(), new Stemmer(), null, null, null, false, true, true);
+            _processing = new IndexProcessing(_processingName, default, new Tokenizer(), new Stemmer(), null, null, null, false, true, true);
 
             var text = new IndexDocument(0, string.Empty, string.Empty, string.Empty, default, "http://www.csfd.cz/film/261379-deadpool/komentare/?comment=10355101 link");
 
@@ -144,7 +144,7 @@ namespace InformationRetrievalManager.NLP.Test
         {
             #region Arrange
 
-            _processing = new IndexProcessing(_processingName, new Tokenizer(), new Stemmer(), null, null, null, false, false, false);
+            _processing = new IndexProcessing(_processingName, default, new Tokenizer(), new Stemmer(), null, null, null, false, false, false);
 
             var text1 = new IndexDocument(0, string.Empty, string.Empty, string.Empty, default, "(pìstí).");
             var text2 = new IndexDocument(1, string.Empty, string.Empty, string.Empty, default, "1280x800");
@@ -179,7 +179,7 @@ namespace InformationRetrievalManager.NLP.Test
         {
             #region Arrange
 
-            _processing = new IndexProcessing(_processingName, new Tokenizer(), new Stemmer(ProcessingLanguage.CZ), new StopWordRemover(ProcessingLanguage.CZ), null, null, true, false, false);
+            _processing = new IndexProcessing(_processingName, default, new Tokenizer(), new Stemmer(ProcessingLanguage.CZ), new StopWordRemover(ProcessingLanguage.CZ), null, null, true, false, false);
 
             var text1 = new IndexDocument(0, string.Empty, string.Empty, string.Empty, default, "Tímto textem britský The Guardian Jana Èulíka nepotìšil");
             var text2 = new IndexDocument(1, string.Empty, string.Empty, string.Empty, default, "Jestliže nepøijde, mìl by se omluvit.");
@@ -221,7 +221,7 @@ namespace InformationRetrievalManager.NLP.Test
         {
             #region Arrange
 
-            _processing = new IndexProcessing(_processingName, new Tokenizer(), new Stemmer(), new StopWordRemover(), null, null, false, false, false);
+            _processing = new IndexProcessing(_processingName, default, new Tokenizer(), new Stemmer(), new StopWordRemover(), null, null, false, false, false);
 
             var text1 = new IndexDocument(0, string.Empty, string.Empty, string.Empty, default, "11.2. 2015");
             var text2 = new IndexDocument(1, string.Empty, string.Empty, string.Empty, default, "15.5.2010");
@@ -253,7 +253,7 @@ namespace InformationRetrievalManager.NLP.Test
         {
             #region Arrange
 
-            _processing = new IndexProcessing(_processingName, new Tokenizer(), new Stemmer(ProcessingLanguage.CZ), null, null, null, false, true, false);
+            _processing = new IndexProcessing(_processingName, default, new Tokenizer(), new Stemmer(ProcessingLanguage.CZ), null, null, null, false, true, false);
 
             var text1 = new IndexDocument(0, string.Empty, string.Empty, string.Empty, default, "æau");
             var text2 = new IndexDocument(1, string.Empty, string.Empty, string.Empty, default, "cau");
@@ -294,7 +294,7 @@ namespace InformationRetrievalManager.NLP.Test
         {
             #region Arrange
 
-            _processing = new IndexProcessing(_processingName, new Tokenizer(), new Stemmer(ProcessingLanguage.CZ), null, null, null, true, false, false);
+            _processing = new IndexProcessing(_processingName, default, new Tokenizer(), new Stemmer(ProcessingLanguage.CZ), null, null, null, true, false, false);
 
             var text1 = new IndexDocument(0, string.Empty, string.Empty, string.Empty, default, "BOMB");
             var text2 = new IndexDocument(1, string.Empty, string.Empty, string.Empty, default, "Bomba");
@@ -333,7 +333,7 @@ namespace InformationRetrievalManager.NLP.Test
         {
             #region Arrange
 
-            _processing = new IndexProcessing(_processingName, new Tokenizer(), new Stemmer(ProcessingLanguage.CZ), null, null, null, false, false, false);
+            _processing = new IndexProcessing(_processingName, default, new Tokenizer(), new Stemmer(ProcessingLanguage.CZ), null, null, null, false, false, false);
 
             var text1 = new IndexDocument(0, string.Empty, string.Empty, string.Empty, default, "smìjí");
             var text2 = new IndexDocument(1, string.Empty, string.Empty, string.Empty, default, "smìju");
@@ -388,7 +388,7 @@ namespace InformationRetrievalManager.NLP.Test
         {
             #region Arrange
 
-            _processing = new IndexProcessing(_processingName, new Tokenizer(), new Stemmer(ProcessingLanguage.CZ), null, null, null, true, false, false);
+            _processing = new IndexProcessing(_processingName, default, new Tokenizer(), new Stemmer(ProcessingLanguage.CZ), null, null, null, true, false, false);
 
             var text1 = new IndexDocument(0, string.Empty, string.Empty, string.Empty, default, "BOMB");
             var text2 = new IndexDocument(1, string.Empty, string.Empty, string.Empty, default, "Bomba");
@@ -427,7 +427,7 @@ namespace InformationRetrievalManager.NLP.Test
         {
             #region Arrange
 
-            _processing = new IndexProcessing(_processingName, new Tokenizer(), new Stemmer(ProcessingLanguage.CZ), null, null, null, true, false, false);
+            _processing = new IndexProcessing(_processingName, default, new Tokenizer(), new Stemmer(ProcessingLanguage.CZ), null, null, null, true, false, false);
 
             var text = new IndexDocument(0, string.Empty, string.Empty, string.Empty, default, "èáú jak se máš?" +
                 "<li> o co jsti se snažil a jak,</li>\n" +
@@ -496,9 +496,9 @@ namespace InformationRetrievalManager.NLP.Test
         /// Print word frequencies
         /// </summary>
         /// <param name="vocabulary">The vocabulary</param>
-        private void PrintWordFrequencies(IReadOnlyDictionary<string, IReadOnlyDictionary<int, IReadOnlyTermInfo>> vocabulary)
+        private void PrintWordFrequencies(IReadOnlyDictionary<string, IReadOnlyDictionary<long, IReadOnlyTermInfo>> vocabulary)
         {
-            foreach (KeyValuePair<string, IReadOnlyDictionary<int, IReadOnlyTermInfo>> entry in vocabulary)
+            foreach (KeyValuePair<string, IReadOnlyDictionary<long, IReadOnlyTermInfo>> entry in vocabulary)
                 _testOutputHelper.WriteLine(entry.Key + ":\t" + entry.Value.Sum(o => o.Value.Frequency));
             PrintSortedDictionary(vocabulary);
         }
@@ -507,7 +507,7 @@ namespace InformationRetrievalManager.NLP.Test
         /// Print sorted words from the lsit of frequencies
         /// </summary>
         /// <param name="vocabulary">The vocabulary</param>
-        private void PrintSortedDictionary(IReadOnlyDictionary<string, IReadOnlyDictionary<int, IReadOnlyTermInfo>> vocabulary)
+        private void PrintSortedDictionary(IReadOnlyDictionary<string, IReadOnlyDictionary<long, IReadOnlyTermInfo>> vocabulary)
         {
             string[] words = vocabulary.Keys.ToArray();
             Array.Sort(words);

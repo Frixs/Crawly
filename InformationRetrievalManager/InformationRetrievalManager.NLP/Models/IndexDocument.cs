@@ -10,9 +10,9 @@ namespace InformationRetrievalManager.NLP
         #region Public Properties
 
         /// <summary>
-        /// Document ID
+        /// Document ID reference
         /// </summary>
-        public int Id { get; set; }
+        public long Id { get; set; }
 
         /// <summary>
         /// Document title
@@ -58,7 +58,7 @@ namespace InformationRetrievalManager.NLP
         ///     - <paramref name="sourceUrl"/> is null.
         ///     - <paramref name="content"/> is null.
         /// </exception>
-        public IndexDocument(int id, string title, string sourceUrl, string category, DateTime timestamp, string content)
+        public IndexDocument(long id, string title, string sourceUrl, string category, DateTime timestamp, string content)
         {
             if (id < 0) throw new ArgumentNullException("Invalid document ID!");
 

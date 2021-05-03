@@ -92,6 +92,7 @@ namespace InformationRetrievalManager.NLP
         /// Default constructor
         /// </summary>
         /// <param name="name">Name of the processing</param>
+        /// <param name="timestamp">The timestamp for this instance that is used as an additional index identifier.</param>
         /// <param name="tokenizer">The tokenizer for this processing</param>
         /// <param name="stemmer">The stemmer for this processing</param>
         /// <param name="stopWordRemover">The stopword remover for this processing (leave <see langword="null"/> to ignore removing stopwords)</param>
@@ -100,15 +101,14 @@ namespace InformationRetrievalManager.NLP
         /// <param name="toLowerCase">Should the toknes be lowercased?</param>
         /// <param name="removeAccentsBeforeStemming">Should we remove accents from tokens before stemming?</param>
         /// <param name="removeAccentsAfterStemming">Should we remove accents from tokens after stemming?</param>
-        public IndexProcessing(string name, Tokenizer tokenizer, Stemmer stemmer, StopWordRemover stopWordRemover = null, IFileManager fileManager = null, ILogger logger = null, bool toLowerCase = false, bool removeAccentsBeforeStemming = false, bool removeAccentsAfterStemming = false)
+        public IndexProcessing(string name, DateTime timestamp, Tokenizer tokenizer, Stemmer stemmer, StopWordRemover stopWordRemover = null, IFileManager fileManager = null, ILogger logger = null, bool toLowerCase = false, bool removeAccentsBeforeStemming = false, bool removeAccentsAfterStemming = false)
         {
-            // TODO: check name allowed characters (should allow double underscore, but not in user inputs) - Names with double underscore are wildcards
             Name = name;
 
             _tokenizer = tokenizer ?? throw new ArgumentNullException(nameof(tokenizer));
             _stemmer = stemmer ?? throw new ArgumentNullException(nameof(stemmer));
             _stopWordRemover = stopWordRemover;
-            _invertedIndex = new InvertedIndex(name, fileManager, logger);
+            _invertedIndex = new InvertedIndex(name, timestamp, fileManager, logger);
 
             _logger = logger;
 
@@ -121,21 +121,21 @@ namespace InformationRetrievalManager.NLP
         /// Constructor with configuration as a parameter
         /// </summary>
         /// <param name="name">Name of the processing</param>
+        /// <param name="timestamp">The timestamp for this instance that is used as an additional index identifier.</param>
         /// <param name="configuration">The configuration for the processing</param>
         /// <param name="fileManager">File manager used used for storing the processed index (the index will be stored in-memory only if the manager is not set)</param>
         /// <param name="logger">Connect logger from the rest of the system (if not set, the logger will not log anything)</param>
-        public IndexProcessing(string name, IndexProcessingConfiguration configuration, IFileManager fileManager = null, ILogger logger = null)
+        public IndexProcessing(string name, DateTime timestamp, IndexProcessingConfiguration configuration, IFileManager fileManager = null, ILogger logger = null)
         {
             if (configuration == null)
                 throw new ArgumentNullException(nameof(configuration));
 
-            // TODO: check name allowed characters (should allow double underscore, but not in user inputs) - Names with double underscore are wildcards
             Name = name;
 
             _tokenizer = new Tokenizer(configuration.CustomRegex);
             _stemmer = new Stemmer(configuration.Language);
             _stopWordRemover = new StopWordRemover(configuration.Language, configuration.CustomStopWords);
-            _invertedIndex = new InvertedIndex(name, fileManager, logger);
+            _invertedIndex = new InvertedIndex(name, timestamp, fileManager, logger);
 
             _logger = logger;
 
@@ -206,13 +206,13 @@ namespace InformationRetrievalManager.NLP
         /// </summary>
         /// <param name="text">The text</param>
         /// <returns>Indexed vocabulary based on the <paramref name="text"/>. The structure is the same as <see cref="InvertedIndex._vocabulary"/> with the only document here (ID=0).</returns>
-        public IReadOnlyDictionary<string, IReadOnlyDictionary<int, IReadOnlyTermInfo>> IndexText(string text)
+        public IReadOnlyDictionary<string, IReadOnlyDictionary<long, IReadOnlyTermInfo>> IndexText(string text)
         {
             if (text == null)
                 throw new ArgumentNullException("Text not specified!");
 
             // Define inverted index instance special for separate query indexing...
-            var ii = new InvertedIndex(Name + "(query)", null, _logger);
+            var ii = new InvertedIndex(Name + "(query)", default, null, _logger);
 
             // Process the text data
             _ = Process(text, 0, ii);
@@ -274,7 +274,7 @@ namespace InformationRetrievalManager.NLP
         /// <param name="documentId">The document ID for indexation (If <paramref name="invertedIndex"/> is not defined, indexation will not proceed and this parameter will be ignored).</param>
         /// <param name="invertedIndex">Inverted index instance used for the indexation.</param>
         /// <returns>Processed terms</returns>
-        private string[] Process(string text, int documentId, IInvertedIndex invertedIndex = null)
+        private string[] Process(string text, long documentId, IInvertedIndex invertedIndex = null)
         {
             // To lower
             if (ToLowerCase)

@@ -20,6 +20,11 @@ namespace InformationRetrievalManager
         #region Public Properties
 
         /// <summary>
+        /// Defines if the entry is read only (<see langword="true"/>) or not (<see langword="false"/>).
+        /// </summary>
+        public bool IsReadOnly { get; set; }
+
+        /// <summary>
         /// The label to identify what this value is for
         /// </summary>
         public string Label { get; set; }
