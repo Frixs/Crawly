@@ -1,5 +1,6 @@
 ﻿using InformationRetrievalManager.Core;
 using InformationRetrievalManager.Relational;
+using System.Windows.Input;
 
 namespace InformationRetrievalManager
 {
@@ -27,6 +28,32 @@ namespace InformationRetrievalManager
 
         #endregion
 
+        #region Flags
+
+        public bool CrawlerConfigurationReadOnlyFlag { get; set; }
+        public bool ProcessingConfigurationReadOnlyFlag { get; set; }
+        public bool DataInstanceNameReadOnlyFlag { get; set; }
+
+        public bool CrawlerConfigurationUpdateCommandFlag { get; set; }
+        public bool ProcessingConfigurationUpdateCommandFlag { get; set; }
+        public bool DataInstanceNameUpdateCommandFlag { get; set; }
+        public bool DataInstanceDeleteCommandFlag { get; set; }
+
+        #endregion
+
+        #region Commands
+
+        public ICommand ToggleEditCrawlerConfigurationReadOnlyCommand { get; set; }
+        public ICommand ToggleEditProcessingConfigurationReadOnlyCommand { get; set; }
+        public ICommand ToggleEditDataInstanceNameReadOnlyCommand { get; set; }
+
+        public ICommand CrawlerConfigurationUpdateCommand { get; set; }
+        public ICommand ProcessingConfigurationUpdateCommand { get; set; }
+        public ICommand DataInstanceNameUpdateCommand { get; set; }
+        public ICommand DataInstanceDeleteCommand { get; set; }
+
+        #endregion
+
         #region Constructor
 
         /// <summary>
@@ -34,9 +61,10 @@ namespace InformationRetrievalManager
         /// </summary>
         public DataInstanceConfigurationViewContext()
         {
+            DataInstanceNameReadOnlyFlag = true;
             DataInstanceNameEntry = new TextEntryViewModel
             {
-                IsReadOnly = true,
+                IsReadOnly = DataInstanceNameReadOnlyFlag,
                 Label = null,
                 Description = null,
                 Validation = ValidationHelpers.GetPropertyValidateAttribute<DataInstanceDataModel, string, ValidateStringAttribute>(o => o.Name),
@@ -55,9 +83,11 @@ namespace InformationRetrievalManager
         /// </summary>
         /// <param name="crawlerConfiguration">Crawler configuration form values.</param>
         /// <param name="processingConfiguration">Processing configuration form values.</param>
-        public void Set(CrawlerConfigurationDataModel crawlerConfiguration, IndexProcessingConfigurationDataModel processingConfiguration)
+        public void Set(CrawlerConfigurationDataModel crawlerConfiguration, IndexProcessingConfigurationDataModel processingConfiguration, string dataInstanceName)
         {
-            CrawlerConfigurationContext.ReadOnly(true).Set(
+            CrawlerConfigurationReadOnlyFlag = ProcessingConfigurationReadOnlyFlag = true;
+
+            CrawlerConfigurationContext.ReadOnly(CrawlerConfigurationReadOnlyFlag).Set(
                 crawlerConfiguration.SiteAddress,
                 crawlerConfiguration.SiteSuffix,
                 crawlerConfiguration.StartPageNo,
@@ -72,7 +102,7 @@ namespace InformationRetrievalManager
                 crawlerConfiguration.SiteArticleDateTimeFormat,
                 crawlerConfiguration.SiteArticleDateTimeCultureInfo
                 );
-            ProcessingConfigurationContext.ReadOnly(true).Set(
+            ProcessingConfigurationContext.ReadOnly(ProcessingConfigurationReadOnlyFlag).Set(
                 processingConfiguration.Language,
                 processingConfiguration.CustomRegex,
                 string.Join(IndexProcessingConfiguration.CustomStopWords_Separator.ToString(), processingConfiguration.CustomStopWords),
@@ -80,6 +110,7 @@ namespace InformationRetrievalManager
                 processingConfiguration.RemoveAccentsBeforeStemming,
                 processingConfiguration.RemoveAccentsAfterStemming
                 );
+            DataInstanceNameEntry.Value = dataInstanceName;
         }
 
         #endregion

@@ -82,6 +82,7 @@
                     <Button
                         Command="{Binding GoToHomePageCommand, Mode=OneTime}"
                         Content="GO BACK"
+                        IsEnabled="{Binding ConfigurationContext.DataInstanceDeleteCommandFlag, Converter={local:BooleanInvertConverter}, Mode=OneWay}"
                         Style="{StaticResource DarkLightButton}" />
                 </Grid>
             </Grid>

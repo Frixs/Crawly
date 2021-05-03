@@ -40,7 +40,7 @@
                 Grid.Column="1"
                 HorizontalAlignment="Center"
                 FontFamily="{StaticResource DosisBold}"
-                FontSize="14">
+                FontSize="16">
                 <TextBlock.Style>
                     <Style TargetType="{x:Type TextBlock}">
                         <Setter Property="Text" Value="{Binding ResultContext.FoundDocuments, ElementName=this, StringFormat={}{0:#\,#}, Mode=OneWay}" />
@@ -65,7 +65,7 @@
                 Grid.Column="2"
                 HorizontalAlignment="Center"
                 FontFamily="{StaticResource DosisBold}"
-                FontSize="14">
+                FontSize="16">
                 <TextBlock.Style>
                     <Style TargetType="{x:Type TextBlock}">
                         <Setter Property="Text" Value="{Binding ResultContext.TotalDocuments, ElementName=this, StringFormat={}{0:#\,#}, Mode=OneWay}" />

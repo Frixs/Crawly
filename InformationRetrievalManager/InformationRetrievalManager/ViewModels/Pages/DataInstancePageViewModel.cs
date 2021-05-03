@@ -242,6 +242,10 @@ namespace InformationRetrievalManager
         /// </summary>
         public ICommand ShowViewCommand { get; set; }
 
+        public ICommand ToggleEditCrawlerConfigurationReadOnlyCommand { get; set; }
+        public ICommand ToggleEditProcessingConfigurationReadOnlyCommand { get; set; }
+        public ICommand ToggleEditDataInstanceNameReadOnlyCommand { get; set; }
+
         #endregion
 
         #region Constructor
@@ -262,7 +266,10 @@ namespace InformationRetrievalManager
             DeleteIndexFileCommand = new RelayParameterizedCommand(async (parameter) => await DeleteIndexFileCommandRoutineAsync(parameter));
             StartQueryCommand = new RelayCommand(async () => await StartQueryCommandRoutineAsync());
             ShowViewCommand = new RelayParameterizedCommand((parameter) => ShowViewCommandRoutine(parameter));
-
+            ConfigurationContext.ToggleEditCrawlerConfigurationReadOnlyCommand = new RelayCommand(ToggleEditCrawlerConfigurationReadOnlyCommandRoutine);
+            ConfigurationContext.ToggleEditProcessingConfigurationReadOnlyCommand = new RelayCommand(ToggleEditProcessingConfigurationReadOnlyCommandRoutine);
+            ConfigurationContext.ToggleEditDataInstanceNameReadOnlyCommand = new RelayCommand(ToggleEditDataInstanceNameReadOnlyCommandRoutine);
+            
             // Create data selection with its entry.
             _dataFileSelection = new List<DataFileInfo>() { new DataFileInfo("< Select Data File >", null, default) };
             DataFileEntry = new ComboEntryViewModel<DataFileInfo>
@@ -712,6 +719,27 @@ namespace InformationRetrievalManager
                 CurrentView = (View)parameter;
             else
                 CurrentView = (View)Enum.ToObject(typeof(View),  int.Parse(parameter.ToString()));
+
+            // If configuration, reload the data...
+            if (CurrentView == View.Configuration)
+                // Load data/values into the configuration context
+                ConfigurationContext.Set(_dataInstance.CrawlerConfiguration, _dataInstance.IndexProcessingConfiguration, _dataInstance.Name);
+        }
+
+        private void ToggleEditDataInstanceNameReadOnlyCommandRoutine()
+        {
+            ConfigurationContext.DataInstanceNameReadOnlyFlag = !ConfigurationContext.DataInstanceNameReadOnlyFlag;
+            ConfigurationContext.DataInstanceNameEntry.IsReadOnly = ConfigurationContext.DataInstanceNameReadOnlyFlag;
+        }
+        private void ToggleEditProcessingConfigurationReadOnlyCommandRoutine()
+        {
+            ConfigurationContext.ProcessingConfigurationReadOnlyFlag = !ConfigurationContext.ProcessingConfigurationReadOnlyFlag;
+            ConfigurationContext.ProcessingConfigurationContext.ReadOnly(ConfigurationContext.ProcessingConfigurationReadOnlyFlag);
+        }
+        private void ToggleEditCrawlerConfigurationReadOnlyCommandRoutine()
+        {
+            ConfigurationContext.CrawlerConfigurationReadOnlyFlag = !ConfigurationContext.CrawlerConfigurationReadOnlyFlag;
+            ConfigurationContext.CrawlerConfigurationContext.ReadOnly(ConfigurationContext.CrawlerConfigurationReadOnlyFlag);
         }
 
         #endregion
@@ -826,7 +854,7 @@ namespace InformationRetrievalManager
             // Load index files
             LoadIndexFiles(true);
             // Load data/values into the configuration context
-            ConfigurationContext.Set(_dataInstance.CrawlerConfiguration, _dataInstance.IndexProcessingConfiguration);
+            ConfigurationContext.Set(_dataInstance.CrawlerConfiguration, _dataInstance.IndexProcessingConfiguration, _dataInstance.Name);
 
             // Flag up data load is done
             CurrentView = View.Main;
