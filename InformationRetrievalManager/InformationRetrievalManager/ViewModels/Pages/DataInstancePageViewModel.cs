@@ -103,13 +103,18 @@ namespace InformationRetrievalManager
         public ComboEntryViewModel<DataFileInfo> IndexFileEntry { get; protected set; } //; ctor
 
         /// <summary>
-        /// Entry for query
+        /// Entry for query.
         /// </summary>
         [ValidateString(nameof(QueryEntry), typeof(DataInstancePageViewModel),
             pIsRequired: nameof(QueryEntry_IsRequired))]
         [ValidateBooleanExpressionString(nameof(QueryEntry), typeof(DataInstancePageViewModel),
             pIsRequired: nameof(QueryEntry_IsRequired))]
         public TextEntryViewModel QueryEntry { get; protected set; } //; ctor
+
+        /// <summary>
+        /// Entry for limiting query selection.
+        /// </summary>
+        public IntegerEntryViewModel QuerySelectLimitEntry { get; protected set; } //; ctor
 
         /// <summary>
         /// Query model radio entry array
@@ -291,6 +296,17 @@ namespace InformationRetrievalManager
                 Value = null,
                 Placeholder = "Ask Me Here",
                 MaxLength = 155
+            };
+
+            // Create query select limit query
+            QuerySelectLimitEntry = new IntegerEntryViewModel
+            {
+                Label = null,
+                Description = null,
+                Validation = null,
+                Value = 10,
+                MinValue = 1,
+                MaxValue = 100
             };
 
             // Create query model entries
@@ -618,10 +634,15 @@ namespace InformationRetrievalManager
         {
             await RunCommandAsync(() => QueryInWorkFlag, async () =>
             {
-                await Task.Delay(3000);
                 string query = QueryEntry.Value;
                 QueryModelType queryModel = _selectedQueryModel;
                 DataFileInfo file = IndexFileEntry.Value;
+                int select = QuerySelectLimitEntry.Value;
+
+                // Clear the previous results first
+                ResultContext.ClearData();
+                // Fire update context property
+                OnPropertyChanged(nameof(ResultContext));
 
                 if (string.IsNullOrEmpty(query))
                     return;
@@ -640,7 +661,7 @@ namespace InformationRetrievalManager
                 await _taskManager.Run(async () =>
                 {
                     ii.Load();
-                    results = await _queryIndexManager.QueryAsync(query, ii.GetReadOnlyVocabulary(), queryModel, _dataInstance.IndexProcessingConfiguration, 5);
+                    results = await _queryIndexManager.QueryAsync(query, ii.GetReadOnlyVocabulary(), queryModel, _dataInstance.IndexProcessingConfiguration, select);
                 });
 
                 // Go through the results...
@@ -661,11 +682,12 @@ namespace InformationRetrievalManager
                     else
                     {
                         // Something went wrong...
-                        // TODO - user feedback + get total found and total documents + select input
+                        // TODO - user feedback + get total found and total documents
                         break;
                     }
                 }
-
+                ResultContext.TotalDocuments = 0;
+                ResultContext.FoundDocuments = 0;
                 // Fire update context property
                 OnPropertyChanged(nameof(ResultContext));
 

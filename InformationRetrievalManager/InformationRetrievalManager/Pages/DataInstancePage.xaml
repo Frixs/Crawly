@@ -5,6 +5,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:InformationRetrievalManager"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    x:Name="thispage"
     Title="DataInstancePage"
     d:Background="{StaticResource BackgroundBrushKey}"
     d:DataContext="{x:Static local:DataInstancePageDesignModel.Instance}"
@@ -537,8 +538,8 @@
                                 <!--  Search BTN  -->
                                 <Button
                                     Grid.Row="1"
+                                    Width="102"
                                     Height="36"
-                                    MinWidth="102"
                                     Padding="15,0,15,0"
                                     HorizontalAlignment="Center"
                                     VerticalAlignment="Top"
@@ -563,6 +564,31 @@
                                     </Button.Style>
                                 </Button>
 
+                                <!--  Limit Select Entry  -->
+                                <local:IntegerEntry
+                                    Grid.Row="1"
+                                    Width="65"
+                                    Margin="182,0,0,0"
+                                    HorizontalAlignment="Center"
+                                    DataContext="{Binding QuerySelectLimitEntry, Mode=OneWay}"
+                                    ToolTip="Result Selection Limit">
+                                    <local:IntegerEntry.Style>
+                                        <Style TargetType="{x:Type local:IntegerEntry}">
+                                            <Setter Property="IsEnabled" Value="False" />
+                                            <Style.Triggers>
+                                                <MultiDataTrigger>
+                                                    <MultiDataTrigger.Conditions>
+                                                        <Condition Binding="{Binding DataContext.IndexFileEntry.Value.FilePath, Converter={local:StringEmptyConverter}, ElementName=thispage, Mode=OneWay}" Value="False" />
+                                                        <Condition Binding="{Binding DataContext.IndexProcessingInWorkFlag, ElementName=thispage, Mode=OneWay}" Value="False" />
+                                                        <Condition Binding="{Binding DataContext.QueryInWorkFlag, ElementName=thispage, Mode=OneWay}" Value="False" />
+                                                    </MultiDataTrigger.Conditions>
+                                                    <Setter Property="IsEnabled" Value="True" />
+                                                </MultiDataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </local:IntegerEntry.Style>
+                                </local:IntegerEntry>
+
                                 <!--  View Results BTN  -->
                                 <Button
                                     Grid.Row="2"
@@ -575,10 +601,10 @@
                                     FontSize="13">
                                     <Button.Style>
                                         <Style BasedOn="{StaticResource LightDarkTextButton}" TargetType="{x:Type Button}">
-                                            <Setter Property="local:AnimateFadeInProperty.Value" Value="False" />
+                                            <Setter Property="local:AnimateFadeInNoWaitProperty.Value" Value="True" />
                                             <Style.Triggers>
-                                                <DataTrigger Binding="{Binding ResultContext.Data, Converter={local:CollectionHasAnyItemsConverter}, Mode=OneWay}" Value="True">
-                                                    <Setter Property="local:AnimateFadeInProperty.Value" Value="True" />
+                                                <DataTrigger Binding="{Binding ResultContext.TotalDocuments, Mode=OneWay}" Value="-1">
+                                                    <Setter Property="local:AnimateFadeInNoWaitProperty.Value" Value="False" />
                                                 </DataTrigger>
                                             </Style.Triggers>
                                         </Style>

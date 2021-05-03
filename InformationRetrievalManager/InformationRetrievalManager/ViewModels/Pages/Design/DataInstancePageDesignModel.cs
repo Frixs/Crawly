@@ -21,7 +21,7 @@
             DataLoaded = true;
             CrawlerInWork = true;
             IndexProcessingInWorkFlag = true;
-            CurrentView = View.Results;
+            CurrentView = View.Main;
         }
 
         #endregion

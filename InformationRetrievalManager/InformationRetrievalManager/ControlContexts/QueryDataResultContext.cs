@@ -14,6 +14,16 @@ namespace InformationRetrievalManager
         /// </summary>
         public ObservableCollection<Result> Data { get; set; } = new ObservableCollection<Result>();
 
+        /// <summary>
+        /// Number of total documents that were searched for the data.
+        /// </summary>
+        public long TotalDocuments { get; set; } = -1;
+
+        /// <summary>
+        /// Number of documents found in total.
+        /// </summary>
+        public long FoundDocuments { get; set; } = -1;
+
         #endregion
 
         #region Constructor
@@ -24,6 +34,20 @@ namespace InformationRetrievalManager
         public QueryDataResultContext()
         {
 
+        }
+
+        #endregion
+
+        #region Public Methods
+
+        /// <summary>
+        /// Clears the data into default.
+        /// </summary>
+        public void ClearData()
+        {
+            TotalDocuments = -1;
+            FoundDocuments = -1;
+            Data.Clear();
         }
 
         #endregion
