@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 
 namespace InformationRetrievalManager.NLP
 {
@@ -43,7 +44,7 @@ namespace InformationRetrievalManager.NLP
         #region Interface Methods
 
         /// <inheritdoc/>
-        public void CalculateData(IReadOnlyDictionary<string, IReadOnlyDictionary<long, IReadOnlyTermInfo>> data, out long totalDocuments)
+        public void CalculateData(IReadOnlyDictionary<string, IReadOnlyDictionary<long, IReadOnlyTermInfo>> data, out long totalDocuments, CancellationToken cancellationToken = default)
         {
             if (data == null)
                 throw new ArgumentNullException("Data not specified!");
@@ -56,13 +57,22 @@ namespace InformationRetrievalManager.NLP
             {
                 foreach (var termDocument in term.Value)
                 {
+                    // Check for cancelation
+                    if (cancellationToken.IsCancellationRequested)
+                        break;
+
                     if (termDocument.Key < 0)
                         continue;
 
                     documents.Add(termDocument.Key);
                 }
+
+                // Check for cancelation
+                if (cancellationToken.IsCancellationRequested)
+                    break;
             }
 
+            // Save the document count
             totalDocuments = documents.Count;
 
             // Log it
@@ -70,7 +80,7 @@ namespace InformationRetrievalManager.NLP
         }
 
         /// <inheritdoc/>
-        public void CalculateQuery(string query, IReadOnlyDictionary<string, IReadOnlyDictionary<long, IReadOnlyTermInfo>> data, IndexProcessingConfiguration processingConfiguration)
+        public void CalculateQuery(string query, IReadOnlyDictionary<string, IReadOnlyDictionary<long, IReadOnlyTermInfo>> data, IndexProcessingConfiguration processingConfiguration, CancellationToken cancellationToken = default)
         {
             if (query == null || data == null)
                 throw new ArgumentNullException("Data not specified!");
@@ -86,11 +96,19 @@ namespace InformationRetrievalManager.NLP
             {
                 foreach (var termDocument in term.Value)
                 {
+                    // Check for cancelation
+                    if (cancellationToken.IsCancellationRequested)
+                        break;
+
                     if (termDocument.Key < 0)
                         continue;
 
                     documents.Add(termDocument.Key);
                 }
+
+                // Check for cancelation
+                if (cancellationToken.IsCancellationRequested)
+                    break;
             }
 
             // Query parser
@@ -115,6 +133,10 @@ namespace InformationRetrievalManager.NLP
                 var results = new List<long>();
                 foreach (var documentId in documents)
                 {
+                    // Check for cancelation
+                    if (cancellationToken.IsCancellationRequested)
+                        break;
+
                     if (queryParsed.Evaluate(new DocumentTermEvaluator(documentId, data, processingConfiguration)))
                         // document accepted
                         results.Add(documentId);
@@ -126,12 +148,19 @@ namespace InformationRetrievalManager.NLP
                 // Log it
                 _logger?.LogDebugSource("Query has been successfully calculated and data prepared.");
             }
+            // Otherwise, something went wrong during query parsing....
+            else
+            {
+                // Log it
+                _logger?.LogDebugSource("Query has failed to parse.");
+            }
         }
 
         /// <inheritdoc/>
-        public long[] CalculateBestMatch(int select, out long foundDocuments)
+        public long[] CalculateBestMatch(int select, out long foundDocuments, CancellationToken cancellationToken = default)
         {
             // The calculations are made in the query method due to parameter limitations.
+            // Cancellation is not needed here
 
             foundDocuments = _queryResults.Length;
 

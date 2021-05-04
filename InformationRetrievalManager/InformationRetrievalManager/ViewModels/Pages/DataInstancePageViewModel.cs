@@ -75,6 +75,12 @@ namespace InformationRetrievalManager
         /// </summary>
         private CancellationTokenSource _indexProcessingTokenSource = new CancellationTokenSource();
 
+        /// <summary>
+        /// Token for canceling the query processing.
+        /// TODO: Improve this approach with something different (user feedback etc.).
+        /// </summary>
+        private CancellationTokenSource _queryTokenSource = new CancellationTokenSource();
+
         #endregion
 
         #region Public Properties
@@ -414,6 +420,7 @@ namespace InformationRetrievalManager
         private void GoToHomePageCommandRoutine()
         {
             _indexProcessingTokenSource.Cancel();
+            _queryTokenSource.Cancel();
             DI.ViewModelApplication.GoToPage(ApplicationPage.Home);
         }
 
@@ -709,7 +716,11 @@ namespace InformationRetrievalManager
                     if (ii.Load())
                     {
                         indexLoaded = true;
-                        queryResult = await _queryIndexManager.QueryAsync(query, ii.GetReadOnlyVocabulary(), queryModel, _dataInstance.IndexProcessingConfiguration, select);
+                        var res = await _queryIndexManager.QueryAsync(query, ii.GetReadOnlyVocabulary(), queryModel, _dataInstance.IndexProcessingConfiguration, select, _queryTokenSource.Token);
+                        if (!_queryTokenSource.Token.IsCancellationRequested)
+                            queryResult = res; // Get the results if not cancelled
+                        else
+                            _queryIndexManager.ResetLastModelData(); // Reset the query manager last data if cancelled
                     }
                     // Otherwise, loading failed...
                     else

@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 
 namespace InformationRetrievalManager.NLP
 {
@@ -53,7 +54,7 @@ namespace InformationRetrievalManager.NLP
         #region Interface Methods
 
         /// <inheritdoc/>
-        public void CalculateData(IReadOnlyDictionary<string, IReadOnlyDictionary<long, IReadOnlyTermInfo>> data, out long totalDocuments)
+        public void CalculateData(IReadOnlyDictionary<string, IReadOnlyDictionary<long, IReadOnlyTermInfo>> data, out long totalDocuments, CancellationToken cancellationToken = default)
         {
             if (data == null)
                 throw new ArgumentNullException("Data not specified!");
@@ -72,12 +73,20 @@ namespace InformationRetrievalManager.NLP
                 // Get no. of documents the term is located in.
                 foreach (var termDocument in term.Value)
                 {
+                    // Check for cancelation
+                    if (cancellationToken.IsCancellationRequested)
+                        break;
+
                     if (termDocument.Key < 0)
                         continue;
 
                     termDocCount++;
                     documents.Add(termDocument.Key);
                 }
+
+                // Check for cancelation
+                if (cancellationToken.IsCancellationRequested)
+                    break;
 
                 // The IDF calculation
                 _termIdf[term.Key] = Math.Log(documents.Count / termDocCount, 10);
@@ -89,7 +98,13 @@ namespace InformationRetrievalManager.NLP
 
             // Go through documents and create document vectors...
             foreach (var documentId in documents)
-                docVectors[documentId] = CalculateDocumentVector(data, documentId);
+            {
+                // Check for cancelation
+                if (cancellationToken.IsCancellationRequested)
+                    break;
+
+                docVectors[documentId] = CalculateDocumentVector(data, documentId, cancellationToken);
+            }
 
             // Save the vectors
             _documentVectors = docVectors;
@@ -99,7 +114,7 @@ namespace InformationRetrievalManager.NLP
         }
 
         /// <inheritdoc/>
-        public void CalculateQuery(string query, IReadOnlyDictionary<string, IReadOnlyDictionary<long, IReadOnlyTermInfo>> data, IndexProcessingConfiguration processingConfiguration)
+        public void CalculateQuery(string query, IReadOnlyDictionary<string, IReadOnlyDictionary<long, IReadOnlyTermInfo>> data, IndexProcessingConfiguration processingConfiguration, CancellationToken cancellationToken = default)
         {
             if (query == null || data == null)
                 throw new ArgumentNullException("Data not specified!");
@@ -126,14 +141,14 @@ namespace InformationRetrievalManager.NLP
                 );
             var queryData = processing.IndexText(query);
 
-            _queryVector = CalculateDocumentVector(CreateQueryDataVocabulary(queryData, data), 0);
+            _queryVector = CalculateDocumentVector(CreateQueryDataVocabulary(queryData, data), 0, cancellationToken);
 
             // Log it
             _logger?.LogDebugSource("Query has been successfully calculated into vector.");
         }
 
         /// <inheritdoc/>
-        public long[] CalculateBestMatch(int select, out long foundDocuments)
+        public long[] CalculateBestMatch(int select, out long foundDocuments, CancellationToken cancellationToken = default)
         {
             var documentVectors = _documentVectors;
             var queryVector = _queryVector;
@@ -149,9 +164,15 @@ namespace InformationRetrievalManager.NLP
             // Calculate cosine similarity for each document...
             var results = new List<(long, double)>();
             foreach (var document in documentVectors)
+            {
+                // Check for cancelation
+                if (cancellationToken.IsCancellationRequested)
+                    break;
+
                 results.Add(
                     (document.Key, CalculateCosSimilarity(queryVector, document.Value))
                     );
+            }
 
             // Sort and return result
             //results.Sort((x, y) => y.Item2.CompareTo(x.Item2));
@@ -200,12 +221,17 @@ namespace InformationRetrievalManager.NLP
         /// </summary>
         /// <param name="data">The data</param>
         /// <param name="documentId">The ID</param>
+        /// <param name="cancellationToken">Cancellation token for interrupting the process.</param>
         /// <returns>Document vector from <paramref name="data"/> based on <paramref name="documentId"/>.</returns>
-        private double[] CalculateDocumentVector(IReadOnlyDictionary<string, IReadOnlyDictionary<long, IReadOnlyTermInfo>> data, long documentId)
+        private double[] CalculateDocumentVector(IReadOnlyDictionary<string, IReadOnlyDictionary<long, IReadOnlyTermInfo>> data, long documentId, CancellationToken cancellationToken = default)
         {
             List<double> docVector = new List<double>();
             foreach (var term in data)
             {
+                // Check for cancelation
+                if (cancellationToken.IsCancellationRequested)
+                    break;
+
                 // Take only the terms located in the document...
                 if (term.Value.ContainsKey(documentId))
                 {

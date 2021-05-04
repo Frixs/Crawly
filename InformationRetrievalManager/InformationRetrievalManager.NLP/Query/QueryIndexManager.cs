@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Security.Cryptography;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace InformationRetrievalManager.NLP
@@ -67,7 +68,7 @@ namespace InformationRetrievalManager.NLP
         #region Interface Methods
 
         /// <inheritdoc/>
-        public async Task<(long[], long, long)> QueryAsync(string query, IReadOnlyDictionary<string, IReadOnlyDictionary<long, IReadOnlyTermInfo>> data, QueryModelType modelType, IndexProcessingConfiguration configuration, int select = 0)
+        public async Task<(long[], long, long)> QueryAsync(string query, IReadOnlyDictionary<string, IReadOnlyDictionary<long, IReadOnlyTermInfo>> data, QueryModelType modelType, IndexProcessingConfiguration configuration, int select = 0, CancellationToken cancellationToken = default)
         {
             if (query == null || data == null)
                 throw new ArgumentNullException("Query data not specified!");
@@ -97,14 +98,14 @@ namespace InformationRetrievalManager.NLP
                         // ... check if the query is different...
                         if (!t_query.Equals(_lastQuery))
                             // If so, recalculate query
-                            _lastModel.CalculateQuery(t_query, t_data, t_configuration);
+                            _lastModel.CalculateQuery(t_query, t_data, t_configuration, cancellationToken);
                         // Otherwise, there is not need to do anything, the query data are the same as the previous request.
                     }
                     // Otherwise, recalculate everything...
                     else
                     {
-                        _lastModel.CalculateData(t_data, out totalDocuments);
-                        _lastModel.CalculateQuery(t_query, t_data, t_configuration);
+                        _lastModel.CalculateData(t_data, out totalDocuments, cancellationToken);
+                        _lastModel.CalculateQuery(t_query, t_data, t_configuration, cancellationToken);
                     }
                 }
                 // Otherwise, recalculate the whole model straight away...
@@ -126,8 +127,8 @@ namespace InformationRetrievalManager.NLP
                             break;
                     }
 
-                    _lastModel.CalculateData(t_data, out totalDocuments);
-                    _lastModel.CalculateQuery(t_query, t_data, t_configuration);
+                    _lastModel.CalculateData(t_data, out totalDocuments, cancellationToken);
+                    _lastModel.CalculateQuery(t_query, t_data, t_configuration, cancellationToken);
                 }
 
                 // Save information about last query request
@@ -136,7 +137,7 @@ namespace InformationRetrievalManager.NLP
                 _lastDataChecksum = dataChecksum;
                 _lastTotalDocumentCount = totalDocuments;
 
-                return (Results: _lastModel.CalculateBestMatch(select, out foundDocuments), FoundDocuments: foundDocuments, TotalDocuments: totalDocuments);
+                return (Results: _lastModel.CalculateBestMatch(select, out foundDocuments, cancellationToken), FoundDocuments: foundDocuments, TotalDocuments: totalDocuments);
             });
         }
 

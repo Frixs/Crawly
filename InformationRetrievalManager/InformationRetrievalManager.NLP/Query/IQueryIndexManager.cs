@@ -1,5 +1,6 @@
 ﻿using InformationRetrievalManager.Core;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace InformationRetrievalManager.NLP
@@ -17,6 +18,7 @@ namespace InformationRetrievalManager.NLP
         /// <param name="modelType">Type of the model to use for querying.</param>
         /// <param name="configuration">Processing configuration to use for the query index processing.</param>
         /// <param name="select">Limit number of records to select (0 to ignore limit).</param>
+        /// <param name="cancellationToken">Cancellation token for interrupting the process.</param>
         /// <returns>
         ///     Tuple:
         ///         1: Array of document IDs sorted from the most relevant to the least. 
@@ -24,7 +26,7 @@ namespace InformationRetrievalManager.NLP
         ///         3. No. of total searched documents.
         /// </returns>
         /// <exception cref="ArgumentNullException">Invalid parameters.</exception>
-        Task<(long[], long, long)> QueryAsync(string query, IReadOnlyDictionary<string, IReadOnlyDictionary<long, IReadOnlyTermInfo>> data, QueryModelType modelType, IndexProcessingConfiguration configuration, int select);
+        Task<(long[], long, long)> QueryAsync(string query, IReadOnlyDictionary<string, IReadOnlyDictionary<long, IReadOnlyTermInfo>> data, QueryModelType modelType, IndexProcessingConfiguration configuration, int select, CancellationToken cancellationToken);
 
         /// <summary>
         /// Resets model data that are saved from previous query calls. 
