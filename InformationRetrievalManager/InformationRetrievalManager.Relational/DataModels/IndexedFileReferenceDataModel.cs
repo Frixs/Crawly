@@ -1,4 +1,5 @@
 ﻿using InformationRetrievalManager.Core;
+using System;
 using System.Collections.Generic;
 
 namespace InformationRetrievalManager.Relational
@@ -45,10 +46,10 @@ namespace InformationRetrievalManager.Relational
         #region Properties
 
         /// <summary>
-        /// MainWindow size size on X axis
+        /// File index timestamp
         /// </summary>
         [ValidateIgnore]
-        public string FileName { get; set; }
+        public DateTime Timestamp { get; set; }
 
         #endregion
     }

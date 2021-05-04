@@ -149,7 +149,7 @@ namespace InformationRetrievalManager.Relational
                 .HasForeignKey(o => o.DataInstanceId)
                 .OnDelete(DeleteBehavior.Cascade);
             // Set up constraints
-            modelBuilder.Entity<IndexedFileReferenceDataModel>().HasIndex(o => o.FileName).IsUnique();
+            modelBuilder.Entity<IndexedFileReferenceDataModel>().HasIndex(o => o.Timestamp).IsUnique();
 
             // Configure Indexed Documents
             // ------------------------------

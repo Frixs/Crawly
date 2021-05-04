@@ -550,7 +550,7 @@
     <Compile Include="DataTypes\DataFileInfo.cs" />
     <Compile Include="DI\DI.cs" />
     <Compile Include="DI\FrameworkConstructionExtensions.cs" />
-    <Compile Include="Extensions\CrawlerExtensions.cs" />
+    <Compile Include="Extensions\RelationalDataModelExtensions.cs" />
     <Compile Include="Localization\Resource.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

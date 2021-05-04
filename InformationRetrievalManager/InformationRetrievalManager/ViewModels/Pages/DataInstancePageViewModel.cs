@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -554,6 +555,7 @@ namespace InformationRetrievalManager
                 await _taskManager.Run(async () =>
                 {
                     CrawlerDataModel[] data = null;
+
                     // Deserialize JSON directly from the file
                     try
                     {
@@ -572,22 +574,40 @@ namespace InformationRetrievalManager
                     // If any data...
                     if (data != null && data.Length > 0)
                     {
-                        IndexProcessingProgress = "Preparing documents...";
+                        IndexProcessingProgress = "Creating index structure...";
 
                         bool dataRollback = false;
-                        // Clear all the previous/old indexes first (if any)
-                        foreach (var doc in _uow.IndexedDocuments.Get(o => o.DataInstanceId == _dataInstance.Id))
-                            _uow.IndexedDocuments.Delete(doc);
-                        _uow.SaveChanges();
+                        DateTime indexTimestamp = DateTime.UtcNow;
+
+                        // Check file sync
+                        var fileReference = _uow.IndexedFileReferences.Get(o => o.DataInstanceId == _dataInstance.Id && o.Timestamp.Equals(file.FilePath)).FirstOrDefault();
+                        // If already indexed file is is being indexed again...
+                        if (fileReference != null && fileReference.IndexedDocuments != null)
+                        {
+                            // Clear all the previous/old indexes first (if any)
+                            foreach (var doc in fileReference.IndexedDocuments)
+                                _uow.IndexedDocuments.Delete(doc);
+                            _uow.SaveChanges();
+                        }
+                        // Otherwise...
+                        else
+                        {
+                            // Create new index file
+                            fileReference = new IndexedFileReferenceDataModel
+                            {
+                                Timestamp = indexTimestamp,
+                                IndexedDocuments = new Collection<IndexedDocumentDataModel>()
+                            };
+                        }
+
+                        IndexProcessingProgress = "Preparing documents...";
 
                         // Prepare documents for indexation
                         bool anyIndexedData = false;
-                        List<IndexDocument> docs = new List<IndexDocument>();
                         for (int i = 0; i < data.Length; ++i)
                         {
                             var model = new IndexedDocumentDataModel
                             {
-                                DataInstanceId = _dataInstance.Id,
                                 Title = data[i].Title == null ? null : Regex.Replace(StringHelpers.ReplaceNewLines(data[i].Title, " "), @"[ ]+", " ").Trim(),
                                 Category = data[i].Category == null ? null : Regex.Replace(StringHelpers.ReplaceNewLines(data[i].Category, " "), @"[ ]+", " ").Trim(),
                                 Timestamp = data[i].Timestamp,
@@ -599,8 +619,7 @@ namespace InformationRetrievalManager
                             if (ValidationHelpers.ValidateModel(model).Count == 0)
                             {
                                 anyIndexedData = true;
-                                _uow.IndexedDocuments.Insert(model);
-                                docs.Add(data[i].ToIndexDocument(model.Id));
+                                fileReference.IndexedDocuments.Add(model);
                             }
 
                             IndexProcessingProgress = $"Preparing documents... ({i}/{data.Length})";
@@ -619,26 +638,43 @@ namespace InformationRetrievalManager
                             // If any documents are ready for indexation...
                             if (anyIndexedData)
                             {
-                                IndexProcessingProgress = "Indexing...";
+                                // Begin DB-TRANSACTION
+                                _uow.BeginTransaction();
+
+                                // Cmmmit
+                                IndexProcessingProgress = "Storing documents... (it may take a while)";
+                                _uow.IndexedFileReferences.Insert(fileReference);
+                                _uow.SaveChanges();
+
+                                // Create index specific document array
+                                IndexDocument[] docs = new IndexDocument[fileReference.IndexedDocuments.Count];
+                                int i = 0;
+                                foreach (var item in fileReference.IndexedDocuments)
+                                {
+                                    docs[i] = item.ToIndexDocument();
+                                    ++i;
+                                }
 
                                 // Indexate documents
-                                var processing = new IndexProcessing(_dataInstance.Id.ToString(), DateTime.UtcNow, _dataInstance.IndexProcessingConfiguration, _fileManager, _logger);
-
-                                processing.IndexDocuments(docs.ToArray(), save: true, 
-                                    setProgressMessage: (value) => IndexProcessingProgress = $"Indexing... ({value}/{docs.Count})", 
+                                IndexProcessingProgress = "Indexing...";
+                                var processing = new IndexProcessing(_dataInstance.Id.ToString(), indexTimestamp, _dataInstance.IndexProcessingConfiguration, _fileManager, _logger);
+                                processing.IndexDocuments(docs, save: true,
+                                    setProgressMessage: (value) => IndexProcessingProgress = $"Indexing... ({value}/{docs.Length})",
                                     cancellationToken: _indexProcessingTokenSource.Token);
-
-                                IndexProcessingProgress = "Committing index...";
 
                                 // If the cancelation is requested...
                                 if (_indexProcessingTokenSource.Token.IsCancellationRequested)
+                                {
                                     dataRollback = true;
+                                    // Rollback DB-TRANSACTION
+                                    _uow.RollbackTransaction();
+                                }
                                 // Otherwise, everythings fine...
                                 else
                                 {
-                                    // Cmmmit
                                     IndexProcessingProgress = "Committing index...";
-                                    _uow.SaveChanges();
+                                    // Commit DB-TRANSACTION
+                                    _uow.CommitTransaction();
                                 }
 
                                 _logger.LogDebugSource("Index processing done!");
@@ -655,11 +691,7 @@ namespace InformationRetrievalManager
                         if (dataRollback)
                         {
                             IndexProcessingProgress = "Data repairing...";
-
-                            foreach (var doc in _uow.IndexedDocuments.Get(o => o.DataInstanceId == _dataInstance.Id))
-                                _uow.IndexedDocuments.Delete(doc);
-                            _uow.SaveChanges();
-
+                            _uow.UndoChanges();
                             IndexProcessingProgress = "Done!";
                         }
                     }
