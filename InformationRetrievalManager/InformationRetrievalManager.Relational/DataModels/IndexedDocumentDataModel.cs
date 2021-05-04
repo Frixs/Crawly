@@ -15,6 +15,7 @@ namespace InformationRetrievalManager.Relational
         public static readonly short Title_MaxLength = 255;
         public static readonly string Title_DefaultValue = "";
 
+        public static readonly bool Category_AllowNull = true;
         public static readonly bool Category_IsRequired = false;
         public static readonly short Category_MaxLength = 50;
         public static readonly string Category_DefaultValue = "";
@@ -71,6 +72,7 @@ namespace InformationRetrievalManager.Relational
         ///     Value can be <see langword="null"/>.
         /// </remarks>
         [ValidateString(nameof(Category), typeof(IndexedDocumentDataModel),
+            pAllowNull: nameof(Category_AllowNull),
             pIsRequired: nameof(Category_IsRequired),
             pMaxLength: nameof(Category_MaxLength))]
         public string Category { get; set; }
