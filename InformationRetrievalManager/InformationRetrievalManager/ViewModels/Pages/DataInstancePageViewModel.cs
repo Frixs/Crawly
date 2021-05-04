@@ -509,10 +509,9 @@ namespace InformationRetrievalManager
                 var fileInfo = parameter as DataFileInfo;
 
                 if (fileInfo != null && fileInfo.FilePath != null && File.Exists(fileInfo.FilePath))
-                {
                     _crawlerStorage.DeleteDataFiles(_dataInstance.Id.ToString(), fileInfo.CreatedAt);
-                    LoadDataFiles(true);
-                }
+
+                LoadDataFiles(true);
 
                 await Task.Delay(1);
             });
@@ -541,10 +540,18 @@ namespace InformationRetrievalManager
                 {
                     CrawlerDataModel[] data = null;
                     // Deserialize JSON directly from the file
-                    using (StreamReader sr = File.OpenText(file.FilePath))
+                    try
                     {
-                        JsonSerializer jsonSerializer = new JsonSerializer();
-                        data = (CrawlerDataModel[])jsonSerializer.Deserialize(sr, typeof(CrawlerDataModel[]));
+                        using (StreamReader sr = File.OpenText(file.FilePath))
+                        {
+                            JsonSerializer jsonSerializer = new JsonSerializer();
+                            data = (CrawlerDataModel[])jsonSerializer.Deserialize(sr, typeof(CrawlerDataModel[]));
+                        }
+                    }
+                    catch
+                    {
+                        // Corrupted data file
+                        data = null;
                     }
 
                     // If any data...
@@ -630,10 +637,9 @@ namespace InformationRetrievalManager
                 var fileInfo = parameter as DataFileInfo;
 
                 if (fileInfo != null && fileInfo.FilePath != null && File.Exists(fileInfo.FilePath))
-                {
                     _indexStorage.DeleteIndexFiles(_dataInstance.Id.ToString(), fileInfo.CreatedAt);
-                    LoadIndexFiles(true);
-                }
+                
+                LoadIndexFiles(true);
 
                 await Task.Delay(1);
             });
@@ -687,7 +693,7 @@ namespace InformationRetrievalManager
                         {
                             Title = doc.Title,
                             Category = doc.Category,
-                            Timestamp = doc.Timestamp.ToString("yyyy-MM-dd hh:mm"),
+                            Timestamp = doc.Timestamp == DateTime.MinValue ? null : doc.Timestamp.ToString("yyyy-MM-dd hh:mm"),
                             SourceUrl = doc.SourceUrl,
                             Content = doc.Content
                         });

@@ -67,6 +67,9 @@ namespace InformationRetrievalManager.Relational
         /// <summary>
         /// Document category
         /// </summary>
+        /// <remarks>
+        ///     Value can be <see langword="null"/>.
+        /// </remarks>
         [ValidateString(nameof(Category), typeof(IndexedDocumentDataModel),
             pIsRequired: nameof(Category_IsRequired),
             pMaxLength: nameof(Category_MaxLength))]
@@ -75,6 +78,9 @@ namespace InformationRetrievalManager.Relational
         /// <summary>
         /// Document timestamp
         /// </summary>
+        /// <remarks>
+        ///     Value <see cref="DateTime.MinValue"/> = not set.
+        /// </remarks>
         [ValidateIgnore]
         public DateTime Timestamp { get; set; }
 

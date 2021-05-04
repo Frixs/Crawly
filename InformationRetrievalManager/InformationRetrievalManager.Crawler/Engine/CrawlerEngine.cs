@@ -13,7 +13,6 @@ namespace InformationRetrievalManager.Crawler
 {
     /// <summary>
     /// Crawler engineú scrapes the web data and parse them into files
-    /// TODO: Make category and timestamp optional
     /// </summary>
     public sealed class CrawlerEngine : ICrawlerEngine
     {
@@ -365,19 +364,25 @@ namespace InformationRetrievalManager.Crawler
 
                     // Go through the specific page...
                     int linkCount = 0;
-                    foreach (var item in doc.DocumentNode.SelectNodes(SiteUrlArticlesXPath))
-                    {
-                        // Check for cancelation
-                        if (_cancelationFlag)
-                            break;
-
-                        if (item.HasAttributes)
+                    var linkNodes = doc.DocumentNode.SelectNodes(SiteUrlArticlesXPath);
+                    if (linkNodes != null)
+                        foreach (var item in linkNodes)
                         {
-                            string link = item.GetAttributeValue(hrefKeyword, defaultArticleLink);
-                            result.Add(link);
-                            linkCount++;
+                            // Check for cancelation
+                            if (_cancelationFlag)
+                                break;
+
+                            if (item.HasAttributes)
+                            {
+                                // Get link from the attribute
+                                string link = item.GetAttributeValue(hrefKeyword, defaultArticleLink);
+                                if (!link.Equals(defaultArticleLink))
+                                {
+                                    result.Add(link);
+                                    linkCount++;
+                                }
+                            }
                         }
-                    }
 
                     UpdateProgressMessageData(linkCount > 0 ? "Successful page scanning!" : "No articles found during page scanning.", web.ResponseUri.ToString());
                     // Calculate progress pct
@@ -449,20 +454,20 @@ namespace InformationRetrievalManager.Crawler
 
                     // Make sure we found all needed HTML...
                     if (title != null
-                        && category != null
-                        && datetime != null
-                        && content != null)
+                        && content != null
+                        && (!string.IsNullOrEmpty(SiteArticleCategoryXPath) ? category != null : true)
+                        && (!string.IsNullOrEmpty(SiteArticleDateTimeXPath) ? datetime != null : true))
                     {
-                        DateTime timestamp;
+                        DateTime timestamp = DateTime.MinValue;
                         // Check fi the datetime is parsable...
-                        if (DateTime.TryParseExact(datetime.InnerText.Trim(), SiteArticleDateTimeParseData.Format, SiteArticleDateTimeParseData.CultureInfo, System.Globalization.DateTimeStyles.None, out timestamp))
+                        if (datetime == null || DateTime.TryParseExact(datetime.InnerText.Trim(), SiteArticleDateTimeParseData.Format, SiteArticleDateTimeParseData.CultureInfo, System.Globalization.DateTimeStyles.None, out timestamp))
                         {
                             // Save data
                             await _crawlerStorage.SaveAsync(
                                 crawler: this,
                                 url: url,
                                 title: MinifyText(title.InnerText).Trim(),
-                                category: MinifyText(category.InnerText).Trim(),
+                                category: category == null ? null : MinifyText(category.InnerText).Trim(),
                                 timestamp: timestamp,
                                 contentHtml: TidyfyText(content.InnerHtml),
                                 contentTextMin: MinifyText(content.InnerText),
