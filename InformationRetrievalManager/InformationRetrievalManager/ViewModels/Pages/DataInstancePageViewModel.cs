@@ -573,11 +573,11 @@ namespace InformationRetrievalManager
                             var model = new IndexedDocumentDataModel
                             {
                                 DataInstanceId = _dataInstance.Id,
-                                Title = data[i].Title,
-                                Category = data[i].Category,
+                                Title = Regex.Replace(StringHelpers.ReplaceNewLines(data[i].Title, " "), @"[ ]+", " ").Trim(),
+                                Category = Regex.Replace(StringHelpers.ReplaceNewLines(data[i].Category, " "), @"[ ]+", " ").Trim(),
                                 Timestamp = data[i].Timestamp,
                                 SourceUrl = data[i].SourceUrl,
-                                Content = StringHelpers.ShortenWithDots(Regex.Replace(data[i].Content.Replace(Environment.NewLine, " "), @"[ ]+", " "), IndexedDocumentDataModel.Content_MaxLength - 3)
+                                Content = StringHelpers.ShortenWithDots(Regex.Replace(StringHelpers.ReplaceNewLines(data[i].Content, " "), @"[ ]+", " ").Trim(), IndexedDocumentDataModel.Content_MaxLength - 3)
                             };
 
                             // Validate, if no errors...

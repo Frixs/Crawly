@@ -281,7 +281,7 @@ namespace InformationRetrievalManager.NLP
                 text = text.ToLower();
 
             // Remove newlines from the document to prepare the doc for tokenization
-            text = text.Replace(Environment.NewLine, " ");
+            text = StringHelpers.ReplaceNewLines(text, " ");
 
             // Remove accents before stemming
             if (RemoveAccentsBeforeStemming)

@@ -29,5 +29,17 @@ namespace InformationRetrievalManager.Core
         {
             return Regex.Replace(value, "(\\B[A-Z])", " $1");
         }
+
+
+        /// <summary>
+        /// Remove new lines from the input string.
+        /// </summary>
+        /// <param name="value">The input string</param>
+        /// <param name="replacement">Replacement for the newline.</param>
+        /// <returns>String without newlines.</returns>
+        public static string ReplaceNewLines(string value, string replacement)
+        {
+            return Regex.Replace(value, "(\\r\\n)|(\\n)|(\\r)", replacement);
+        }
     }
 }
