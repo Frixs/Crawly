@@ -129,7 +129,7 @@ namespace InformationRetrievalManager
                 Description = "Select the article's timestamp/datetime of publication.",
                 Validation = ValidationHelpers.GetPropertyValidateAttribute<CrawlerConfigurationDataModel, string, ValidateStringAttribute>(o => o.SiteArticleDateTimeXPath),
                 Value = CrawlerConfigurationDataModel.SiteArticleDateTimeXPath_DefaultValue,
-                Placeholder = "E.g. //time[@itemprop='datePublished']//@datetime",
+                Placeholder = "E.g. //time[@itemprop='datePublished']",
                 MaxLength = CrawlerConfigurationDataModel.SiteArticleDateTimeXPath_MaxLength
             };
             SiteArticleDateTimeFormatEntry = new TextEntryViewModel
@@ -138,7 +138,7 @@ namespace InformationRetrievalManager
                 Description = "The exact format of the publication datetime.",
                 Validation = ValidationHelpers.GetPropertyValidateAttribute<CrawlerConfigurationDataModel, string, ValidateStringAttribute>(o => o.SiteArticleDateTimeFormat),
                 Value = CrawlerConfigurationDataModel.SiteArticleDateTimeFormat_DefaultValue,
-                Placeholder = "E.g. yyyy'-'MM'-'dd'T'HH':'mm':'ss'Z'",
+                Placeholder = "E.g. dd' 'MMM' 'yyyy",
                 MaxLength = CrawlerConfigurationDataModel.SiteArticleDateTimeFormat_MaxLength
             };
             SiteArticleDateTimeCultureInfoEntry = new TextEntryViewModel

@@ -597,7 +597,7 @@ namespace InformationRetrievalManager
                             IndexProcessingProgress = "Indexing...";
 
                             // Indexate documents
-                            var processing = new IndexProcessing(_dataInstance.Id.ToString(), DateTime.Now, _dataInstance.IndexProcessingConfiguration, _fileManager, _logger);
+                            var processing = new IndexProcessing(_dataInstance.Id.ToString(), DateTime.UtcNow, _dataInstance.IndexProcessingConfiguration, _fileManager, _logger);
 
                             processing.IndexDocuments(docs.ToArray(), save: true);
                             _logger.LogDebugSource("Index processing done!");
@@ -673,15 +673,34 @@ namespace InformationRetrievalManager
                 if (IndexProcessingInWorkFlag)
                     return;
 
+                bool indexLoaded = false;
                 var ii = new InvertedIndex(_dataInstance.Id.ToString(), file.CreatedAt, _fileManager, _logger);
 
                 (long[], long, long) queryResult = (Array.Empty<long>(), -1, -1);
 
                 await _taskManager.Run(async () =>
                 {
-                    ii.Load();
-                    queryResult = await _queryIndexManager.QueryAsync(query, ii.GetReadOnlyVocabulary(), queryModel, _dataInstance.IndexProcessingConfiguration, select);
+                    // Load data
+                    // If success....
+                    if (ii.Load())
+                    {
+                        indexLoaded = true;
+                        queryResult = await _queryIndexManager.QueryAsync(query, ii.GetReadOnlyVocabulary(), queryModel, _dataInstance.IndexProcessingConfiguration, select);
+                    }
+                    // Otherwise, loading failed...
+                    else
+                    {
+                        indexLoaded = false;
+                        QueryErrorString = "Index file is corrupted!";
+                    }
                 });
+
+                // If the index did not load...
+                if (!indexLoaded)
+                {
+                    // Corrupted file => delete it
+                    await DeleteIndexFileCommandRoutineAsync(file);
+                }
 
                 // Go through the results...
                 for (int i = 0; i < queryResult.Item1.Length; ++i)
