@@ -28,6 +28,11 @@ namespace InformationRetrievalManager.Relational
         IRepository<IndexProcessingConfigurationDataModel> IndexProcessingConfigurations { get; }
 
         /// <summary>
+        /// Indexed file reference repository
+        /// </summary>
+        IRepository<IndexedFileReferenceDataModel> IndexedFileReferences { get; }
+
+        /// <summary>
         /// Indexed document repository
         /// </summary>
         IRepository<IndexedDocumentDataModel> IndexedDocuments { get; }

@@ -40,18 +40,18 @@ namespace InformationRetrievalManager.Relational
         public long Id { get; set; }
 
         /// <summary>
-        /// Foreign Key for <see cref="DataInstance"/>
+        /// Foreign Key for <see cref="IndexedFileReference"/>
         /// </summary>
         [ValidateIgnore]
-        public long? DataInstanceId { get; set; }
+        public long? IndexedFileReferenceId { get; set; }
 
         /// <summary>
-        /// Reference to ONE data instance // Fluent API
+        /// Reference to ONE indexed file reference // Fluent API
         /// </summary>
         [System.Text.Json.Serialization.JsonIgnore]
         [Newtonsoft.Json.JsonIgnore]
         [ValidateIgnore]
-        public DataInstanceDataModel DataInstance { get; set; }
+        public IndexedFileReferenceDataModel IndexedFileReference { get; set; }
 
         #endregion
 

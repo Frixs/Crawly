@@ -47,13 +47,13 @@ namespace InformationRetrievalManager.Relational
         public IndexProcessingConfigurationDataModel IndexProcessingConfiguration { get; set; }
 
         /// <summary>
-        /// Reference to MANY indexed documents // Fluent API
+        /// Reference to MANY indexed file references // Fluent API
         /// ---
-        /// E.g. You can use this list to put as many indexed documents into this list 
-        /// while creation a new data instance to create new indexed documents associated to this data instance at the same time during commit
+        /// E.g. You can use this list to put as many indexed file references into this list 
+        /// while creation a new data instance to create new indexed file references associated to this data instance at the same time during commit
         /// </summary>
         [ValidateIgnore]
-        public ICollection<IndexedDocumentDataModel> IndexedDocuments { get; set; }
+        public ICollection<IndexedFileReferenceDataModel> IndexedFileReferences { get; set; }
 
         #endregion
 

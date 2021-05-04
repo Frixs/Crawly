@@ -36,7 +36,12 @@ namespace InformationRetrievalManager.Relational
         public DbSet<IndexProcessingConfigurationDataModel> IndexProcessingConfigurations { get; set; }
 
         /// <summary>
-        /// Indexed document references
+        /// Indexed document file references
+        /// </summary>
+        public DbSet<IndexedFileReferenceDataModel> IndexedFileReferences { get; set; }
+
+        /// <summary>
+        /// Indexed documents
         /// </summary>
         public DbSet<IndexedDocumentDataModel> IndexedDocuments { get; set; }
 
@@ -132,6 +137,20 @@ namespace InformationRetrievalManager.Relational
             // Set up limits
             modelBuilder.Entity<IndexProcessingConfigurationDataModel>().Property(o => o.CustomRegex).HasMaxLength(IndexProcessingConfigurationDataModel.CustomRegex_MaxLength);
 
+            // Configure Indexed File References
+            // ------------------------------
+            //
+            // Set Id as primary key
+            modelBuilder.Entity<IndexedFileReferenceDataModel>().HasKey(a => a.Id);
+            // Set Foreign Key
+            modelBuilder.Entity<IndexedFileReferenceDataModel>()
+                .HasOne(o => o.DataInstance)
+                .WithMany(o => o.IndexedFileReferences)
+                .HasForeignKey(o => o.DataInstanceId)
+                .OnDelete(DeleteBehavior.Cascade);
+            // Set up constraints
+            modelBuilder.Entity<IndexedFileReferenceDataModel>().HasIndex(o => o.FileName).IsUnique();
+
             // Configure Indexed Documents
             // ------------------------------
             //
@@ -139,9 +158,9 @@ namespace InformationRetrievalManager.Relational
             modelBuilder.Entity<IndexedDocumentDataModel>().HasKey(a => a.Id);
             // Set Foreign Key
             modelBuilder.Entity<IndexedDocumentDataModel>()
-                .HasOne(o => o.DataInstance)
+                .HasOne(o => o.IndexedFileReference)
                 .WithMany(o => o.IndexedDocuments)
-                .HasForeignKey(o => o.DataInstanceId)
+                .HasForeignKey(o => o.IndexedFileReferenceId)
                 .OnDelete(DeleteBehavior.Cascade);
             // Set up limits
             modelBuilder.Entity<IndexedDocumentDataModel>().Property(o => o.Title).HasMaxLength(IndexedDocumentDataModel.Title_MaxLength);

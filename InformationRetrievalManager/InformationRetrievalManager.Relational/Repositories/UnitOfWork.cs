@@ -2,7 +2,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace InformationRetrievalManager.Relational
@@ -47,6 +46,11 @@ namespace InformationRetrievalManager.Relational
         private IRepository<IndexProcessingConfigurationDataModel> _indexProcessingConfigurations;
 
         /// <summary>
+        /// Private reference of property <see cref="IndexedFileReferences"/>
+        /// </summary>
+        private IRepository<IndexedFileReferenceDataModel> _indexedFileReferences;
+
+        /// <summary>
         /// Private reference of property <see cref="IndexedDocuments"/>
         /// </summary>
         private IRepository<IndexedDocumentDataModel> _indexedDocuments;
@@ -74,6 +78,11 @@ namespace InformationRetrievalManager.Relational
         public IRepository<IndexProcessingConfigurationDataModel> IndexProcessingConfigurations =>
             _indexProcessingConfigurations ??
                 (_indexProcessingConfigurations = new IndexProcessingConfigurationRepository(_dbContext));
+
+        /// <inheritdoc/>
+        public IRepository<IndexedFileReferenceDataModel> IndexedFileReferences =>
+            _indexedFileReferences ??
+                (_indexedFileReferences = new IndexedFileReferenceRepository(_dbContext));
 
         /// <inheritdoc/>
         public IRepository<IndexedDocumentDataModel> IndexedDocuments =>
