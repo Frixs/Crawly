@@ -33,29 +33,28 @@ namespace InformationRetrievalManager
         /// </summary>
         public CrawlerConfigurationFormContext()
         {
-            // TODO localization
             SiteAddressEntry = new TextEntryViewModel
             {
                 Label = "Site Address",
-                Description = "TODO here so logn text lorem ipsum nevim neco dalsiho pisu je to jedno ale dlouho ale je potřeba jeste delsi adz do nevidim",
+                Description = "The website you want to search data for.",
                 Validation = ValidationHelpers.GetPropertyValidateAttribute<CrawlerConfigurationDataModel, string, ValidateStringAttribute>(o => o.SiteAddress),
                 Value = CrawlerConfigurationDataModel.SiteAddress_DefaultValue,
-                Placeholder = "E.g.: https://www.google.com",
+                Placeholder = "E.g.: https://www.pcgamer.com",
                 MaxLength = CrawlerConfigurationDataModel.SiteAddress_MaxLength
             };
             SiteSuffixEntry = new TextEntryViewModel
             {
                 Label = "Site Suffix",
-                Description = "",
+                Description = "The site suffix should contain '{0}' to mark the position of the page number.",
                 Validation = ValidationHelpers.GetPropertyValidateAttribute<CrawlerConfigurationDataModel, string, ValidateStringAttribute>(o => o.SiteSuffix),
                 Value = CrawlerConfigurationDataModel.SiteSuffix_DefaultValue,
-                Placeholder = "E.g.: /news?page={0}",
+                Placeholder = "E.g.: /news/page/{0}",
                 MaxLength = CrawlerConfigurationDataModel.SiteSuffix_MaxLength
             };
             StartPageNoEntry = new IntegerEntryViewModel
             {
                 Label = "Start Page Number",
-                Description = "",
+                Description = "The first page to search.",
                 Validation = ValidationHelpers.GetPropertyValidateAttribute<CrawlerConfigurationDataModel, int, ValidateIntegerAttribute>(o => o.StartPageNo),
                 Value = CrawlerConfigurationDataModel.StartPageNo_DefaultValue,
                 MinValue = CrawlerConfigurationDataModel.StartPageNo_MinValue,
@@ -64,7 +63,7 @@ namespace InformationRetrievalManager
             MaxPageNoEntry = new IntegerEntryViewModel
             {
                 Label = "Max Allowed Page Number",
-                Description = "",
+                Description = "The maximal page number that should not be overpassed during searching.",
                 Validation = ValidationHelpers.GetPropertyValidateAttribute<CrawlerConfigurationDataModel, int, ValidateIntegerAttribute>(o => o.MaxPageNo),
                 Value = CrawlerConfigurationDataModel.MaxPageNo_DefaultValue,
                 MinValue = CrawlerConfigurationDataModel.MaxPageNo_MinValue,
@@ -91,64 +90,64 @@ namespace InformationRetrievalManager
             SiteUrlArticlesXPathEntry = new TextEntryViewModel
             {
                 Label = "XPath: Article URLs",
-                Description = "",
+                Description = "Select links to specific articles.",
                 Validation = ValidationHelpers.GetPropertyValidateAttribute<CrawlerConfigurationDataModel, string, ValidateStringAttribute>(o => o.SiteUrlArticlesXPath),
                 Value = CrawlerConfigurationDataModel.SiteUrlArticlesXPath_DefaultValue,
-                Placeholder = "",
+                Placeholder = "E.g. //div[contains(@class, 'listingResults')]//a[@class='article-link']",
                 MaxLength = CrawlerConfigurationDataModel.SiteUrlArticlesXPath_MaxLength
             };
             SiteArticleContentAreaXPathEntry = new TextEntryViewModel
             {
                 Label = "XPath: Article Content Area",
-                Description = "",
+                Description = "Select area where the content body is located.",
                 Validation = ValidationHelpers.GetPropertyValidateAttribute<CrawlerConfigurationDataModel, string, ValidateStringAttribute>(o => o.SiteArticleContentAreaXPath),
                 Value = CrawlerConfigurationDataModel.SiteArticleContentAreaXPath_DefaultValue,
-                Placeholder = "",
+                Placeholder = "E.g. //div[@id='article-body']",
                 MaxLength = CrawlerConfigurationDataModel.SiteArticleContentAreaXPath_MaxLength
             };
             SiteArticleTitleXPathEntry = new TextEntryViewModel
             {
                 Label = "XPath: Article Title",
-                Description = "",
+                Description = "Select the title node.",
                 Validation = ValidationHelpers.GetPropertyValidateAttribute<CrawlerConfigurationDataModel, string, ValidateStringAttribute>(o => o.SiteArticleTitleXPath),
                 Value = CrawlerConfigurationDataModel.SiteArticleTitleXPath_DefaultValue,
-                Placeholder = "",
+                Placeholder = "E.g. //h1",
                 MaxLength = CrawlerConfigurationDataModel.SiteArticleTitleXPath_MaxLength
             };
             SiteArticleCategoryXPathEntry = new TextEntryViewModel
             {
                 Label = "XPath: Article Category",
-                Description = "",
+                Description = "Select the category node.",
                 Validation = ValidationHelpers.GetPropertyValidateAttribute<CrawlerConfigurationDataModel, string, ValidateStringAttribute>(o => o.SiteArticleCategoryXPath),
                 Value = CrawlerConfigurationDataModel.SiteArticleCategoryXPath_DefaultValue,
-                Placeholder = "",
+                Placeholder = "E.g. (//nav[@id='articleTag']//div[@class='tag'])[1]//a",
                 MaxLength = CrawlerConfigurationDataModel.SiteArticleCategoryXPath_MaxLength
             };
             SiteArticleDateTimeXPathEntry = new TextEntryViewModel
             {
                 Label = "XPath: Article DateTime",
-                Description = "",
+                Description = "Select the article's timestamp/datetime of publication.",
                 Validation = ValidationHelpers.GetPropertyValidateAttribute<CrawlerConfigurationDataModel, string, ValidateStringAttribute>(o => o.SiteArticleDateTimeXPath),
                 Value = CrawlerConfigurationDataModel.SiteArticleDateTimeXPath_DefaultValue,
-                Placeholder = "",
+                Placeholder = "E.g. //time[@itemprop='datePublished']//@datetime",
                 MaxLength = CrawlerConfigurationDataModel.SiteArticleDateTimeXPath_MaxLength
             };
             SiteArticleDateTimeFormatEntry = new TextEntryViewModel
             {
                 Label = "Article DateTime Format",
-                Description = "",
+                Description = "The exact format of the publication datetime.",
                 Validation = ValidationHelpers.GetPropertyValidateAttribute<CrawlerConfigurationDataModel, string, ValidateStringAttribute>(o => o.SiteArticleDateTimeFormat),
                 Value = CrawlerConfigurationDataModel.SiteArticleDateTimeFormat_DefaultValue,
-                Placeholder = "",
+                Placeholder = "E.g. yyyy'-'MM'-'dd'T'HH':'mm':'ss'Z'",
                 MaxLength = CrawlerConfigurationDataModel.SiteArticleDateTimeFormat_MaxLength
             };
             SiteArticleDateTimeCultureInfoEntry = new TextEntryViewModel
             {
                 Label = "Article DateTime Culture",
-                Description = "",
+                Description = "Culture info about the datetime (necessary only if the datetime consist of named months e.g.).",
                 Validation = ValidationHelpers.GetPropertyValidateAttribute<CrawlerConfigurationDataModel, string, ValidateStringAttribute>(o => o.SiteArticleDateTimeCultureInfo),
                 Value = CrawlerConfigurationDataModel.SiteArticleDateTimeCultureInfo_DefaultValue,
-                Placeholder = "",
+                Placeholder = "E.g. en-US",
                 MaxLength = CrawlerConfigurationDataModel.SiteArticleDateTimeCultureInfo_MaxLength
             };
         }

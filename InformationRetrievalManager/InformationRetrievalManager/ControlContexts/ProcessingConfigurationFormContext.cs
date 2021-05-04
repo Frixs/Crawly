@@ -2,6 +2,7 @@
 using InformationRetrievalManager.Relational;
 using System;
 using System.Linq;
+using Ixs.DNA;
 
 namespace InformationRetrievalManager
 {
@@ -28,11 +29,10 @@ namespace InformationRetrievalManager
         /// </summary>
         public ProcessingConfigurationFormContext()
         {
-            // TODO localization
             LanguageEntry = new ComboEntryViewModel<ProcessingLanguage>()
             {
                 Label = "Language",
-                Description = "",
+                Description = "The language used to process the texts.",
                 Validation = null,
                 Value = IndexProcessingConfigurationDataModel.Language_DefaultValue,
                 ValueList = Enum.GetValues(typeof(ProcessingLanguage)).Cast<ProcessingLanguage>().ToList()
@@ -40,39 +40,39 @@ namespace InformationRetrievalManager
             CustomRegexEntry = new TextEntryViewModel
             {
                 Label = "Custom Regex",
-                Description = "",
+                Description = "The custom regex used for searching tokens.",
                 Validation = ValidationHelpers.GetPropertyValidateAttribute<IndexProcessingConfigurationDataModel, string, ValidateStringAttribute>(o => o.CustomRegex),
                 Value = IndexProcessingConfigurationDataModel.CustomRegex_DefaultValue,
-                Placeholder = "",
+                Placeholder = "E.g. [a-zA-Z]+",
                 MaxLength = IndexProcessingConfigurationDataModel.CustomRegex_MaxLength
             };
             CustomStopWordsEntry = new TextEntryViewModel
             {
                 Label = "Custom Stop Words",
-                Description = "",
+                Description = "Additional stop-words that are additively added to the standard language set during removal. Use '{0}' to split the words.".Format(IndexProcessingConfiguration.CustomStopWords_Separator),
                 Validation = null,
                 Value = "",
-                Placeholder = "",
+                Placeholder = "E.g. hello,world",
                 MaxLength = 999
             };
             ToLowerCaseEntry = new CheckEntryViewModel
             {
                 Label = "To Lower Case",
-                Description = "",
+                Description = "It puts the entire text int lower-case form during the processing.",
                 Validation = null,
                 Value = IndexProcessingConfigurationDataModel.ToLowerCase_DefaultValue
             };
             RemoveAccentsBeforeStemmingEntry = new CheckEntryViewModel
             {
                 Label = "Before Stemming",
-                Description = "",
+                Description = "Remove accents from the entire text before the Stemming process.",
                 Validation = null,
                 Value = IndexProcessingConfigurationDataModel.RemoveAccentsBeforeStemming_DefaultValue
             };
             RemoveAccentsAfterStemmingEntry = new CheckEntryViewModel
             {
                 Label = "After Stemming",
-                Description = "",
+                Description = "Remove accents from the entire text after the Stemming process.",
                 Validation = null,
                 Value = IndexProcessingConfigurationDataModel.RemoveAccentsAfterStemming_DefaultValue
             };

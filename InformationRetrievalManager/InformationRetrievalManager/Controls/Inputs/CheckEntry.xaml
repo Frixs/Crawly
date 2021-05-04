@@ -56,6 +56,7 @@
             LineHeight="11"
             LineStackingStrategy="BlockLineHeight"
             Text="{Binding Description, Mode=OneWay}"
+            TextAlignment="Center"
             TextWrapping="Wrap">
             <TextBlock.Style>
                 <Style TargetType="TextBlock">

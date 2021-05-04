@@ -797,7 +797,7 @@ namespace InformationRetrievalManager
                     {
                         Code = nameof(_dataInstance.CrawlerConfiguration.SiteArticleDateTimeCultureInfo),
                         Description = "Invalid date-time culture."
-                    }); // TODO localization
+                    });
                 }
 
                 // If any errors...
@@ -949,7 +949,7 @@ namespace InformationRetrievalManager
                     {
                         Code = nameof(_dataInstance.Name),
                         Description = "Data Instance Name already exists."
-                    }); // TODO localization
+                    });
                 }
 
                 // If any errors...
