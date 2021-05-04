@@ -584,29 +584,15 @@ namespace InformationRetrievalManager
                         bool dataRollback = false;
                         DateTime indexTimestamp = DateTime.UtcNow;
 
-                        // Check file sync
-                        var fileReference = _uow.IndexedFileReferences.Get(o => o.DataInstanceId == _dataInstance.Id && o.Timestamp.Equals(file.FilePath)).FirstOrDefault();
-                        // If already indexed file is is being indexed again...
-                        if (fileReference != null && fileReference.IndexedDocuments != null)
+                        // Create new index file
+                        var fileReference = new IndexedFileReferenceDataModel
                         {
-                            // Clear all the previous/old indexes first (if any)
-                            foreach (var doc in fileReference.IndexedDocuments)
-                                _uow.IndexedDocuments.Delete(doc);
-                            _uow.SaveChanges();
-                        }
-                        // Otherwise...
-                        else
-                        {
-                            // Create new index file
-                            fileReference = new IndexedFileReferenceDataModel
-                            {
-                                DataInstanceId = _dataInstance.Id,
-                                Timestamp = indexTimestamp,
-                                IndexedDocuments = new Collection<IndexedDocumentDataModel>()
-                            };
-                        }
+                            DataInstanceId = _dataInstance.Id,
+                            Timestamp = indexTimestamp,
+                            IndexedDocuments = new Collection<IndexedDocumentDataModel>()
+                        };
 
-                        IndexProcessingProgress = "Preparing documents...";
+                        IndexProcessingProgress = "Preprocessing documents...";
 
                         // Prepare documents for indexation
                         bool anyIndexedData = false;
@@ -648,7 +634,7 @@ namespace InformationRetrievalManager
                                 _uow.BeginTransaction();
 
                                 // Cmmmit
-                                IndexProcessingProgress = "Preparing documents... (it may take a while)";
+                                IndexProcessingProgress = "Preparing documents... (it might take a while)";
                                 _uow.IndexedFileReferences.Insert(fileReference);
                                 _uow.SaveChanges();
 
