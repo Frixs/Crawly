@@ -186,8 +186,8 @@ namespace InformationRetrievalManager.NLP
             if (document == null)
                 throw new ArgumentNullException("Document not specified!");
 
-            // TODO: add to process title and other fields
-            string docContent = document.Content;
+            // TODO: Create better approach for this
+            string docContent = document.Category + "" + document.Title + " " + document.Content;
 
             // Load indexed data
             if (load)
