@@ -58,21 +58,21 @@ namespace InformationRetrievalManager
             ToLowerCaseEntry = new CheckEntryViewModel
             {
                 Label = "To Lower Case",
-                Description = "It puts the entire text int lower-case form during the processing.",
+                Description = "It puts the texts into lower-case form during the processing.",
                 Validation = null,
                 Value = IndexProcessingConfigurationDataModel.ToLowerCase_DefaultValue
             };
             RemoveAccentsBeforeStemmingEntry = new CheckEntryViewModel
             {
                 Label = "Before Stemming",
-                Description = "Remove accents from the entire text before the Stemming process.",
+                Description = "Remove accents from the texts before the Stemming process.",
                 Validation = null,
                 Value = IndexProcessingConfigurationDataModel.RemoveAccentsBeforeStemming_DefaultValue
             };
             RemoveAccentsAfterStemmingEntry = new CheckEntryViewModel
             {
                 Label = "After Stemming",
-                Description = "Remove accents from the entire text after the Stemming process.",
+                Description = "Remove accents from the texts after the Stemming process.",
                 Validation = null,
                 Value = IndexProcessingConfigurationDataModel.RemoveAccentsAfterStemming_DefaultValue
             };
