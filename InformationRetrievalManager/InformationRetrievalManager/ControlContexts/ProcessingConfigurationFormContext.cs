@@ -32,7 +32,7 @@ namespace InformationRetrievalManager
             LanguageEntry = new ComboEntryViewModel<ProcessingLanguage>()
             {
                 Label = "Language",
-                Description = "The language used to process the texts.",
+                Description = "Processing approach to the texts.",
                 Validation = null,
                 Value = IndexProcessingConfigurationDataModel.Language_DefaultValue,
                 ValueList = Enum.GetValues(typeof(ProcessingLanguage)).Cast<ProcessingLanguage>().ToList()
@@ -40,7 +40,7 @@ namespace InformationRetrievalManager
             CustomRegexEntry = new TextEntryViewModel
             {
                 Label = "Custom Regex",
-                Description = "The custom regex used for searching tokens.",
+                Description = "The custom regex used for token searching.",
                 Validation = ValidationHelpers.GetPropertyValidateAttribute<IndexProcessingConfigurationDataModel, string, ValidateStringAttribute>(o => o.CustomRegex),
                 Value = IndexProcessingConfigurationDataModel.CustomRegex_DefaultValue,
                 Placeholder = "E.g. [a-zA-Z]+",

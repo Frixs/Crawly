@@ -144,7 +144,7 @@ namespace InformationRetrievalManager
             SiteArticleDateTimeCultureInfoEntry = new TextEntryViewModel
             {
                 Label = "Article DateTime Culture",
-                Description = "Culture info about the datetime (necessary only if the datetime consist of named months e.g.).",
+                Description = "Culture info for the DateTime (necessary only if the DateTime consist of named months e.g.).",
                 Validation = ValidationHelpers.GetPropertyValidateAttribute<CrawlerConfigurationDataModel, string, ValidateStringAttribute>(o => o.SiteArticleDateTimeCultureInfo),
                 Value = CrawlerConfigurationDataModel.SiteArticleDateTimeCultureInfo_DefaultValue,
                 Placeholder = "E.g. en-US",
