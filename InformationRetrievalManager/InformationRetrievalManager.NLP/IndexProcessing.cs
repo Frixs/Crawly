@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace InformationRetrievalManager.NLP
 {
@@ -155,22 +156,28 @@ namespace InformationRetrievalManager.NLP
         /// <param name="documents">Array of the documents</param>
         /// <param name="save">Once the indexation will be done, the indexed data will be saved into file storage, and working in-memory storage will be cleared.</param>
         /// <param name="load">Loads already indexed data of <see cref="_invertedIndex"/> under the same <see cref="IReadOnlyInvertedIndex.Name"/> into working in-memory storage and <paramref name="documents"/> will be indexed into the loaded data as a addition.</param>
+        /// <param name="cancellationToken">Cancellation token for interrupting the process.</param>
         /// <exception cref="ArgumentNullException">If the array is null</exception>
-        public void IndexDocuments(IndexDocument[] documents, bool save = false, bool load = false)
+        public void IndexDocuments(IndexDocument[] documents, bool save = false, bool load = false, CancellationToken cancellationToken = default)
         {
             if (documents == null)
                 throw new ArgumentNullException("Array of documents not specified!");
 
             // Load indexed data
-            if (load)
+            if (load && !cancellationToken.IsCancellationRequested)
                 _invertedIndex.Load();
 
             // Indexate documents
             for (int i = 0; i < documents.Length; ++i)
+            {
+                if (cancellationToken.IsCancellationRequested)
+                    break;
+
                 IndexDocument(documents[i], false, false);
+            }
 
             // Save indexed data
-            if (save)
+            if (save && !cancellationToken.IsCancellationRequested)
                 _invertedIndex.Save();
         }
 

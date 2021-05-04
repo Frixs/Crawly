@@ -11,6 +11,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
@@ -67,6 +68,12 @@ namespace InformationRetrievalManager
         /// Currently selected query model.
         /// </summary>
         private QueryModelType _selectedQueryModel; //; ctor
+
+        /// <summary>
+        /// Token for canceling the index processing.
+        /// TODO: Improve this approach with something different (user feedback etc.).
+        /// </summary>
+        private CancellationTokenSource _indexProcessingTokenSource = new CancellationTokenSource();
 
         #endregion
 
@@ -406,6 +413,7 @@ namespace InformationRetrievalManager
         /// </summary>
         private void GoToHomePageCommandRoutine()
         {
+            _indexProcessingTokenSource.Cancel();
             DI.ViewModelApplication.GoToPage(ApplicationPage.Home);
         }
 
@@ -589,6 +597,12 @@ namespace InformationRetrievalManager
                                 docs.Add(data[i].ToIndexDocument(model.Id));
                                 anyIndexedData = true;
                             }
+
+                            IndexProcessingProgress = $"Preparing documents... ({i}/{data.Length})";
+
+                            // Check for cancelation
+                            if (_indexProcessingTokenSource.Token.IsCancellationRequested)
+                                break;
                         }
 
                         // If any documents are ready for indexation...
@@ -599,11 +613,18 @@ namespace InformationRetrievalManager
                             // Indexate documents
                             var processing = new IndexProcessing(_dataInstance.Id.ToString(), DateTime.UtcNow, _dataInstance.IndexProcessingConfiguration, _fileManager, _logger);
 
-                            processing.IndexDocuments(docs.ToArray(), save: true);
+                            processing.IndexDocuments(docs.ToArray(), save: true, cancellationToken: _indexProcessingTokenSource.Token);
+
+                            // If the cancelation is NOT requested...
+                            if (!_indexProcessingTokenSource.Token.IsCancellationRequested)
+                            {
+                                // Commit
+                                IndexProcessingProgress = "Committing index...";
+                                _uow.CommitTransaction();
+                            }
+
                             _logger.LogDebugSource("Index processing done!");
                             IndexProcessingProgress = "Done!";
-
-                            _uow.CommitTransaction();
 
                             Application.Current.Dispatcher.Invoke(() => LoadIndexFiles(true));
                         }
@@ -611,9 +632,12 @@ namespace InformationRetrievalManager
                         else
                         {
                             IndexProcessingProgress = "No documents are valid for indexation!";
-
                             _uow.RollbackTransaction();
                         }
+
+                        // Check for cancelation (make sure everything is rollbacked)
+                        if (_indexProcessingTokenSource.Token.IsCancellationRequested)
+                            _uow.RollbackTransaction();
                     }
                     // Otherwise, corrupted data or no data...
                     else
