@@ -654,9 +654,13 @@ namespace InformationRetrievalManager
                         // If rollback is requested...
                         if (dataRollback)
                         {
+                            IndexProcessingProgress = "Data repairing...";
+
                             foreach (var doc in _uow.IndexedDocuments.Get(o => o.DataInstanceId == _dataInstance.Id))
                                 _uow.IndexedDocuments.Delete(doc);
                             _uow.SaveChanges();
+
+                            IndexProcessingProgress = "Done!";
                         }
                     }
                     // Otherwise, corrupted data or no data...
