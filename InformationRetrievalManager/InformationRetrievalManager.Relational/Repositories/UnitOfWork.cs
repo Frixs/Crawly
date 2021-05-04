@@ -162,7 +162,7 @@ namespace InformationRetrievalManager.Relational
                 return;
 
             _dbContext.Database.BeginTransaction();
-            _logger.LogDebugSource($"Database transaction has started!");
+            _logger.LogDebugSource($"Database transaction started!");
         }
 
         /// <inheritdoc/>

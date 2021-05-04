@@ -595,6 +595,7 @@ namespace InformationRetrievalManager
                             // Create new index file
                             fileReference = new IndexedFileReferenceDataModel
                             {
+                                DataInstanceId = _dataInstance.Id,
                                 Timestamp = indexTimestamp,
                                 IndexedDocuments = new Collection<IndexedDocumentDataModel>()
                             };
@@ -679,8 +680,6 @@ namespace InformationRetrievalManager
 
                                 _logger.LogDebugSource("Index processing done!");
                                 IndexProcessingProgress = "Done!";
-
-                                Application.Current.Dispatcher.Invoke(() => LoadIndexFiles(true));
                             }
                             // Otherwise no documents are ready (corrupted)...
                             else
@@ -694,6 +693,9 @@ namespace InformationRetrievalManager
                             _uow.UndoChanges();
                             IndexProcessingProgress = "Done!";
                         }
+
+                        // Reload index files
+                        Application.Current.Dispatcher.Invoke(() => LoadIndexFiles(true));
                     }
                     // Otherwise, corrupted data or no data...
                     else
@@ -1150,9 +1152,9 @@ namespace InformationRetrievalManager
         /// <param name="resetToDefaultSelection">Indication to reset the selection entry to default value.</param>
         public void LoadDataFiles(bool resetToDefaultSelection = false)
         {
-            ushort fileLimit = 50;
-            string startsWith = "data_";
-            string endsWith = ".json";
+            const ushort fileLimit = 50;
+            const string startsWith = "data_";
+            const string endsWith = ".json";
 
             var filePaths = _crawlerStorage.GetAllDataFiles(_dataInstance.Id.ToString());
             var dataFilePaths = filePaths.Where(o => o.EndsWith(endsWith)).ToArray();
@@ -1184,41 +1186,69 @@ namespace InformationRetrievalManager
         }
 
         /// <summary>
-        /// Loads index files
+        /// Loads index files (it also checks and synchronizes index references).
         /// </summary>
         /// <param name="resetToDefaultSelection">Indication to reset the selection entry to default value.</param>
         public void LoadIndexFiles(bool resetToDefaultSelection = false)
         {
-            ushort fileLimit = 50;
+            const ushort fileLimit = 50;
             string startsWith = $"{_dataInstance.Id}_";
-            string endsWith = ".idx";
+            const string endsWith = ".idx";
 
+            var data = new List<DataFileInfo>();
+
+            // Get file references
+            var fileReferences = _uow.IndexedFileReferences.Get(o => o.DataInstanceId == _dataInstance.Id)
+                .OrderByDescending(o => o.Timestamp)
+                .ToArray();
+            // Get real files (filepaths)
             var filePaths = _indexStorage.GetIndexFiles(_dataInstance.Id.ToString());
-            if (filePaths != null)
+
+            // Go through the file references...
+            for (int i = fileReferences.Length - 1; i >= 0; --i)
             {
-                var data = new List<DataFileInfo>();
-                for (int i = 0; i < filePaths.Length; ++i)
+                var fReference = fileReferences[i];
+                DateTime datetimeReference = new DateTime(fReference.Timestamp.Year, fReference.Timestamp.Month, fReference.Timestamp.Day, fReference.Timestamp.Hour, fReference.Timestamp.Minute, fReference.Timestamp.Second);
+                bool found = false;
+
+                // Go through the real files for each file reference...
+                for (int y = 0; y < filePaths.Length; ++y)
                 {
-                    string filename = Path.GetFileName(filePaths[i]);
+                    string filename = Path.GetFileName(filePaths[y]);
                     try
                     {
+                        // Parse file timestamp
                         string dateStr = filename.Substring(startsWith.Length, filename.Length - startsWith.Length - endsWith.Length);
+                        var datetimeFile = DateTime.ParseExact(dateStr, "yyyy_M_d_H_m_s", CultureInfo.InvariantCulture);
 
-                        var datetime = DateTime.ParseExact(dateStr, "yyyy_M_d_H_m_s", CultureInfo.InvariantCulture);
-                        data.Add(new DataFileInfo(datetime.ToString("yyyy-MM-dd (HH:mm:ss)"), filePaths[i], datetime));
+                        // Match the real time with the reference one...
+                        if (DateTime.Compare(datetimeReference, datetimeFile) == 0) // equal
+                        {
+                            found = true;
+                            data.Add(new DataFileInfo(datetimeFile.ToString("yyyy-MM-dd (HH:mm:ss)"), filePaths[y], datetimeFile));
+                            break;
+                        }
                     }
                     catch
                     {
                         // Corrupted filename
-                        // skip
+                        File.Delete(filePaths[y]);
                     }
                 }
 
-                data.Sort((x, y) => DateTime.Compare(y.CreatedAt, x.CreatedAt));
-                if (data.Count > fileLimit)
-                    data = data.Take(fileLimit).ToList();
-                UpdateIndexFileSelection(data, resetToDefaultSelection);
+                // If there is missing real file (desync with file references)...
+                if (!found)
+                {
+                    // Delete the file reference (index)
+                    _uow.IndexedFileReferences.Delete(fReference.Id);
+                    _uow.SaveChanges();
+                }
             }
+
+            data.Sort((x, y) => DateTime.Compare(y.CreatedAt, x.CreatedAt));
+            if (data.Count > fileLimit)
+                data = data.Take(fileLimit).ToList();
+            UpdateIndexFileSelection(data, resetToDefaultSelection);
         }
 
         #endregion
