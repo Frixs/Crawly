@@ -123,6 +123,7 @@ namespace InformationRetrievalManager.Relational
                     default: break;
                 }
             }
+            _logger.LogTraceSource($"Database changes rollbacked!");
         }
 
         /// <inheritdoc/>
@@ -142,6 +143,7 @@ namespace InformationRetrievalManager.Relational
                     break;
                 default: break;
             }
+            _logger.LogTraceSource($"Database changes for '{entity.GetType()}' rollbacked!");
         }
 
         /// <inheritdoc/>
