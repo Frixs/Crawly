@@ -76,6 +76,8 @@ namespace InformationRetrievalManager.Relational
             //
             // Set Id as primary key
             modelBuilder.Entity<DataInstanceDataModel>().HasKey(a => a.Id);
+            // Set up limits
+            modelBuilder.Entity<DataInstanceDataModel>().Property(o => o.Name).HasMaxLength(DataInstanceDataModel.Name_MaxLength);
 
             // Configure Crawler Configurations
             // ------------------------------
@@ -88,6 +90,16 @@ namespace InformationRetrievalManager.Relational
                 .WithOne(o => o.CrawlerConfiguration)
                 .HasForeignKey<CrawlerConfigurationDataModel>(o => o.DataInstanceId)
                 .OnDelete(DeleteBehavior.Cascade);
+            // Set up limits
+            modelBuilder.Entity<CrawlerConfigurationDataModel>().Property(o => o.SiteAddress).HasMaxLength(CrawlerConfigurationDataModel.SiteAddress_MaxLength);
+            modelBuilder.Entity<CrawlerConfigurationDataModel>().Property(o => o.SiteSuffix).HasMaxLength(CrawlerConfigurationDataModel.SiteSuffix_MaxLength);
+            modelBuilder.Entity<CrawlerConfigurationDataModel>().Property(o => o.SiteUrlArticlesXPath).HasMaxLength(CrawlerConfigurationDataModel.SiteUrlArticlesXPath_MaxLength);
+            modelBuilder.Entity<CrawlerConfigurationDataModel>().Property(o => o.SiteArticleContentAreaXPath).HasMaxLength(CrawlerConfigurationDataModel.SiteArticleContentAreaXPath_MaxLength);
+            modelBuilder.Entity<CrawlerConfigurationDataModel>().Property(o => o.SiteArticleTitleXPath).HasMaxLength(CrawlerConfigurationDataModel.SiteArticleTitleXPath_MaxLength);
+            modelBuilder.Entity<CrawlerConfigurationDataModel>().Property(o => o.SiteArticleCategoryXPath).HasMaxLength(CrawlerConfigurationDataModel.SiteArticleCategoryXPath_MaxLength);
+            modelBuilder.Entity<CrawlerConfigurationDataModel>().Property(o => o.SiteArticleDateTimeXPath).HasMaxLength(CrawlerConfigurationDataModel.SiteArticleDateTimeXPath_MaxLength);
+            modelBuilder.Entity<CrawlerConfigurationDataModel>().Property(o => o.SiteArticleDateTimeFormat).HasMaxLength(CrawlerConfigurationDataModel.SiteArticleDateTimeFormat_MaxLength);
+            modelBuilder.Entity<CrawlerConfigurationDataModel>().Property(o => o.SiteArticleDateTimeCultureInfo).HasMaxLength(CrawlerConfigurationDataModel.SiteArticleDateTimeCultureInfo_MaxLength);
 
             // Configure Index Processing Configurations
             // ------------------------------
@@ -117,6 +129,8 @@ namespace InformationRetrievalManager.Relational
                 .Entity<IndexProcessingConfigurationDataModel>()
                 .Property(e => e.CustomStopWords)
                 .Metadata.SetValueComparer(valueComparer);
+            // Set up limits
+            modelBuilder.Entity<IndexProcessingConfigurationDataModel>().Property(o => o.CustomRegex).HasMaxLength(IndexProcessingConfigurationDataModel.CustomRegex_MaxLength);
 
             // Configure Indexed Documents
             // ------------------------------
@@ -129,6 +143,11 @@ namespace InformationRetrievalManager.Relational
                 .WithMany(o => o.IndexedDocuments)
                 .HasForeignKey(o => o.DataInstanceId)
                 .OnDelete(DeleteBehavior.Cascade);
+            // Set up limits
+            modelBuilder.Entity<IndexedDocumentDataModel>().Property(o => o.Title).HasMaxLength(IndexedDocumentDataModel.Title_MaxLength);
+            modelBuilder.Entity<IndexedDocumentDataModel>().Property(o => o.Category).HasMaxLength(IndexedDocumentDataModel.Category_MaxLength);
+            modelBuilder.Entity<IndexedDocumentDataModel>().Property(o => o.SourceUrl).HasMaxLength(IndexedDocumentDataModel.SourceUrl_MaxLength);
+            modelBuilder.Entity<IndexedDocumentDataModel>().Property(o => o.Content).HasMaxLength(IndexedDocumentDataModel.Content_MaxLength);
         }
 
         #endregion

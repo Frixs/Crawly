@@ -12,7 +12,7 @@ namespace InformationRetrievalManager.Relational
         #region Limit Constants
 
         public static readonly bool Title_IsRequired = true;
-        public static readonly short Title_MaxLength = 255;
+        public static readonly short Title_MaxLength = 350;
         public static readonly string Title_DefaultValue = "";
 
         public static readonly bool Category_AllowNull = true;
