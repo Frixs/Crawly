@@ -9,10 +9,23 @@
     Title="{Binding Value_ViewModelApplication.ApplicationName, Source={x:Static local:ViewModelLocator.Instance}, FallbackValue='Title Placeholder'}"
     MinWidth="{x:Static data:ApplicationStateDataModel.MainWindowSizeX_MinValue}"
     MinHeight="{x:Static data:ApplicationStateDataModel.MainWindowSizeY_MinValue}"
+    Background="{StaticResource BackgroundBrushKey}"
     Closing="Window_Closing"
     Icon="/InformationRetrievalManager;component/icon.ico"
     mc:Ignorable="d">
-    <Grid Background="{StaticResource BackgroundBrushKey}">
+    <Grid>
+        <!--  Texture Background  -->
+        <Grid.Background>
+            <VisualBrush
+                Opacity="0.7"
+                TileMode="Tile"
+                Viewport="0,0,0.5,0.5">
+                <VisualBrush.Visual>
+                    <Image Source="/Resources/Images/texture_data_seamless.png" />
+                </VisualBrush.Visual>
+            </VisualBrush>
+        </Grid.Background>
+
         <local:PageHost
             Grid.Row="1"
             CurrentPage="{Binding Value_ViewModelApplication.CurrentPage, Source={x:Static local:ViewModelLocator.Instance}}"

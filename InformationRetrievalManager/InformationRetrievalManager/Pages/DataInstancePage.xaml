@@ -15,18 +15,6 @@
     mc:Ignorable="d">
 
     <Border Padding="15">
-        <!--  Texture  -->
-        <Border.Background>
-            <VisualBrush
-                Opacity="0.7"
-                TileMode="Tile"
-                Viewport="0,0,0.5,0.5">
-                <VisualBrush.Visual>
-                    <Image Source="/Resources/Images/texture_data_seamless.png" />
-                </VisualBrush.Visual>
-            </VisualBrush>
-        </Border.Background>
-
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
