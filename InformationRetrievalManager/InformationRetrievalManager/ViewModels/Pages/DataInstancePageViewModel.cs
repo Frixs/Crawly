@@ -185,7 +185,7 @@ namespace InformationRetrievalManager
         /// <summary>
         /// Command flag for crawler controls
         /// </summary>
-        private bool CrawlerInWorkFlag { get; set; }
+        public bool CrawlerInWorkFlag { get; set; }
 
         /// <summary>
         /// Indicates if index processing is currently in work
@@ -200,7 +200,12 @@ namespace InformationRetrievalManager
         /// <summary>
         /// Command flag for opening process (e.g. files or for opening web pages)
         /// </summary>
-        private bool ProcessFlag { get; set; }
+        public bool ProcessFlag { get; set; }
+
+        /// <summary>
+        /// Command flag for deleting index.
+        /// </summary>
+        public bool DeleteIndexFlag { get; set; }
 
         #endregion
 
@@ -527,7 +532,7 @@ namespace InformationRetrievalManager
                 if (fileInfo != null && fileInfo.FilePath != null && File.Exists(fileInfo.FilePath))
                     _crawlerStorage.DeleteDataFiles(_dataInstance.Id.ToString(), fileInfo.CreatedAt);
 
-                LoadDataFiles(true);
+                await LoadDataFilesAsync(true);
 
                 await Task.Delay(1);
             });
@@ -623,7 +628,7 @@ namespace InformationRetrievalManager
                                 fileReference.IndexedDocuments.Add(model);
                             }
 
-                            IndexProcessingProgress = $"Preparing documents... ({i}/{data.Length})";
+                            IndexProcessingProgress = $"Preprocessing documents... ({i}/{data.Length})";
 
                             // Check for cancelation
                             if (_indexProcessingTokenSource.Token.IsCancellationRequested)
@@ -643,7 +648,7 @@ namespace InformationRetrievalManager
                                 _uow.BeginTransaction();
 
                                 // Cmmmit
-                                IndexProcessingProgress = "Storing documents... (it may take a while)";
+                                IndexProcessingProgress = "Preparing documents... (it may take a while)";
                                 _uow.IndexedFileReferences.Insert(fileReference);
                                 _uow.SaveChanges();
 
@@ -695,7 +700,7 @@ namespace InformationRetrievalManager
                         }
 
                         // Reload index files
-                        Application.Current.Dispatcher.Invoke(() => LoadIndexFiles(true));
+                        await LoadIndexFilesAsync(true);
                     }
                     // Otherwise, corrupted data or no data...
                     else
@@ -714,16 +719,14 @@ namespace InformationRetrievalManager
         /// <param name="parameter"><see cref="DataFileInfo"/></param>
         private async Task DeleteIndexFileCommandRoutineAsync(object parameter)
         {
-            await RunCommandAsync(() => ProcessFlag, async () =>
+            await RunCommandAsync(() => DeleteIndexFlag, async () =>
             {
-                var fileInfo = parameter as DataFileInfo;
+                DataFileInfo fileInfo = parameter as DataFileInfo;
 
                 if (fileInfo != null && fileInfo.FilePath != null && File.Exists(fileInfo.FilePath))
                     _indexStorage.DeleteIndexFiles(_dataInstance.Id.ToString(), fileInfo.CreatedAt);
 
-                LoadIndexFiles(true);
-
-                await Task.Delay(1);
+                await LoadIndexFilesAsync(true);
             });
         }
 
@@ -871,7 +874,7 @@ namespace InformationRetrievalManager
                 // Re-initialize state values
                 ConfigurationContext.FormErrorString = null;
 
-                if (CrawlerInWork || IndexProcessingInWorkFlag || QueryInWorkFlag)
+                if (CrawlerInWork || IndexProcessingInWorkFlag || QueryInWorkFlag || DeleteIndexFlag)
                 {
                     ConfigurationContext.FormErrorString = "Cannot update configuration during processing!";
                     return;
@@ -969,7 +972,7 @@ namespace InformationRetrievalManager
                 // Re-initialize state values
                 ConfigurationContext.FormErrorString = null;
 
-                if (CrawlerInWork || IndexProcessingInWorkFlag || QueryInWorkFlag)
+                if (CrawlerInWork || IndexProcessingInWorkFlag || QueryInWorkFlag || DeleteIndexFlag)
                 {
                     ConfigurationContext.FormErrorString = "Cannot update configuration during processing!";
                     return;
@@ -1040,7 +1043,7 @@ namespace InformationRetrievalManager
                 // Re-initialize state values
                 ConfigurationContext.FormErrorString = null;
 
-                if (CrawlerInWork || IndexProcessingInWorkFlag || QueryInWorkFlag)
+                if (CrawlerInWork || IndexProcessingInWorkFlag || QueryInWorkFlag || DeleteIndexFlag)
                 {
                     ConfigurationContext.FormErrorString = "Cannot update configuration during processing!";
                     return;
@@ -1094,7 +1097,7 @@ namespace InformationRetrievalManager
                 // Re-initialize state values
                 ConfigurationContext.FormErrorString = null;
 
-                if (CrawlerInWork || IndexProcessingInWorkFlag || QueryInWorkFlag)
+                if (CrawlerInWork || IndexProcessingInWorkFlag || QueryInWorkFlag || DeleteIndexFlag)
                 {
                     ConfigurationContext.FormErrorString = "Cannot update configuration during processing!";
                     return;
@@ -1150,105 +1153,113 @@ namespace InformationRetrievalManager
         /// Loads data files
         /// </summary>
         /// <param name="resetToDefaultSelection">Indication to reset the selection entry to default value.</param>
-        public void LoadDataFiles(bool resetToDefaultSelection = false)
+        public async Task LoadDataFilesAsync(bool resetToDefaultSelection = false)
         {
-            const ushort fileLimit = 50;
-            const string startsWith = "data_";
-            const string endsWith = ".json";
-
-            var filePaths = _crawlerStorage.GetAllDataFiles(_dataInstance.Id.ToString());
-            var dataFilePaths = filePaths.Where(o => o.EndsWith(endsWith)).ToArray();
-            if (dataFilePaths != null)
+            await _taskManager.Run(() =>
             {
-                var data = new List<DataFileInfo>();
-                for (int i = 0; i < dataFilePaths.Length; ++i)
+                const ushort fileLimit = 50;
+                const string startsWith = "data_";
+                const string endsWith = ".json";
+
+                var filePaths = _crawlerStorage.GetAllDataFiles(_dataInstance.Id.ToString());
+                var dataFilePaths = filePaths.Where(o => o.EndsWith(endsWith)).ToArray();
+                if (dataFilePaths != null)
                 {
-                    string filename = Path.GetFileName(dataFilePaths[i]);
-                    try
-                    {
-                        string dateStr = filename.Substring(startsWith.Length, filename.Length - startsWith.Length - endsWith.Length);
 
-                        var datetime = DateTime.ParseExact(dateStr, "yyyy_M_d_H_m_s", CultureInfo.InvariantCulture);
-                        data.Add(new DataFileInfo(datetime.ToString("yyyy-MM-dd (HH:mm:ss)"), dataFilePaths[i], datetime));
-                    }
-                    catch
+                    var data = new List<DataFileInfo>();
+                    for (int i = 0; i < dataFilePaths.Length; ++i)
                     {
-                        // Corrupted filename
-                        // skip
+                        string filename = Path.GetFileName(dataFilePaths[i]);
+                        try
+                        {
+                            string dateStr = filename.Substring(startsWith.Length, filename.Length - startsWith.Length - endsWith.Length);
+
+                            var datetime = DateTime.ParseExact(dateStr, "yyyy_M_d_H_m_s", CultureInfo.InvariantCulture);
+                            data.Add(new DataFileInfo(datetime.ToString("yyyy-MM-dd (HH:mm:ss)"), dataFilePaths[i], datetime));
+                        }
+                        catch
+                        {
+                            // Corrupted filename
+                            // skip
+                        }
                     }
+
+
+                    data.Sort((x, y) => DateTime.Compare(y.CreatedAt, x.CreatedAt));
+                    if (data.Count > fileLimit)
+                        data = data.Take(fileLimit).ToList();
+                    Application.Current.Dispatcher.Invoke(() => UpdateDataFileSelection(data, resetToDefaultSelection));
                 }
-
-                data.Sort((x, y) => DateTime.Compare(y.CreatedAt, x.CreatedAt));
-                if (data.Count > fileLimit)
-                    data = data.Take(fileLimit).ToList();
-                UpdateDataFileSelection(data, resetToDefaultSelection);
-            }
+            });
         }
 
         /// <summary>
         /// Loads index files (it also checks and synchronizes index references).
         /// </summary>
         /// <param name="resetToDefaultSelection">Indication to reset the selection entry to default value.</param>
-        public void LoadIndexFiles(bool resetToDefaultSelection = false)
+        public async Task LoadIndexFilesAsync(bool resetToDefaultSelection = false)
         {
-            const ushort fileLimit = 50;
-            string startsWith = $"{_dataInstance.Id}_";
-            const string endsWith = ".idx";
-
-            var data = new List<DataFileInfo>();
-
-            // Get file references
-            var fileReferences = _uow.IndexedFileReferences.Get(o => o.DataInstanceId == _dataInstance.Id)
-                .OrderByDescending(o => o.Timestamp)
-                .ToArray();
-            // Get real files (filepaths)
-            var filePaths = _indexStorage.GetIndexFiles(_dataInstance.Id.ToString());
-
-            // Go through the file references...
-            for (int i = fileReferences.Length - 1; i >= 0; --i)
+            await _taskManager.Run(() =>
             {
-                var fReference = fileReferences[i];
-                DateTime datetimeReference = new DateTime(fReference.Timestamp.Year, fReference.Timestamp.Month, fReference.Timestamp.Day, fReference.Timestamp.Hour, fReference.Timestamp.Minute, fReference.Timestamp.Second);
-                bool found = false;
+                const ushort fileLimit = 50;
+                string startsWith = $"{_dataInstance.Id}_";
+                const string endsWith = ".idx";
 
-                // Go through the real files for each file reference...
-                for (int y = 0; y < filePaths.Length; ++y)
+                var data = new List<DataFileInfo>();
+
+                // Get file references
+                var fileReferences = _uow.IndexedFileReferences.Get(o => o.DataInstanceId == _dataInstance.Id)
+                    .OrderByDescending(o => o.Timestamp)
+                    .ToArray();
+                // Get real files (filepaths)
+                var filePaths = _indexStorage.GetIndexFiles(_dataInstance.Id.ToString());
+
+                // Go through the file references...
+                for (int i = fileReferences.Length - 1; i >= 0; --i)
                 {
-                    string filename = Path.GetFileName(filePaths[y]);
-                    try
-                    {
-                        // Parse file timestamp
-                        string dateStr = filename.Substring(startsWith.Length, filename.Length - startsWith.Length - endsWith.Length);
-                        var datetimeFile = DateTime.ParseExact(dateStr, "yyyy_M_d_H_m_s", CultureInfo.InvariantCulture);
+                    var fReference = fileReferences[i];
+                    DateTime datetimeReference = new DateTime(fReference.Timestamp.Year, fReference.Timestamp.Month, fReference.Timestamp.Day, fReference.Timestamp.Hour, fReference.Timestamp.Minute, fReference.Timestamp.Second);
+                    bool found = false;
 
-                        // Match the real time with the reference one...
-                        if (DateTime.Compare(datetimeReference, datetimeFile) == 0) // equal
+                    // Go through the real files for each file reference...
+                    for (int y = 0; y < filePaths.Length; ++y)
+                    {
+                        string filename = Path.GetFileName(filePaths[y]);
+                        try
                         {
-                            found = true;
-                            data.Add(new DataFileInfo(datetimeFile.ToString("yyyy-MM-dd (HH:mm:ss)"), filePaths[y], datetimeFile));
-                            break;
+                            // Parse file timestamp
+                            string dateStr = filename.Substring(startsWith.Length, filename.Length - startsWith.Length - endsWith.Length);
+                            var datetimeFile = DateTime.ParseExact(dateStr, "yyyy_M_d_H_m_s", CultureInfo.InvariantCulture);
+
+                            // Match the real time with the reference one...
+                            if (DateTime.Compare(datetimeReference, datetimeFile) == 0) // equal
+                            {
+                                found = true;
+                                data.Add(new DataFileInfo(datetimeFile.ToString("yyyy-MM-dd (HH:mm:ss)"), filePaths[y], datetimeFile));
+                                break;
+                            }
+                        }
+                        catch
+                        {
+                            // Corrupted filename
+                            File.Delete(filePaths[y]);
                         }
                     }
-                    catch
+
+                    // If there is missing real file (desync with file references)...
+                    if (!found)
                     {
-                        // Corrupted filename
-                        File.Delete(filePaths[y]);
+                        // Delete the file reference (index)
+                        _uow.IndexedFileReferences.Delete(fReference.Id);
+                        _uow.SaveChanges();
                     }
                 }
 
-                // If there is missing real file (desync with file references)...
-                if (!found)
-                {
-                    // Delete the file reference (index)
-                    _uow.IndexedFileReferences.Delete(fReference.Id);
-                    _uow.SaveChanges();
-                }
-            }
-
-            data.Sort((x, y) => DateTime.Compare(y.CreatedAt, x.CreatedAt));
-            if (data.Count > fileLimit)
-                data = data.Take(fileLimit).ToList();
-            UpdateIndexFileSelection(data, resetToDefaultSelection);
+                data.Sort((x, y) => DateTime.Compare(y.CreatedAt, x.CreatedAt));
+                if (data.Count > fileLimit)
+                    data = data.Take(fileLimit).ToList();
+                Application.Current.Dispatcher.Invoke(() => UpdateIndexFileSelection(data, resetToDefaultSelection));
+            });
         }
 
         #endregion
@@ -1279,11 +1290,14 @@ namespace InformationRetrievalManager
                 UpdateCrawlerEvents(_crawlerEngine);
 
             // Load data files
-            LoadDataFiles(true);
+            await LoadDataFilesAsync(true);
             // Load index files
-            LoadIndexFiles(true);
+            await LoadIndexFilesAsync(true);
             // Load data/values into the configuration context
             ConfigurationContext.Set(_dataInstance.CrawlerConfiguration, _dataInstance.IndexProcessingConfiguration, _dataInstance.Name);
+
+            // Additional small delay to support GUI for lazy load
+            await Task.Delay(300);
 
             // Flag up data load is done
             if (loadToMainView) CurrentView = View.Main;
@@ -1331,10 +1345,10 @@ namespace InformationRetrievalManager
                     OnPropertyChanged(nameof(CrawlerProgress));
                 });
             };
-            crawler.OnFinishProcessEvent += (s, e) =>
+            crawler.OnFinishProcessEvent += async (s, e) =>
             {
                 CrawlerProgress = "Done!";
-                Application.Current.Dispatcher.Invoke(() =>
+                await Application.Current.Dispatcher.Invoke(async () =>
                 {
                     OnPropertyChanged(nameof(CrawlerProgress));
 
@@ -1347,7 +1361,7 @@ namespace InformationRetrievalManager
                         CrawlerProgressMsgs[i] = CrawlerProgressUrls[i] = string.Empty;
 
                     // Load data files
-                    LoadDataFiles(true);
+                    await LoadDataFilesAsync(true);
                 });
             };
         }

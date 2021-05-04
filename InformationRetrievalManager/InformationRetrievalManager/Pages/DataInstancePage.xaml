@@ -90,6 +90,7 @@
                                             <Condition Binding="{Binding ConfigurationContext.ProcessingConfigurationUpdateCommandFlag, Mode=OneWay}" Value="False" />
                                             <Condition Binding="{Binding ConfigurationContext.DataInstanceNameUpdateCommandFlag, Mode=OneWay}" Value="False" />
                                             <Condition Binding="{Binding ConfigurationContext.DataInstanceDeleteCommandFlag, Mode=OneWay}" Value="False" />
+                                            <Condition Binding="{Binding DeleteIndexFlag, Mode=OneWay}" Value="False" />
                                         </MultiDataTrigger.Conditions>
                                         <Setter Property="IsEnabled" Value="True" />
                                     </MultiDataTrigger>
@@ -404,6 +405,7 @@
                                                         <Condition Binding="{Binding DataFileEntry.Value.FilePath, Converter={local:StringEmptyConverter}, Mode=OneWay}" Value="False" />
                                                         <Condition Binding="{Binding CrawlerInWork, Mode=OneWay}" Value="False" />
                                                         <Condition Binding="{Binding QueryInWorkFlag, Mode=OneWay}" Value="False" />
+                                                        <Condition Binding="{Binding DeleteIndexFlag, Mode=OneWay}" Value="False" />
                                                     </MultiDataTrigger.Conditions>
                                                     <Setter Property="IsEnabled" Value="True" />
                                                 </MultiDataTrigger>
@@ -500,7 +502,8 @@
                                             CommandParameter="{Binding IndexFileEntry.Value, Mode=OneWay}"
                                             Content="{StaticResource FontAwesomeTrashAltIcon}"
                                             FontFamily="{StaticResource FontAwesomeSolid}"
-                                            ToolTip="Delete Data">
+                                            IsEnabled="{Binding DeleteIndexFlag, Converter={local:BooleanInvertConverter}, Mode=OneWay}"
+                                            ToolTip="Delete Index">
                                             <Button.Style>
                                                 <Style BasedOn="{StaticResource DarkLightButton}" TargetType="{x:Type Button}">
                                                     <Setter Property="Visibility" Value="Visible" />
@@ -571,6 +574,7 @@
                                                         <Condition Binding="{Binding IndexFileEntry.Value.FilePath, Converter={local:StringEmptyConverter}, Mode=OneWay}" Value="False" />
                                                         <Condition Binding="{Binding QueryEntry.Value, Converter={local:StringEmptyConverter}, Mode=OneWay}" Value="False" />
                                                         <Condition Binding="{Binding IndexProcessingInWorkFlag, Mode=OneWay}" Value="False" />
+                                                        <Condition Binding="{Binding DeleteIndexFlag, Mode=OneWay}" Value="False" />
                                                     </MultiDataTrigger.Conditions>
                                                     <Setter Property="IsEnabled" Value="True" />
                                                 </MultiDataTrigger>
