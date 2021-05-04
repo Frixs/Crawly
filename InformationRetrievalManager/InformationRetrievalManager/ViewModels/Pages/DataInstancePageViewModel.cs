@@ -572,13 +572,13 @@ namespace InformationRetrievalManager
                     // If any data...
                     if (data != null && data.Length > 0)
                     {
-                        _uow.BeginTransaction();
-
                         IndexProcessingProgress = "Preparing documents...";
 
+                        bool dataRollback = false;
                         // Clear all the previous/old indexes first (if any)
                         foreach (var doc in _uow.IndexedDocuments.Get(o => o.DataInstanceId == _dataInstance.Id))
                             _uow.IndexedDocuments.Delete(doc);
+                        _uow.SaveChanges();
 
                         // Prepare documents for indexation
                         bool anyIndexedData = false;
@@ -598,53 +598,66 @@ namespace InformationRetrievalManager
                             // Validate, if no errors...
                             if (ValidationHelpers.ValidateModel(model).Count == 0)
                             {
-                                _uow.IndexedDocuments.Insert(model);
-                                _uow.SaveChanges();
-
-                                docs.Add(data[i].ToIndexDocument(model.Id));
                                 anyIndexedData = true;
+                                _uow.IndexedDocuments.Insert(model);
+                                docs.Add(data[i].ToIndexDocument(model.Id));
                             }
 
                             IndexProcessingProgress = $"Preparing documents... ({i}/{data.Length})";
 
                             // Check for cancelation
                             if (_indexProcessingTokenSource.Token.IsCancellationRequested)
-                                break;
-                        }
-
-                        // If any documents are ready for indexation...
-                        if (anyIndexedData)
-                        {
-                            IndexProcessingProgress = "Indexing...";
-
-                            // Indexate documents
-                            var processing = new IndexProcessing(_dataInstance.Id.ToString(), DateTime.UtcNow, _dataInstance.IndexProcessingConfiguration, _fileManager, _logger);
-
-                            processing.IndexDocuments(docs.ToArray(), save: true, cancellationToken: _indexProcessingTokenSource.Token);
-
-                            // If the cancelation is NOT requested...
-                            if (!_indexProcessingTokenSource.Token.IsCancellationRequested)
                             {
-                                // Commit
-                                IndexProcessingProgress = "Committing index...";
-                                _uow.CommitTransaction();
+                                dataRollback = true;
+                                break;
                             }
-
-                            _logger.LogDebugSource("Index processing done!");
-                            IndexProcessingProgress = "Done!";
-
-                            Application.Current.Dispatcher.Invoke(() => LoadIndexFiles(true));
                         }
-                        // Otherwise no documents are ready (corrupted)...
-                        else
+
+                        // If data were processed successfully (no rollback required)...
+                        if (dataRollback == false)
                         {
-                            IndexProcessingProgress = "No documents are valid for indexation!";
-                            _uow.RollbackTransaction();
+                            // If any documents are ready for indexation...
+                            if (anyIndexedData)
+                            {
+                                IndexProcessingProgress = "Indexing...";
+
+                                // Indexate documents
+                                var processing = new IndexProcessing(_dataInstance.Id.ToString(), DateTime.UtcNow, _dataInstance.IndexProcessingConfiguration, _fileManager, _logger);
+
+                                processing.IndexDocuments(docs.ToArray(), save: true, 
+                                    setProgressMessage: (value) => IndexProcessingProgress = $"Indexing... ({value}/{docs.Count})", 
+                                    cancellationToken: _indexProcessingTokenSource.Token);
+
+                                IndexProcessingProgress = "Committing index...";
+
+                                // If the cancelation is requested...
+                                if (_indexProcessingTokenSource.Token.IsCancellationRequested)
+                                    dataRollback = true;
+                                // Otherwise, everythings fine...
+                                else
+                                {
+                                    // Cmmmit
+                                    IndexProcessingProgress = "Committing index...";
+                                    _uow.SaveChanges();
+                                }
+
+                                _logger.LogDebugSource("Index processing done!");
+                                IndexProcessingProgress = "Done!";
+
+                                Application.Current.Dispatcher.Invoke(() => LoadIndexFiles(true));
+                            }
+                            // Otherwise no documents are ready (corrupted)...
+                            else
+                                IndexProcessingProgress = "No documents are valid for indexation!";
                         }
 
-                        // Check for cancelation (make sure everything is rollbacked)
-                        if (_indexProcessingTokenSource.Token.IsCancellationRequested)
-                            _uow.RollbackTransaction();
+                        // If rollback is requested...
+                        if (dataRollback)
+                        {
+                            foreach (var doc in _uow.IndexedDocuments.Get(o => o.DataInstanceId == _dataInstance.Id))
+                                _uow.IndexedDocuments.Delete(doc);
+                            _uow.SaveChanges();
+                        }
                     }
                     // Otherwise, corrupted data or no data...
                     else
@@ -669,7 +682,7 @@ namespace InformationRetrievalManager
 
                 if (fileInfo != null && fileInfo.FilePath != null && File.Exists(fileInfo.FilePath))
                     _indexStorage.DeleteIndexFiles(_dataInstance.Id.ToString(), fileInfo.CreatedAt);
-                
+
                 LoadIndexFiles(true);
 
                 await Task.Delay(1);
