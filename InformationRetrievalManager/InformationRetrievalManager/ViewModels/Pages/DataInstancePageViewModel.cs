@@ -577,7 +577,7 @@ namespace InformationRetrievalManager
                         IndexProcessingProgress = "Preparing documents...";
 
                         // Clear all the previous/old indexes first (if any)
-                        foreach (var doc in _uow.IndexedDocuments.Get())
+                        foreach (var doc in _uow.IndexedDocuments.Get(o => o.DataInstanceId == _dataInstance.Id))
                             _uow.IndexedDocuments.Delete(doc);
 
                         // Prepare documents for indexation
@@ -588,11 +588,11 @@ namespace InformationRetrievalManager
                             var model = new IndexedDocumentDataModel
                             {
                                 DataInstanceId = _dataInstance.Id,
-                                Title = Regex.Replace(StringHelpers.ReplaceNewLines(data[i].Title, " "), @"[ ]+", " ").Trim(),
-                                Category = Regex.Replace(StringHelpers.ReplaceNewLines(data[i].Category, " "), @"[ ]+", " ").Trim(),
+                                Title = data[i].Title == null ? null : Regex.Replace(StringHelpers.ReplaceNewLines(data[i].Title, " "), @"[ ]+", " ").Trim(),
+                                Category = data[i].Category == null ? null : Regex.Replace(StringHelpers.ReplaceNewLines(data[i].Category, " "), @"[ ]+", " ").Trim(),
                                 Timestamp = data[i].Timestamp,
                                 SourceUrl = data[i].SourceUrl,
-                                Content = StringHelpers.ShortenWithDots(Regex.Replace(StringHelpers.ReplaceNewLines(data[i].Content, " "), @"[ ]+", " ").Trim(), IndexedDocumentDataModel.Content_MaxLength - 3)
+                                Content = data[i].Content == null ? null : StringHelpers.ShortenWithDots(Regex.Replace(StringHelpers.ReplaceNewLines(data[i].Content, " "), @"[ ]+", " ").Trim(), IndexedDocumentDataModel.Content_MaxLength - 3)
                             };
 
                             // Validate, if no errors...
