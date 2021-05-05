@@ -34,10 +34,10 @@ namespace InformationRetrievalManager.Core
 
                     try
                     {
-                        using (Stream stream = File.Open(path, FileMode.Open))
+                        using (FileStream stream = File.Open(path, FileMode.Open))
                         {
-                            BinaryFormatter bin = new BinaryFormatter();
-                            resultObj = bin.Deserialize(stream);
+                            BinaryFormatter bf = new BinaryFormatter();
+                            resultObj = bf.Deserialize(stream);
                         }
                     }
                     catch (IOException)
@@ -79,7 +79,7 @@ namespace InformationRetrievalManager.Core
 
                     try
                     {
-                        using (Stream stream = File.Open(path, FileMode.Create))
+                        using (FileStream stream = File.Open(path, FileMode.Create))
                         {
                             BinaryFormatter bf = new BinaryFormatter();
                             bf.Serialize(stream, obj);

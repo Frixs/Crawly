@@ -20,6 +20,15 @@ namespace InformationRetrievalManager.NLP
         /// <summary>
         /// Default constructor
         /// </summary>
+        /// <remarks>
+        ///     Should not be used outside of serialization/deserialization !!!
+        /// </remarks>
+        public TermInfo() { }
+
+        /// <summary>
+        /// Constructor with property sets
+        /// </summary>
+        /// <param name="frequency">The frequency of this term info.</param>
         public TermInfo(int frequency)
         {
             Frequency = frequency;
