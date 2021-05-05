@@ -161,6 +161,7 @@ namespace InformationRetrievalManager.Relational
             if (_dbContext.Database.CurrentTransaction != null)
                 return;
 
+            _dbContext.ChangeTracker.AutoDetectChangesEnabled = false;
             _dbContext.Database.BeginTransaction();
             _logger.LogDebugSource($"Database transaction started!");
         }
@@ -172,6 +173,7 @@ namespace InformationRetrievalManager.Relational
                 return;
 
             _dbContext.Database.CommitTransaction();
+            _dbContext.ChangeTracker.AutoDetectChangesEnabled = true;
             _logger.LogDebugSource($"Database transaction committed!");
         }
 
@@ -182,6 +184,7 @@ namespace InformationRetrievalManager.Relational
                 return;
 
             _dbContext.Database.RollbackTransaction();
+            _dbContext.ChangeTracker.AutoDetectChangesEnabled = true;
             _logger.LogDebugSource($"Database transaction roll-backed!");
         }
 
