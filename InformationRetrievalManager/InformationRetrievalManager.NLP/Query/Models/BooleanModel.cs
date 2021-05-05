@@ -44,7 +44,7 @@ namespace InformationRetrievalManager.NLP
         #region Interface Methods
 
         /// <inheritdoc/>
-        public void CalculateData(IReadOnlyDictionary<string, IReadOnlyDictionary<long, IReadOnlyTermInfo>> data, out long totalDocuments, CancellationToken cancellationToken = default)
+        public void CalculateData(IReadOnlyDictionary<string, IReadOnlyDictionary<long, IReadOnlyTermInfo>> data, out long totalDocuments, Action<string> setProgressMessage = null, CancellationToken cancellationToken = default)
         {
             if (data == null)
                 throw new ArgumentNullException("Data not specified!");
@@ -53,8 +53,11 @@ namespace InformationRetrievalManager.NLP
             var documents = new HashSet<long>();
 
             // Count all documents
+            long i = 0;
             foreach (var term in data)
             {
+                i++;
+
                 foreach (var termDocument in term.Value)
                 {
                     // Check for cancelation
@@ -70,6 +73,8 @@ namespace InformationRetrievalManager.NLP
                 // Check for cancelation
                 if (cancellationToken.IsCancellationRequested)
                     break;
+
+                setProgressMessage?.Invoke($"counting documents: {i}/{data.Count}");
             }
 
             // Save the document count
@@ -77,10 +82,11 @@ namespace InformationRetrievalManager.NLP
 
             // Log it
             _logger?.LogDebugSource("Data has been successfully calculated.");
+            setProgressMessage?.Invoke("data done");
         }
 
         /// <inheritdoc/>
-        public void CalculateQuery(string query, IReadOnlyDictionary<string, IReadOnlyDictionary<long, IReadOnlyTermInfo>> data, IndexProcessingConfiguration processingConfiguration, CancellationToken cancellationToken = default)
+        public void CalculateQuery(string query, IReadOnlyDictionary<string, IReadOnlyDictionary<long, IReadOnlyTermInfo>> data, IndexProcessingConfiguration processingConfiguration, Action<string> setProgressMessage = null, CancellationToken cancellationToken = default)
         {
             if (query == null || data == null)
                 throw new ArgumentNullException("Data not specified!");
@@ -92,8 +98,11 @@ namespace InformationRetrievalManager.NLP
             var documents = new HashSet<long>();
 
             // Get all document IDs
+            long i = 0;
             foreach (var term in data)
             {
+                i++;
+
                 foreach (var termDocument in term.Value)
                 {
                     // Check for cancelation
@@ -109,6 +118,8 @@ namespace InformationRetrievalManager.NLP
                 // Check for cancelation
                 if (cancellationToken.IsCancellationRequested)
                     break;
+
+                setProgressMessage?.Invoke($"getting documents IDs: {i}/{data.Count}");
             }
 
             // Query parser
@@ -116,6 +127,7 @@ namespace InformationRetrievalManager.NLP
             string[] queryTokens = parser.Tokenize(query);
 
             // Parse query
+            setProgressMessage?.Invoke("parsing query");
             QueryBooleanExpressionParser.Node queryParsed = null;
             try
             {
@@ -152,15 +164,18 @@ namespace InformationRetrievalManager.NLP
             else
             {
                 // Log it
-                _logger?.LogDebugSource("Query has failed to parse.");
+                _logger?.LogDebugSource("Query failed to parse.");
             }
+            setProgressMessage?.Invoke("query done");
         }
 
         /// <inheritdoc/>
-        public long[] CalculateBestMatch(int select, out long foundDocuments, CancellationToken cancellationToken = default)
+        public long[] CalculateBestMatch(int select, out long foundDocuments, Action<string> setProgressMessage = null, CancellationToken cancellationToken = default)
         {
             // The calculations are made in the query method due to parameter limitations.
             // Cancellation is not needed here
+
+            setProgressMessage?.Invoke("retrieving results");
 
             foundDocuments = _queryResults.Length;
 

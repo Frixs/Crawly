@@ -54,7 +54,7 @@ namespace InformationRetrievalManager.NLP
         #region Interface Methods
 
         /// <inheritdoc/>
-        public void CalculateData(IReadOnlyDictionary<string, IReadOnlyDictionary<long, IReadOnlyTermInfo>> data, out long totalDocuments, CancellationToken cancellationToken = default)
+        public void CalculateData(IReadOnlyDictionary<string, IReadOnlyDictionary<long, IReadOnlyTermInfo>> data, out long totalDocuments, Action<string> setProgressMessage = null, CancellationToken cancellationToken = default)
         {
             if (data == null)
                 throw new ArgumentNullException("Data not specified!");
@@ -67,8 +67,10 @@ namespace InformationRetrievalManager.NLP
             var documents = new HashSet<long>();
 
             // Calculate term IDF
+            long i = 0;
             foreach (var term in data)
             {
+                i++;
                 var termDocCount = 0;
                 // Get no. of documents the term is located in.
                 foreach (var termDocument in term.Value)
@@ -90,6 +92,7 @@ namespace InformationRetrievalManager.NLP
 
                 // The IDF calculation
                 _termIdf[term.Key] = Math.Log(documents.Count / termDocCount, 10);
+                setProgressMessage?.Invoke($"data IDF calculation: {i}/{data.Count}");
             }
             totalDocuments = documents.Count;
 
@@ -97,13 +100,16 @@ namespace InformationRetrievalManager.NLP
             var docVectors = new Dictionary<long, double[]>();
 
             // Go through documents and create document vectors...
+            i = 0;
             foreach (var documentId in documents)
             {
+                i++;
                 // Check for cancelation
                 if (cancellationToken.IsCancellationRequested)
                     break;
 
                 docVectors[documentId] = CalculateDocumentVector(data, documentId, cancellationToken);
+                setProgressMessage?.Invoke($"creating data document vectors: {i}/{documents.Count}");
             }
 
             // Save the vectors
@@ -111,10 +117,11 @@ namespace InformationRetrievalManager.NLP
 
             // Log it
             _logger?.LogDebugSource("Data has been successfully calculated into vectors.");
+            setProgressMessage?.Invoke("data done");
         }
 
         /// <inheritdoc/>
-        public void CalculateQuery(string query, IReadOnlyDictionary<string, IReadOnlyDictionary<long, IReadOnlyTermInfo>> data, IndexProcessingConfiguration processingConfiguration, CancellationToken cancellationToken = default)
+        public void CalculateQuery(string query, IReadOnlyDictionary<string, IReadOnlyDictionary<long, IReadOnlyTermInfo>> data, IndexProcessingConfiguration processingConfiguration, Action<string> setProgressMessage = null, CancellationToken cancellationToken = default)
         {
             if (query == null || data == null)
                 throw new ArgumentNullException("Data not specified!");
@@ -126,6 +133,8 @@ namespace InformationRetrievalManager.NLP
 
             // (Re)Initialize the values
             _queryVector = null;
+
+            setProgressMessage?.Invoke("creating query document vector");
 
             // Process the query and indexate it for vocabulary
             var processing = new IndexProcessing("__tfidf",
@@ -145,10 +154,11 @@ namespace InformationRetrievalManager.NLP
 
             // Log it
             _logger?.LogDebugSource("Query has been successfully calculated into vector.");
+            setProgressMessage?.Invoke("query done");
         }
 
         /// <inheritdoc/>
-        public long[] CalculateBestMatch(int select, out long foundDocuments, CancellationToken cancellationToken = default)
+        public long[] CalculateBestMatch(int select, out long foundDocuments, Action<string> setProgressMessage = null, CancellationToken cancellationToken = default)
         {
             var documentVectors = _documentVectors;
             var queryVector = _queryVector;
@@ -163,8 +173,10 @@ namespace InformationRetrievalManager.NLP
 
             // Calculate cosine similarity for each document...
             var results = new List<(long, double)>();
+            long i = 0;
             foreach (var document in documentVectors)
             {
+                i++;
                 // Check for cancelation
                 if (cancellationToken.IsCancellationRequested)
                     break;
@@ -172,9 +184,11 @@ namespace InformationRetrievalManager.NLP
                 results.Add(
                     (document.Key, CalculateCosSimilarity(queryVector, document.Value))
                     );
+                setProgressMessage?.Invoke($"calculating cosine similarity: {i}/{documentVectors.Count}");
             }
 
             // Sort and return result
+            setProgressMessage?.Invoke("retrieving results");
             //results.Sort((x, y) => y.Item2.CompareTo(x.Item2));
             results = results.OrderByDescending(o => o.Item2).ThenBy(o => o.Item1).ToList();
             foundDocuments = results.Count;

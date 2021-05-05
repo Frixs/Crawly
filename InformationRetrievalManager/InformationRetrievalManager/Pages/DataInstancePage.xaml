@@ -449,6 +449,7 @@
                                     <RowDefinition Height="Auto" />
                                     <RowDefinition Height="Auto" />
                                     <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
                                     <RowDefinition Height="*" />
                                 </Grid.RowDefinitions>
 
@@ -596,9 +597,25 @@
                                     </local:IntegerEntry.Style>
                                 </local:IntegerEntry>
 
+                                <!--  Progress Wrapper  -->
+                                <Grid Grid.Row="2" local:AnimateFadeInProperty.Value="{Binding QueryInWorkFlag, Mode=OneWay}">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+
+                                    <!--  Progress (bar) Status  -->
+                                    <TextBlock
+                                        Grid.Row="0"
+                                        Margin="0,5,0,0"
+                                        HorizontalAlignment="Center"
+                                        FontFamily="{StaticResource DosisExtraBold}"
+                                        FontSize="15"
+                                        Text="{Binding QueryProgress, Mode=OneWay}" />
+                                </Grid>
+
                                 <!--  Query Error Message  -->
                                 <TextBlock
-                                    Grid.Row="2"
+                                    Grid.Row="3"
                                     Margin="0,10,0,0"
                                     HorizontalAlignment="Center"
                                     FontFamily="{StaticResource DosisMedium}"
@@ -620,7 +637,7 @@
 
                                 <!--  View Results BTN  -->
                                 <Button
-                                    Grid.Row="3"
+                                    Grid.Row="4"
                                     Margin="0,15,0,0"
                                     HorizontalAlignment="Center"
                                     Command="{Binding ShowViewCommand, Mode=OneTime}"

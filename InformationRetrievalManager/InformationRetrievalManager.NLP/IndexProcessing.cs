@@ -175,7 +175,7 @@ namespace InformationRetrievalManager.NLP
                     break;
                 
                 IndexDocument(documents[i], false, false);
-                setProgressMessage(i.ToString());
+                setProgressMessage?.Invoke(i.ToString());
             }
 
             // Save indexed data

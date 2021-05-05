@@ -136,11 +136,6 @@ namespace InformationRetrievalManager
         public string CrawlerProgress { get; protected set; }
 
         /// <summary>
-        /// Index processing progress feedback message to user.
-        /// </summary>
-        public string IndexProcessingProgress { get; protected set; }
-
-        /// <summary>
         /// Crawler progress feedback message (1-5)
         /// </summary>
         public string[] CrawlerProgressMsgs { get; protected set; } = new string[5];
@@ -149,6 +144,16 @@ namespace InformationRetrievalManager
         /// Crawler progress page url (1-5)
         /// </summary>
         public string[] CrawlerProgressUrls { get; protected set; } = new string[5];
+
+        /// <summary>
+        /// Index processing progress feedback message to user.
+        /// </summary>
+        public string IndexProcessingProgress { get; protected set; }
+
+        /// <summary>
+        /// Query processing progress feedback message to user.
+        /// </summary>
+        public string QueryProgress { get; protected set; }
 
         /// <summary>
         /// Gives query feedback to the user if error occurrs.
@@ -723,6 +728,8 @@ namespace InformationRetrievalManager
         {
             await RunCommandAsync(() => QueryInWorkFlag, async () =>
             {
+                QueryProgress = string.Empty;
+
                 string query = QueryEntry.Value;
                 QueryModelType queryModel = _selectedQueryModel;
                 DataFileInfo file = IndexFileEntry.Value;
@@ -752,11 +759,19 @@ namespace InformationRetrievalManager
                 await _taskManager.Run(async () =>
                 {
                     // Load data
+                    QueryProgress = "Loading index...";
                     // If success....
                     if (ii.Load())
                     {
                         indexLoaded = true;
-                        var res = await _queryIndexManager.QueryAsync(query, ii.GetReadOnlyVocabulary(), queryModel, _dataInstance.IndexProcessingConfiguration, select, _queryTokenSource.Token);
+                        // Calculate the query and get results...
+                        var res = await _queryIndexManager.QueryAsync(query, ii.GetReadOnlyVocabulary(), 
+                            modelType: queryModel, _dataInstance.IndexProcessingConfiguration, select, 
+                            setProgressMessage: (value) => QueryProgress = $"Processing... ({value})", 
+                            cancellationToken: _queryTokenSource.Token);
+
+                        QueryProgress = "Preparing results...";
+
                         if (!_queryTokenSource.Token.IsCancellationRequested)
                             queryResult = res; // Get the results if not cancelled
                         else
@@ -811,6 +826,8 @@ namespace InformationRetrievalManager
                     // Automatically move the user to the result view
                     CurrentView = View.Results;
                 }
+
+                QueryProgress = "Done!";
             });
         }
 
