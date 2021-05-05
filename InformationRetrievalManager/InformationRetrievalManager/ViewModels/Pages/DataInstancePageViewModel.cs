@@ -593,9 +593,9 @@ namespace InformationRetrievalManager
                         var fileReference = new IndexedFileReferenceDataModel
                         {
                             DataInstanceId = _dataInstance.Id,
-                            Timestamp = indexTimestamp,
-                            IndexedDocuments = new Collection<IndexedDocumentDataModel>()
+                            Timestamp = indexTimestamp
                         };
+                        var indexedDocuments = new Collection<IndexedDocumentDataModel>();
 
                         IndexProcessingProgress = "Preprocessing documents...";
 
@@ -616,7 +616,7 @@ namespace InformationRetrievalManager
                             if (ValidationHelpers.ValidateModel(model).Count == 0)
                             {
                                 anyIndexedData = true;
-                                fileReference.IndexedDocuments.Add(model);
+                                indexedDocuments.Add(model);
                             }
 
                             IndexProcessingProgress = $"Preprocessing documents... ({i}/{data.Length})";
@@ -639,24 +639,34 @@ namespace InformationRetrievalManager
                                 _uow.BeginTransaction();
 
                                 // Cmmmit
-                                IndexProcessingProgress = "Preparing documents... (it might take a while)";
+                                IndexProcessingProgress = "Preparing documents...";
                                 _uow.IndexedFileReferences.Insert(fileReference);
+                                _uow.SaveChanges();
+                                long i = 0;
+                                foreach (var doc in indexedDocuments)
+                                {
+                                    i++;
+                                    doc.IndexedFileReferenceId = fileReference.Id;
+                                    _uow.IndexedDocuments.Insert(doc);
+                                    IndexProcessingProgress = $"Preparing documents... ({i}/{indexedDocuments.Count})";
+                                }
+                                IndexProcessingProgress = "Storing documents... (it might take a while)";
                                 _uow.SaveChanges();
 
                                 // Create index specific document array
                                 IndexDocument[] docs = new IndexDocument[fileReference.IndexedDocuments.Count];
-                                int i = 0;
+                                i = 0;
                                 foreach (var item in fileReference.IndexedDocuments)
                                 {
                                     docs[i] = item.ToIndexDocument();
-                                    ++i;
+                                    i++;
                                 }
 
                                 // Indexate documents
                                 IndexProcessingProgress = "Indexing...";
                                 var processing = new IndexProcessing(_dataInstance.Id.ToString(), indexTimestamp, _dataInstance.IndexProcessingConfiguration, _fileManager, _logger);
                                 processing.IndexDocuments(docs, save: true,
-                                    setProgressMessage: (value) => IndexProcessingProgress = $"Indexing... ({value}/{docs.Length})",
+                                    setProgressMessage: (value) => IndexProcessingProgress = $"Indexing... ({value})",
                                     cancellationToken: _indexProcessingTokenSource.Token);
 
                                 // If the cancelation is requested...
@@ -802,7 +812,7 @@ namespace InformationRetrievalManager
                         {
                             Title = doc.Title,
                             Category = doc.Category,
-                            Timestamp = doc.Timestamp == DateTime.MinValue ? null : doc.Timestamp.ToString("yyyy-MM-dd hh:mm"),
+                            Timestamp = doc.Timestamp == DateTime.MinValue ? null : doc.Timestamp.ToString("yyyy-MM-dd HH:mm"),
                             SourceUrl = doc.SourceUrl,
                             Content = doc.Content
                         });

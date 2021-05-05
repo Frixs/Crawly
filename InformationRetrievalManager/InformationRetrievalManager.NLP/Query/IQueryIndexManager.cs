@@ -23,7 +23,7 @@ namespace InformationRetrievalManager.NLP
         /// <param name="cancellationToken">Cancellation token for interrupting the process.</param>
         /// <returns>
         ///     Tuple:
-        ///         1: Array of document IDs sorted from the most relevant to the least. 
+        ///         1: Array of document IDs sorted from the most relevant to the least (secondary by document ID ASC). 
         ///         2: No. of ofund documents. 
         ///         3. No. of total searched documents.
         /// </returns>

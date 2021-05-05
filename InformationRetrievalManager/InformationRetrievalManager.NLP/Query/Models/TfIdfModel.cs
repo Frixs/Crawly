@@ -109,7 +109,7 @@ namespace InformationRetrievalManager.NLP
                     break;
 
                 docVectors[documentId] = CalculateDocumentVector(data, documentId, cancellationToken);
-                setProgressMessage?.Invoke($"creating data document vectors: {i}/{documents.Count}");
+                setProgressMessage?.Invoke($"calculating data document vectors: {i}/{documents.Count}");
             }
 
             // Save the vectors
@@ -134,7 +134,7 @@ namespace InformationRetrievalManager.NLP
             // (Re)Initialize the values
             _queryVector = null;
 
-            setProgressMessage?.Invoke("creating query document vector");
+            setProgressMessage?.Invoke("calculating query document vector");
 
             // Process the query and indexate it for vocabulary
             var processing = new IndexProcessing("__tfidf",

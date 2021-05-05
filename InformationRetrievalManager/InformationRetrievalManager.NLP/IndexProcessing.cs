@@ -166,7 +166,10 @@ namespace InformationRetrievalManager.NLP
 
             // Load indexed data
             if (load && !cancellationToken.IsCancellationRequested)
+            {
+                setProgressMessage?.Invoke("loading");
                 _invertedIndex.Load();
+            }
             
             // Indexate documents
             for (long i = 0; i < documents.Length; ++i)
@@ -175,12 +178,15 @@ namespace InformationRetrievalManager.NLP
                     break;
                 
                 IndexDocument(documents[i], false, false);
-                setProgressMessage?.Invoke(i.ToString());
+                setProgressMessage?.Invoke($"{i}/{documents.Length}");
             }
 
             // Save indexed data
             if (save && !cancellationToken.IsCancellationRequested)
+            {
+                setProgressMessage?.Invoke("saving");
                 _invertedIndex.Save();
+            }
         }
 
         /// <summary>
