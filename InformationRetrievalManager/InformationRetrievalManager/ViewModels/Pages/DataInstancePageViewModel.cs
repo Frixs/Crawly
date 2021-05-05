@@ -7,10 +7,12 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
@@ -68,6 +70,18 @@ namespace InformationRetrievalManager
         /// </summary>
         private QueryModelType _selectedQueryModel; //; ctor
 
+        /// <summary>
+        /// Token for canceling the index processing.
+        /// TODO: Improve this approach with something different (user feedback etc.).
+        /// </summary>
+        private CancellationTokenSource _indexProcessingTokenSource = new CancellationTokenSource();
+
+        /// <summary>
+        /// Token for canceling the query processing.
+        /// TODO: Improve this approach with something different (user feedback etc.).
+        /// </summary>
+        private CancellationTokenSource _queryTokenSource = new CancellationTokenSource();
+
         #endregion
 
         #region Public Properties
@@ -122,11 +136,6 @@ namespace InformationRetrievalManager
         public string CrawlerProgress { get; protected set; }
 
         /// <summary>
-        /// Index processing progress feedback message to user.
-        /// </summary>
-        public string IndexProcessingProgress { get; protected set; }
-
-        /// <summary>
         /// Crawler progress feedback message (1-5)
         /// </summary>
         public string[] CrawlerProgressMsgs { get; protected set; } = new string[5];
@@ -135,6 +144,16 @@ namespace InformationRetrievalManager
         /// Crawler progress page url (1-5)
         /// </summary>
         public string[] CrawlerProgressUrls { get; protected set; } = new string[5];
+
+        /// <summary>
+        /// Index processing progress feedback message to user.
+        /// </summary>
+        public string IndexProcessingProgress { get; protected set; }
+
+        /// <summary>
+        /// Query processing progress feedback message to user.
+        /// </summary>
+        public string QueryProgress { get; protected set; }
 
         /// <summary>
         /// Gives query feedback to the user if error occurrs.
@@ -171,7 +190,7 @@ namespace InformationRetrievalManager
         /// <summary>
         /// Command flag for crawler controls
         /// </summary>
-        private bool CrawlerInWorkFlag { get; set; }
+        public bool CrawlerInWorkFlag { get; set; }
 
         /// <summary>
         /// Indicates if index processing is currently in work
@@ -186,7 +205,12 @@ namespace InformationRetrievalManager
         /// <summary>
         /// Command flag for opening process (e.g. files or for opening web pages)
         /// </summary>
-        private bool ProcessFlag { get; set; }
+        public bool ProcessFlag { get; set; }
+
+        /// <summary>
+        /// Command flag for deleting index.
+        /// </summary>
+        public bool DeleteIndexFlag { get; set; }
 
         #endregion
 
@@ -406,6 +430,8 @@ namespace InformationRetrievalManager
         /// </summary>
         private void GoToHomePageCommandRoutine()
         {
+            _indexProcessingTokenSource.Cancel();
+            _queryTokenSource.Cancel();
             DI.ViewModelApplication.GoToPage(ApplicationPage.Home);
         }
 
@@ -509,10 +535,9 @@ namespace InformationRetrievalManager
                 var fileInfo = parameter as DataFileInfo;
 
                 if (fileInfo != null && fileInfo.FilePath != null && File.Exists(fileInfo.FilePath))
-                {
                     _crawlerStorage.DeleteDataFiles(_dataInstance.Id.ToString(), fileInfo.CreatedAt);
-                    LoadDataFiles(true);
-                }
+
+                await LoadDataFilesAsync(true);
 
                 await Task.Delay(1);
             });
@@ -540,73 +565,142 @@ namespace InformationRetrievalManager
                 await _taskManager.Run(async () =>
                 {
                     CrawlerDataModel[] data = null;
+
                     // Deserialize JSON directly from the file
-                    using (StreamReader sr = File.OpenText(file.FilePath))
+                    try
                     {
-                        JsonSerializer jsonSerializer = new JsonSerializer();
-                        data = (CrawlerDataModel[])jsonSerializer.Deserialize(sr, typeof(CrawlerDataModel[]));
+                        using (StreamReader sr = File.OpenText(file.FilePath))
+                        {
+                            JsonSerializer jsonSerializer = new JsonSerializer();
+                            data = (CrawlerDataModel[])jsonSerializer.Deserialize(sr, typeof(CrawlerDataModel[]));
+                        }
+                    }
+                    catch
+                    {
+                        // Corrupted data file
+                        data = null;
                     }
 
                     // If any data...
                     if (data != null && data.Length > 0)
                     {
-                        _uow.BeginTransaction();
+                        IndexProcessingProgress = "Creating index structure...";
 
-                        IndexProcessingProgress = "Preparing documents...";
+                        bool dataRollback = false;
+                        DateTime indexTimestamp = DateTime.UtcNow;
 
-                        // Clear all the previous/old indexes first (if any)
-                        foreach (var doc in _uow.IndexedDocuments.Get())
-                            _uow.IndexedDocuments.Delete(doc);
+                        // Create new index file
+                        var fileReference = new IndexedFileReferenceDataModel
+                        {
+                            DataInstanceId = _dataInstance.Id,
+                            Timestamp = indexTimestamp
+                        };
+                        var indexedDocuments = new Collection<IndexedDocumentDataModel>();
+
+                        IndexProcessingProgress = "Preprocessing documents...";
 
                         // Prepare documents for indexation
                         bool anyIndexedData = false;
-                        List<IndexDocument> docs = new List<IndexDocument>();
                         for (int i = 0; i < data.Length; ++i)
                         {
                             var model = new IndexedDocumentDataModel
                             {
-                                DataInstanceId = _dataInstance.Id,
-                                Title = data[i].Title,
-                                Category = data[i].Category,
+                                Title = data[i].Title == null ? null : Regex.Replace(StringHelpers.ReplaceNewLines(data[i].Title, " "), @"[ ]+", " ").Trim(),
+                                Category = data[i].Category == null ? null : Regex.Replace(StringHelpers.ReplaceNewLines(data[i].Category, " "), @"[ ]+", " ").Trim(),
                                 Timestamp = data[i].Timestamp,
                                 SourceUrl = data[i].SourceUrl,
-                                Content = StringHelpers.ShortenWithDots(Regex.Replace(data[i].Content.Replace(Environment.NewLine, " "), @"[ ]+", " "), IndexedDocumentDataModel.Content_MaxLength - 3)
+                                Content = data[i].Content == null ? null : StringHelpers.ShortenWithDots(Regex.Replace(StringHelpers.ReplaceNewLines(data[i].Content, " "), @"[ ]+", " ").Trim(), IndexedDocumentDataModel.Content_MaxLength - 3)
                             };
 
                             // Validate, if no errors...
                             if (ValidationHelpers.ValidateModel(model).Count == 0)
                             {
-                                _uow.IndexedDocuments.Insert(model);
-                                _uow.SaveChanges();
-
-                                docs.Add(data[i].ToIndexDocument(model.Id));
                                 anyIndexedData = true;
+                                indexedDocuments.Add(model);
+                            }
+
+                            IndexProcessingProgress = $"Preprocessing documents... ({i}/{data.Length})";
+
+                            // Check for cancelation
+                            if (_indexProcessingTokenSource.Token.IsCancellationRequested)
+                            {
+                                dataRollback = true;
+                                break;
                             }
                         }
 
-                        // If any documents are ready for indexation...
-                        if (anyIndexedData)
+                        // If data were processed successfully (no rollback required)...
+                        if (dataRollback == false)
                         {
-                            IndexProcessingProgress = "Indexing...";
+                            // If any documents are ready for indexation...
+                            if (anyIndexedData)
+                            {
+                                // Begin DB-TRANSACTION
+                                _uow.BeginTransaction();
 
-                            // Indexate documents
-                            var processing = new IndexProcessing(_dataInstance.Id.ToString(), DateTime.Now, _dataInstance.IndexProcessingConfiguration, _fileManager, _logger);
+                                // Cmmmit
+                                IndexProcessingProgress = "Preparing documents...";
+                                _uow.IndexedFileReferences.Insert(fileReference);
+                                _uow.SaveChanges();
+                                long i = 0;
+                                foreach (var doc in indexedDocuments)
+                                {
+                                    i++;
+                                    doc.IndexedFileReferenceId = fileReference.Id;
+                                    _uow.IndexedDocuments.Insert(doc);
+                                    _uow.SaveChanges(); // Save immediately to make sure the docs will have their IDs in ASC order by the current order
+                                    IndexProcessingProgress = $"Preparing documents... ({i}/{indexedDocuments.Count})";
+                                }
+                                
+                                // Create index specific document array
+                                IndexDocument[] docs = new IndexDocument[fileReference.IndexedDocuments.Count];
+                                i = 0;
+                                foreach (var item in fileReference.IndexedDocuments)
+                                {
+                                    docs[i] = item.ToIndexDocument();
+                                    i++;
+                                }
 
-                            processing.IndexDocuments(docs.ToArray(), save: true);
-                            _logger.LogDebugSource("Index processing done!");
+                                // Indexate documents
+                                IndexProcessingProgress = "Indexing...";
+                                var processing = new IndexProcessing(_dataInstance.Id.ToString(), indexTimestamp, _dataInstance.IndexProcessingConfiguration, _fileManager, _logger);
+                                processing.IndexDocuments(docs, save: true,
+                                    setProgressMessage: (value) => IndexProcessingProgress = $"Indexing... ({value})",
+                                    cancellationToken: _indexProcessingTokenSource.Token);
+
+                                // If the cancelation is requested...
+                                if (_indexProcessingTokenSource.Token.IsCancellationRequested)
+                                {
+                                    dataRollback = true;
+                                    // Rollback DB-TRANSACTION
+                                    _uow.RollbackTransaction();
+                                }
+                                // Otherwise, everythings fine...
+                                else
+                                {
+                                    IndexProcessingProgress = "Committing index...";
+                                    // Commit DB-TRANSACTION
+                                    _uow.CommitTransaction();
+                                }
+
+                                _logger.LogDebugSource("Index processing done!");
+                                IndexProcessingProgress = "Done!";
+                            }
+                            // Otherwise no documents are ready (corrupted)...
+                            else
+                                IndexProcessingProgress = "No documents are valid for indexation!";
+                        }
+
+                        // If rollback is requested...
+                        if (dataRollback)
+                        {
+                            IndexProcessingProgress = "Data repairing...";
+                            _uow.UndoChanges();
                             IndexProcessingProgress = "Done!";
-
-                            _uow.CommitTransaction();
-
-                            Application.Current.Dispatcher.Invoke(() => LoadIndexFiles(true));
                         }
-                        // Otherwise no documents are ready (corrupted)...
-                        else
-                        {
-                            IndexProcessingProgress = "No documents are valid for indexation!";
 
-                            _uow.RollbackTransaction();
-                        }
+                        // Reload index files
+                        await LoadIndexFilesAsync(true);
                     }
                     // Otherwise, corrupted data or no data...
                     else
@@ -625,17 +719,14 @@ namespace InformationRetrievalManager
         /// <param name="parameter"><see cref="DataFileInfo"/></param>
         private async Task DeleteIndexFileCommandRoutineAsync(object parameter)
         {
-            await RunCommandAsync(() => ProcessFlag, async () =>
+            await RunCommandAsync(() => DeleteIndexFlag, async () =>
             {
-                var fileInfo = parameter as DataFileInfo;
+                DataFileInfo fileInfo = parameter as DataFileInfo;
 
                 if (fileInfo != null && fileInfo.FilePath != null && File.Exists(fileInfo.FilePath))
-                {
                     _indexStorage.DeleteIndexFiles(_dataInstance.Id.ToString(), fileInfo.CreatedAt);
-                    LoadIndexFiles(true);
-                }
 
-                await Task.Delay(1);
+                await LoadIndexFilesAsync(true);
             });
         }
 
@@ -646,6 +737,8 @@ namespace InformationRetrievalManager
         {
             await RunCommandAsync(() => QueryInWorkFlag, async () =>
             {
+                QueryProgress = string.Empty;
+
                 string query = QueryEntry.Value;
                 QueryModelType queryModel = _selectedQueryModel;
                 DataFileInfo file = IndexFileEntry.Value;
@@ -667,15 +760,46 @@ namespace InformationRetrievalManager
                 if (IndexProcessingInWorkFlag)
                     return;
 
+                bool indexLoaded = false;
                 var ii = new InvertedIndex(_dataInstance.Id.ToString(), file.CreatedAt, _fileManager, _logger);
 
                 (long[], long, long) queryResult = (Array.Empty<long>(), -1, -1);
 
                 await _taskManager.Run(async () =>
                 {
-                    ii.Load();
-                    queryResult = await _queryIndexManager.QueryAsync(query, ii.GetReadOnlyVocabulary(), queryModel, _dataInstance.IndexProcessingConfiguration, select);
+                    // Load data
+                    QueryProgress = "Loading index...";
+                    // If success....
+                    if (ii.Load())
+                    {
+                        indexLoaded = true;
+                        // Calculate the query and get results...
+                        var res = await _queryIndexManager.QueryAsync(query, ii.GetReadOnlyVocabulary(), 
+                            modelType: queryModel, _dataInstance.IndexProcessingConfiguration, select, 
+                            setProgressMessage: (value) => QueryProgress = $"Processing... ({value})", 
+                            cancellationToken: _queryTokenSource.Token);
+
+                        QueryProgress = "Preparing results...";
+
+                        if (!_queryTokenSource.Token.IsCancellationRequested)
+                            queryResult = res; // Get the results if not cancelled
+                        else
+                            _queryIndexManager.ResetLastModelData(); // Reset the query manager last data if cancelled
+                    }
+                    // Otherwise, loading failed...
+                    else
+                    {
+                        indexLoaded = false;
+                        QueryErrorString = "Index file is corrupted!";
+                    }
                 });
+
+                // If the index did not load...
+                if (!indexLoaded)
+                {
+                    // Corrupted file => delete it
+                    await DeleteIndexFileCommandRoutineAsync(file);
+                }
 
                 // Go through the results...
                 for (int i = 0; i < queryResult.Item1.Length; ++i)
@@ -687,7 +811,7 @@ namespace InformationRetrievalManager
                         {
                             Title = doc.Title,
                             Category = doc.Category,
-                            Timestamp = doc.Timestamp.ToString("yyyy-MM-dd hh:mm"),
+                            Timestamp = doc.Timestamp == DateTime.MinValue ? null : doc.Timestamp.ToString("yyyy-MM-dd HH:mm"),
                             SourceUrl = doc.SourceUrl,
                             Content = doc.Content
                         });
@@ -711,6 +835,8 @@ namespace InformationRetrievalManager
                     // Automatically move the user to the result view
                     CurrentView = View.Results;
                 }
+
+                QueryProgress = "Done!";
             });
         }
 
@@ -760,7 +886,7 @@ namespace InformationRetrievalManager
                 // Re-initialize state values
                 ConfigurationContext.FormErrorString = null;
 
-                if (CrawlerInWork || IndexProcessingInWorkFlag || QueryInWorkFlag)
+                if (CrawlerInWork || IndexProcessingInWorkFlag || QueryInWorkFlag || DeleteIndexFlag)
                 {
                     ConfigurationContext.FormErrorString = "Cannot update configuration during processing!";
                     return;
@@ -797,7 +923,7 @@ namespace InformationRetrievalManager
                     {
                         Code = nameof(_dataInstance.CrawlerConfiguration.SiteArticleDateTimeCultureInfo),
                         Description = "Invalid date-time culture."
-                    }); // TODO localization
+                    });
                 }
 
                 // If any errors...
@@ -858,7 +984,7 @@ namespace InformationRetrievalManager
                 // Re-initialize state values
                 ConfigurationContext.FormErrorString = null;
 
-                if (CrawlerInWork || IndexProcessingInWorkFlag || QueryInWorkFlag)
+                if (CrawlerInWork || IndexProcessingInWorkFlag || QueryInWorkFlag || DeleteIndexFlag)
                 {
                     ConfigurationContext.FormErrorString = "Cannot update configuration during processing!";
                     return;
@@ -929,7 +1055,7 @@ namespace InformationRetrievalManager
                 // Re-initialize state values
                 ConfigurationContext.FormErrorString = null;
 
-                if (CrawlerInWork || IndexProcessingInWorkFlag || QueryInWorkFlag)
+                if (CrawlerInWork || IndexProcessingInWorkFlag || QueryInWorkFlag || DeleteIndexFlag)
                 {
                     ConfigurationContext.FormErrorString = "Cannot update configuration during processing!";
                     return;
@@ -949,7 +1075,7 @@ namespace InformationRetrievalManager
                     {
                         Code = nameof(_dataInstance.Name),
                         Description = "Data Instance Name already exists."
-                    }); // TODO localization
+                    });
                 }
 
                 // If any errors...
@@ -983,7 +1109,7 @@ namespace InformationRetrievalManager
                 // Re-initialize state values
                 ConfigurationContext.FormErrorString = null;
 
-                if (CrawlerInWork || IndexProcessingInWorkFlag || QueryInWorkFlag)
+                if (CrawlerInWork || IndexProcessingInWorkFlag || QueryInWorkFlag || DeleteIndexFlag)
                 {
                     ConfigurationContext.FormErrorString = "Cannot update configuration during processing!";
                     return;
@@ -1039,77 +1165,113 @@ namespace InformationRetrievalManager
         /// Loads data files
         /// </summary>
         /// <param name="resetToDefaultSelection">Indication to reset the selection entry to default value.</param>
-        public void LoadDataFiles(bool resetToDefaultSelection = false)
+        public async Task LoadDataFilesAsync(bool resetToDefaultSelection = false)
         {
-            ushort fileLimit = 50;
-            string startsWith = "data_";
-            string endsWith = ".json";
-
-            var filePaths = _crawlerStorage.GetAllDataFiles(_dataInstance.Id.ToString());
-            var dataFilePaths = filePaths.Where(o => o.EndsWith(endsWith)).ToArray();
-            if (dataFilePaths != null)
+            await _taskManager.Run(() =>
             {
-                var data = new List<DataFileInfo>();
-                for (int i = 0; i < dataFilePaths.Length; ++i)
+                const ushort fileLimit = 50;
+                const string startsWith = "data_";
+                const string endsWith = ".json";
+
+                var filePaths = _crawlerStorage.GetAllDataFiles(_dataInstance.Id.ToString());
+                var dataFilePaths = filePaths.Where(o => o.EndsWith(endsWith)).ToArray();
+                if (dataFilePaths != null)
                 {
-                    string filename = Path.GetFileName(dataFilePaths[i]);
-                    try
-                    {
-                        string dateStr = filename.Substring(startsWith.Length, filename.Length - startsWith.Length - endsWith.Length);
 
-                        var datetime = DateTime.ParseExact(dateStr, "yyyy_M_d_H_m_s", CultureInfo.InvariantCulture);
-                        data.Add(new DataFileInfo(datetime.ToString("yyyy-MM-dd (HH:mm:ss)"), dataFilePaths[i], datetime));
-                    }
-                    catch
+                    var data = new List<DataFileInfo>();
+                    for (int i = 0; i < dataFilePaths.Length; ++i)
                     {
-                        // Corrupted filename
-                        // skip
+                        string filename = Path.GetFileName(dataFilePaths[i]);
+                        try
+                        {
+                            string dateStr = filename.Substring(startsWith.Length, filename.Length - startsWith.Length - endsWith.Length);
+
+                            var datetime = DateTime.ParseExact(dateStr, "yyyy_M_d_H_m_s", CultureInfo.InvariantCulture);
+                            data.Add(new DataFileInfo(datetime.ToString("yyyy-MM-dd (HH:mm:ss)"), dataFilePaths[i], datetime));
+                        }
+                        catch
+                        {
+                            // Corrupted filename
+                            // skip
+                        }
                     }
+
+
+                    data.Sort((x, y) => DateTime.Compare(y.CreatedAt, x.CreatedAt));
+                    if (data.Count > fileLimit)
+                        data = data.Take(fileLimit).ToList();
+                    Application.Current.Dispatcher.Invoke(() => UpdateDataFileSelection(data, resetToDefaultSelection));
                 }
-
-                data.Sort((x, y) => DateTime.Compare(y.CreatedAt, x.CreatedAt));
-                if (data.Count > fileLimit)
-                    data = data.Take(fileLimit).ToList();
-                UpdateDataFileSelection(data, resetToDefaultSelection);
-            }
+            });
         }
 
         /// <summary>
-        /// Loads index files
+        /// Loads index files (it also checks and synchronizes index references).
         /// </summary>
         /// <param name="resetToDefaultSelection">Indication to reset the selection entry to default value.</param>
-        public void LoadIndexFiles(bool resetToDefaultSelection = false)
+        public async Task LoadIndexFilesAsync(bool resetToDefaultSelection = false)
         {
-            ushort fileLimit = 50;
-            string startsWith = $"{_dataInstance.Id}_";
-            string endsWith = ".idx";
-
-            var filePaths = _indexStorage.GetIndexFiles(_dataInstance.Id.ToString());
-            if (filePaths != null)
+            await _taskManager.Run(() =>
             {
-                var data = new List<DataFileInfo>();
-                for (int i = 0; i < filePaths.Length; ++i)
-                {
-                    string filename = Path.GetFileName(filePaths[i]);
-                    try
-                    {
-                        string dateStr = filename.Substring(startsWith.Length, filename.Length - startsWith.Length - endsWith.Length);
+                const ushort fileLimit = 50;
+                string startsWith = $"{_dataInstance.Id}_";
+                const string endsWith = ".idx";
 
-                        var datetime = DateTime.ParseExact(dateStr, "yyyy_M_d_H_m_s", CultureInfo.InvariantCulture);
-                        data.Add(new DataFileInfo(datetime.ToString("yyyy-MM-dd (HH:mm:ss)"), filePaths[i], datetime));
-                    }
-                    catch
+                var data = new List<DataFileInfo>();
+
+                // Get file references
+                var fileReferences = _uow.IndexedFileReferences.Get(o => o.DataInstanceId == _dataInstance.Id)
+                    .OrderByDescending(o => o.Timestamp)
+                    .ToArray();
+                // Get real files (filepaths)
+                var filePaths = _indexStorage.GetIndexFiles(_dataInstance.Id.ToString());
+
+                // Go through the file references...
+                for (int i = fileReferences.Length - 1; i >= 0; --i)
+                {
+                    var fReference = fileReferences[i];
+                    DateTime datetimeReference = new DateTime(fReference.Timestamp.Year, fReference.Timestamp.Month, fReference.Timestamp.Day, fReference.Timestamp.Hour, fReference.Timestamp.Minute, fReference.Timestamp.Second);
+                    bool found = false;
+
+                    // Go through the real files for each file reference...
+                    for (int y = 0; y < filePaths.Length; ++y)
                     {
-                        // Corrupted filename
-                        // skip
+                        string filename = Path.GetFileName(filePaths[y]);
+                        try
+                        {
+                            // Parse file timestamp
+                            string dateStr = filename.Substring(startsWith.Length, filename.Length - startsWith.Length - endsWith.Length);
+                            var datetimeFile = DateTime.ParseExact(dateStr, "yyyy_M_d_H_m_s", CultureInfo.InvariantCulture);
+
+                            // Match the real time with the reference one...
+                            if (DateTime.Compare(datetimeReference, datetimeFile) == 0) // equal
+                            {
+                                found = true;
+                                data.Add(new DataFileInfo(datetimeFile.ToString("yyyy-MM-dd (HH:mm:ss)"), filePaths[y], datetimeFile));
+                                break;
+                            }
+                        }
+                        catch
+                        {
+                            // Corrupted filename
+                            File.Delete(filePaths[y]);
+                        }
+                    }
+
+                    // If there is missing real file (desync with file references)...
+                    if (!found)
+                    {
+                        // Delete the file reference (index)
+                        _uow.IndexedFileReferences.Delete(fReference.Id);
+                        _uow.SaveChanges();
                     }
                 }
 
                 data.Sort((x, y) => DateTime.Compare(y.CreatedAt, x.CreatedAt));
                 if (data.Count > fileLimit)
                     data = data.Take(fileLimit).ToList();
-                UpdateIndexFileSelection(data, resetToDefaultSelection);
-            }
+                Application.Current.Dispatcher.Invoke(() => UpdateIndexFileSelection(data, resetToDefaultSelection));
+            });
         }
 
         #endregion
@@ -1140,11 +1302,14 @@ namespace InformationRetrievalManager
                 UpdateCrawlerEvents(_crawlerEngine);
 
             // Load data files
-            LoadDataFiles(true);
+            await LoadDataFilesAsync(true);
             // Load index files
-            LoadIndexFiles(true);
+            await LoadIndexFilesAsync(true);
             // Load data/values into the configuration context
             ConfigurationContext.Set(_dataInstance.CrawlerConfiguration, _dataInstance.IndexProcessingConfiguration, _dataInstance.Name);
+
+            // Additional small delay to support GUI for lazy load
+            await Task.Delay(300);
 
             // Flag up data load is done
             if (loadToMainView) CurrentView = View.Main;
@@ -1192,10 +1357,10 @@ namespace InformationRetrievalManager
                     OnPropertyChanged(nameof(CrawlerProgress));
                 });
             };
-            crawler.OnFinishProcessEvent += (s, e) =>
+            crawler.OnFinishProcessEvent += async (s, e) =>
             {
                 CrawlerProgress = "Done!";
-                Application.Current.Dispatcher.Invoke(() =>
+                await Application.Current.Dispatcher.Invoke(async () =>
                 {
                     OnPropertyChanged(nameof(CrawlerProgress));
 
@@ -1208,7 +1373,7 @@ namespace InformationRetrievalManager
                         CrawlerProgressMsgs[i] = CrawlerProgressUrls[i] = string.Empty;
 
                     // Load data files
-                    LoadDataFiles(true);
+                    await LoadDataFilesAsync(true);
                 });
             };
         }

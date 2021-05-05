@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using Microsoft.EntityFrameworkCore.ChangeTracking;
+using System.Threading.Tasks;
 
 namespace InformationRetrievalManager.Relational
 {
@@ -28,6 +29,11 @@ namespace InformationRetrievalManager.Relational
         IRepository<IndexProcessingConfigurationDataModel> IndexProcessingConfigurations { get; }
 
         /// <summary>
+        /// Indexed file reference repository
+        /// </summary>
+        IRepository<IndexedFileReferenceDataModel> IndexedFileReferences { get; }
+
+        /// <summary>
         /// Indexed document repository
         /// </summary>
         IRepository<IndexedDocumentDataModel> IndexedDocuments { get; }
@@ -52,7 +58,8 @@ namespace InformationRetrievalManager.Relational
         /// Begin database transaction.
         /// </summary>
         /// <remarks>
-        ///     If the transaction already exists, this all will be ignored.
+        ///     The transaction method turns OFF <see cref="ChangeTracker.AutoDetectChangesEnabled"/>! 
+        ///     If the transaction already exists, this all will no be proceeded.
         /// </remarks>
         void BeginTransaction();
 
@@ -60,7 +67,8 @@ namespace InformationRetrievalManager.Relational
         /// Commit current database transaction.
         /// </summary>
         /// <remarks>
-        ///     If the transaction does not exist, this all will be ignored.
+        ///     The transaction method turns ON (re-enable) <see cref="ChangeTracker.AutoDetectChangesEnabled"/>! 
+        ///     If the transaction does not exist, this all will no be proceeded.
         /// </remarks>
         void CommitTransaction();
 
@@ -68,7 +76,8 @@ namespace InformationRetrievalManager.Relational
         /// Rollback current database transaction.
         /// </summary>
         /// <remarks>
-        ///     If the transaction does not exist, this all will be ignored.
+        ///     The transaction method turns ON (re-enable) <see cref="ChangeTracker.AutoDetectChangesEnabled"/>! 
+        ///     If the transaction does not exist, this all will no be proceeded.
         /// </remarks>
         void RollbackTransaction();
 

@@ -174,7 +174,7 @@ namespace InformationRetrievalManager
                     {
                         Code = nameof(crawlerConfiguration.SiteArticleDateTimeCultureInfo),
                         Description = "Invalid date-time culture."
-                    }); // TODO localization
+                    });
                 }
                 // Data instance name must be unique...
                 if (_uow.DataInstances.Get(o => o.Name.Equals(dataInstance.Name)).Any())
@@ -183,7 +183,7 @@ namespace InformationRetrievalManager
                     {
                         Code = nameof(dataInstance.Name),
                         Description = "Data Instance Name already exists."
-                    }); // TODO localization
+                    });
                 }
 
                 // If any errors...

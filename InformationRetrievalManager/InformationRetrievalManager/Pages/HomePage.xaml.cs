@@ -8,6 +8,7 @@
         public HomePage()
         {
             InitializeComponent();
+            LazyUnload = 250;
         }
     }
 }

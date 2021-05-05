@@ -113,7 +113,7 @@ namespace InformationRetrievalManager.NLP
             bool ok = false;
 
             // Deserialize
-            var result = _fileManager.DeserializeObjectFromBinFileAsync($"{Constants.IndexDataStorageDir}/{Name}/{MakeFilename()}").Result;
+            var result = _fileManager.DeserializeObjectFromBinFileAsync<SortedDictionary<string, Dictionary<long, TermInfo>>>($"{Constants.IndexDataStorageDir}/{Name}/{MakeFilename()}").Result;
             short status = result.Item1;
             object obj = result.Item2;
 

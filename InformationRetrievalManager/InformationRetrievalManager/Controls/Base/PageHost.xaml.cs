@@ -96,7 +96,7 @@ namespace InformationRetrievalManager
             // Move the previous page into the old page frame.
             oldPageFrame.Content = oldPageContent;
 
-            bool lazyUnloadTrigger = false;
+            bool lazyUnloadFlag = false;
             // Animate out previous page when the Loaded event fires right after this call due to moving frames.
             if (oldPageContent is BasePage oldPage)
             {
@@ -104,7 +104,7 @@ namespace InformationRetrievalManager
 
                 // Set specific heavy-pages and make them ready for lazy-unload 
                 // (make sure old page exists - thats why this call is inside if statement)
-                lazyUnloadTrigger = oldPage.LazyUnload > 0;
+                lazyUnloadFlag = oldPage.LazyUnload > 0;
 
                 // Once it is done, remove it.
                 _ = Task.Delay((int)(oldPage.SlideSeconds * 1000 + oldPage.LazyUnload)).ContinueWith((t) =>
@@ -113,9 +113,15 @@ namespace InformationRetrievalManager
                     Application.Current.Dispatcher.Invoke(() =>
                     {
                         oldPageFrame.Content = null;
-
+                    });
+                });
+                // Load new page content after lazy unload delay...
+                _ = Task.Delay((int)(oldPage.LazyUnload)).ContinueWith((t) =>
+                {
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
                         // Lazy unload
-                        if (lazyUnloadTrigger)
+                        if (lazyUnloadFlag)
                             // Set the new page content.
                             newPageFrame.Content = currentPage.ToBasePage(currentPageViewModel);
                     });
@@ -123,7 +129,7 @@ namespace InformationRetrievalManager
             }
 
             // Set the new page content.
-            if (!lazyUnloadTrigger) newPageFrame.Content = currentPage.ToBasePage(currentPageViewModel);
+            if (!lazyUnloadFlag) newPageFrame.Content = currentPage.ToBasePage(currentPageViewModel);
 
             return value;
         }

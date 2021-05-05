@@ -11,7 +11,7 @@ namespace InformationRetrievalManager.Relational
         #region Limit Constants
 
         public static readonly bool SiteAddress_IsRequired = true;
-        public static readonly short SiteAddress_MaxLength = 255;
+        public static readonly short SiteAddress_MaxLength = 350;
         public static readonly string SiteAddress_CanContainRegex = @"https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)";
         public static readonly string SiteAddress_DefaultValue = "";
 

@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System;
 using System.Threading.Tasks;
+using MessagePack;
 
 namespace InformationRetrievalManager.Core
 {
@@ -20,7 +22,13 @@ namespace InformationRetrievalManager.Core
         ///         1=IO exception, 
         ///         2=Serialization error,
         /// </returns>
-        Task<(short, object)> DeserializeObjectFromBinFileAsync(string path);
+        /// <exception cref="FileNotFoundException"></exception>
+        /// <exception cref="IOException"></exception>
+        /// <exception cref="Exception"></exception>
+        /// <remarks>
+        ///     Method uses <see cref="MessagePackSerializer"/> from external library.
+        /// </remarks>
+        Task<(short, T)> DeserializeObjectFromBinFileAsync<T>(string path);
 
         /// <summary>
         /// Serialize object into binary file
@@ -33,7 +41,13 @@ namespace InformationRetrievalManager.Core
         ///         1=IO exception, 
         ///         2=Serialization error,
         /// </returns>
-        Task<short> SerializeObjectToBinFileAsync(object obj, string path);
+        /// <exception cref="FileNotFoundException"></exception>
+        /// <exception cref="IOException"></exception>
+        /// <exception cref="Exception"></exception>
+        /// <remarks>
+        ///     Method uses <see cref="MessagePackSerializer"/> from external library.
+        /// </remarks>
+        Task<short> SerializeObjectToBinFileAsync<T>(T obj, string path);
 
         /// <summary>
         /// Writes the text to the specified file.

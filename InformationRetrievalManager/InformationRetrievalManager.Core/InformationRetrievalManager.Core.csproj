@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <PackageReference Include="Ixs.DNA.Framework" Version="1.0.7.15004" />
+    <PackageReference Include="MessagePack" Version="2.2.85" />
   </ItemGroup>
 
   <ItemGroup>

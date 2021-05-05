@@ -73,12 +73,12 @@ namespace InformationRetrievalManager.Crawler
         string SiteArticleTitleXPath { get; }
 
         /// <summary>
-        /// XPath to category of the article
+        /// XPath to category of the article (not required)
         /// </summary>
         string SiteArticleCategoryXPath { get; }
 
         /// <summary>
-        /// XPath to date-time of the article
+        /// XPath to date-time of the article (not required)
         /// </summary>
         string SiteArticleDateTimeXPath { get; }
 

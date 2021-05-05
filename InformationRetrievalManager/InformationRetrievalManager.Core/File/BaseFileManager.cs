@@ -1,10 +1,9 @@
 ﻿using Ixs.DNA;
+using MessagePack;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
-using System.Runtime.Serialization;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading.Tasks;
 
 namespace InformationRetrievalManager.Core
@@ -15,7 +14,7 @@ namespace InformationRetrievalManager.Core
     public class BaseFileManager : IFileManager
     {
         /// <inheritdoc/>
-        public async Task<(short, object)> DeserializeObjectFromBinFileAsync(string path)
+        public async Task<(short, T)> DeserializeObjectFromBinFileAsync<T>(string path)
         {
             // Normalize path.
             path = NormalizedPath(path);
@@ -30,21 +29,34 @@ namespace InformationRetrievalManager.Core
                 return await CoreDI.Task.Run(() =>
                 {
                     short resultStatus = 0;
-                    object resultObj = null;
+                    T resultObj = default;
 
                     try
                     {
-                        using (Stream stream = File.Open(path, FileMode.Open))
+                        byte[] data;
+                        using (FileStream stream = File.Open(path, FileMode.Open))
                         {
-                            BinaryFormatter bin = new BinaryFormatter();
-                            resultObj = bin.Deserialize(stream);
+                            byte[] buffer = new byte[16 * 1024];
+                            using (MemoryStream ms = new MemoryStream())
+                            {
+                                int read;
+                                while ((read = stream.Read(buffer, 0, buffer.Length)) > 0)
+                                    ms.Write(buffer, 0, read);
+                                data = ms.ToArray();
+                            }
                         }
+
+                        resultObj = MessagePackSerializer.Deserialize<T>(data);
+                    }
+                    catch (FileNotFoundException)
+                    {
+                        resultStatus = 1;
                     }
                     catch (IOException)
                     {
                         resultStatus = 1;
                     }
-                    catch (SerializationException)
+                    catch (Exception)
                     {
                         resultStatus = 2;
                     }
@@ -55,7 +67,7 @@ namespace InformationRetrievalManager.Core
         }
 
         /// <inheritdoc/>
-        public async Task<short> SerializeObjectToBinFileAsync(object obj, string path)
+        public async Task<short> SerializeObjectToBinFileAsync<T>(T obj, string path)
         {
             if (obj == null)
                 throw new ArgumentNullException(nameof(obj));
@@ -74,22 +86,39 @@ namespace InformationRetrievalManager.Core
                 {
                     short result = 0;
 
-                    // Check if the file exists...
+                    // Check if the file exists (create one if does not exist)...
                     TryCreatePath(path);
 
                     try
                     {
-                        using (Stream stream = File.Open(path, FileMode.Create))
+                        byte[] data = MessagePackSerializer.Serialize(obj);
+                        using (FileStream stream = File.Open(path, FileMode.Create))
                         {
-                            BinaryFormatter bf = new BinaryFormatter();
-                            bf.Serialize(stream, obj);
+                            // Write the data to the file, byte by byte.
+                            for (int i = 0; i < data.Length; ++i)
+                                stream.WriteByte(data[i]);
+
+                            // Set the stream position to the beginning of the file.
+                            stream.Seek(0, SeekOrigin.Begin);
+
+                            // Read and verify the data.
+                            for (int i = 0; i < stream.Length; ++i)
+                                if (data[i] != stream.ReadByte())
+                                {
+                                    result = 2;
+                                    break;
+                                }
                         }
+                    }
+                    catch (FileNotFoundException)
+                    {
+                        result = 1;
                     }
                     catch (IOException)
                     {
                         result = 1;
                     }
-                    catch (SerializationException)
+                    catch (Exception)
                     {
                         result = 2;
                     }

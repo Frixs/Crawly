@@ -13,334 +13,319 @@
     x:TypeArguments="local:HomePageViewModel"
     mc:Ignorable="d">
 
-    <Border>
-        <Border.Background>
+    <Grid>
+        <Grid.Background>
             <LinearGradientBrush StartPoint="0,0" EndPoint="0.04,1.4">
-                <GradientStop Offset="0.0" Color="{StaticResource Background}" />
+                <GradientStop Offset="0.0" Color="Transparent" />
                 <GradientStop Offset="1.0" Color="{StaticResource BackgroundAlt}" />
             </LinearGradientBrush>
-        </Border.Background>
+        </Grid.Background>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="4*" />
+            <RowDefinition Height="5.5*" />
+        </Grid.RowDefinitions>
 
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="4*" />
-                <RowDefinition Height="5.5*" />
-            </Grid.RowDefinitions>
+        <!--  White Row  -->
+        <Border Grid.Row="0" Padding="15,15,15,25">
+            <Grid>
+                <!--  Logo  -->
+                <Image
+                    Height="135"
+                    VerticalAlignment="Bottom"
+                    Source="/Resources/Images/logo_crawly_bold.png" />
 
-            <!--  Texture  -->
-            <Grid.Background>
-                <VisualBrush
-                    Opacity="0.7"
-                    TileMode="Tile"
-                    Viewport="0,0,0.5,0.5">
-                    <VisualBrush.Visual>
-                        <Image Source="/Resources/Images/texture_data_seamless.png" />
-                    </VisualBrush.Visual>
-                </VisualBrush>
-            </Grid.Background>
-
-            <!--  White Row  -->
-            <Border Grid.Row="0" Padding="15,15,15,25">
-                <Grid>
-                    <!--  Logo  -->
-                    <Image
-                        Height="135"
-                        VerticalAlignment="Bottom"
-                        Source="/Resources/Images/logo_crawly_bold.png" />
-
-                    <!--  Speech Bubble Canvas  -->
-                    <Canvas
-                        Margin="130,-222,0,222"
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Bottom">
-                        <Grid Margin="0,0,0,0" Opacity="0">
-                            <Grid.Triggers>
+                <!--  Speech Bubble Canvas  -->
+                <Canvas
+                    Margin="130,-222,0,222"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Bottom">
+                    <Grid Margin="0,0,0,0" Opacity="0">
+                        <Grid.Triggers>
+                            <EventTrigger RoutedEvent="Grid.Loaded">
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <ThicknessAnimationUsingKeyFrames
+                                            BeginTime="00:00:00"
+                                            RepeatBehavior="Forever"
+                                            Storyboard.TargetProperty="Margin">
+                                            <SplineThicknessKeyFrame KeyTime="00:00:00" Value="0,0,0,0" />
+                                            <SplineThicknessKeyFrame KeyTime="00:00:02" Value="1,-3,0,0" />
+                                            <SplineThicknessKeyFrame KeyTime="00:00:05" Value="4,2,0,0" />
+                                            <SplineThicknessKeyFrame KeyTime="00:00:08" Value="-3,8,0,0" />
+                                            <SplineThicknessKeyFrame KeyTime="00:00:11" Value="-4,2,0,0" />
+                                            <SplineThicknessKeyFrame KeyTime="00:00:15" Value="0,0,0,0" />
+                                        </ThicknessAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation
+                                            BeginTime="00:00:1.5"
+                                            Storyboard.TargetProperty="Opacity"
+                                            From="0"
+                                            To="1"
+                                            Duration="0:0:0.6" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </EventTrigger>
+                        </Grid.Triggers>
+                        <!--  1st text  -->
+                        <TextBlock
+                            Margin="56,0,-56,-57"
+                            VerticalAlignment="Bottom"
+                            Panel.ZIndex="1"
+                            FontFamily="{StaticResource DosisRegular}"
+                            FontSize="16"
+                            Opacity="0"
+                            Text="Howdy!">
+                            <TextBlock.Triggers>
                                 <EventTrigger RoutedEvent="Grid.Loaded">
                                     <BeginStoryboard>
                                         <Storyboard>
-                                            <ThicknessAnimationUsingKeyFrames
-                                                BeginTime="00:00:00"
-                                                RepeatBehavior="Forever"
-                                                Storyboard.TargetProperty="Margin">
-                                                <SplineThicknessKeyFrame KeyTime="00:00:00" Value="0,0,0,0" />
-                                                <SplineThicknessKeyFrame KeyTime="00:00:02" Value="1,-3,0,0" />
-                                                <SplineThicknessKeyFrame KeyTime="00:00:05" Value="4,2,0,0" />
-                                                <SplineThicknessKeyFrame KeyTime="00:00:08" Value="-3,8,0,0" />
-                                                <SplineThicknessKeyFrame KeyTime="00:00:11" Value="-4,2,0,0" />
-                                                <SplineThicknessKeyFrame KeyTime="00:00:15" Value="0,0,0,0" />
-                                            </ThicknessAnimationUsingKeyFrames>
-                                        </Storyboard>
-                                    </BeginStoryboard>
-                                    <BeginStoryboard>
-                                        <Storyboard>
                                             <DoubleAnimation
-                                                BeginTime="00:00:1.5"
+                                                BeginTime="00:00:02"
                                                 Storyboard.TargetProperty="Opacity"
                                                 From="0"
                                                 To="1"
-                                                Duration="0:0:0.6" />
+                                                Duration="0:0:0.3" />
                                         </Storyboard>
                                     </BeginStoryboard>
                                 </EventTrigger>
-                            </Grid.Triggers>
-                            <!--  1st text  -->
-                            <TextBlock
-                                Margin="56,0,-56,-57"
-                                VerticalAlignment="Bottom"
-                                Panel.ZIndex="1"
-                                FontFamily="{StaticResource DosisRegular}"
-                                FontSize="16"
-                                Opacity="0"
-                                Text="Howdy!">
-                                <TextBlock.Triggers>
-                                    <EventTrigger RoutedEvent="Grid.Loaded">
-                                        <BeginStoryboard>
-                                            <Storyboard>
-                                                <DoubleAnimation
-                                                    BeginTime="00:00:02"
-                                                    Storyboard.TargetProperty="Opacity"
-                                                    From="0"
-                                                    To="1"
-                                                    Duration="0:0:0.3" />
-                                            </Storyboard>
-                                        </BeginStoryboard>
-                                    </EventTrigger>
-                                </TextBlock.Triggers>
-                            </TextBlock>
-                            <!--  2nd text  -->
-                            <TextBlock
-                                Margin="108,0,-108,-57"
-                                VerticalAlignment="Bottom"
-                                Panel.ZIndex="1"
-                                FontFamily="{StaticResource DosisRegular}"
-                                FontSize="16"
-                                Opacity="0"
-                                Text="I'm Crawly!">
-                                <TextBlock.Triggers>
-                                    <EventTrigger RoutedEvent="Grid.Loaded">
-                                        <BeginStoryboard>
-                                            <Storyboard>
-                                                <DoubleAnimation
-                                                    BeginTime="00:00:04"
-                                                    Storyboard.TargetProperty="Opacity"
-                                                    From="0"
-                                                    To="1"
-                                                    Duration="0:0:0.3" />
-                                            </Storyboard>
-                                        </BeginStoryboard>
-                                    </EventTrigger>
-                                </TextBlock.Triggers>
-                            </TextBlock>
-                            <!--  3rd text  -->
-                            <TextBlock
-                                Width="225"
-                                Margin="38,0,-40,-85"
-                                VerticalAlignment="Bottom"
-                                Panel.ZIndex="1"
-                                FontFamily="{StaticResource DosisRegular}"
-                                FontSize="13"
-                                Opacity="0"
-                                Text="The web crawler &amp; data indexer!">
-                                <TextBlock.Triggers>
-                                    <EventTrigger RoutedEvent="Grid.Loaded">
-                                        <BeginStoryboard>
-                                            <Storyboard>
-                                                <DoubleAnimation
-                                                    BeginTime="00:00:06"
-                                                    Storyboard.TargetProperty="Opacity"
-                                                    From="0"
-                                                    To="1"
-                                                    Duration="0:0:0.3" />
-                                            </Storyboard>
-                                        </BeginStoryboard>
-                                    </EventTrigger>
-                                </TextBlock.Triggers>
-                            </TextBlock>
+                            </TextBlock.Triggers>
+                        </TextBlock>
+                        <!--  2nd text  -->
+                        <TextBlock
+                            Margin="108,0,-108,-57"
+                            VerticalAlignment="Bottom"
+                            Panel.ZIndex="1"
+                            FontFamily="{StaticResource DosisRegular}"
+                            FontSize="16"
+                            Opacity="0"
+                            Text="I'm Crawly!">
+                            <TextBlock.Triggers>
+                                <EventTrigger RoutedEvent="Grid.Loaded">
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation
+                                                BeginTime="00:00:04"
+                                                Storyboard.TargetProperty="Opacity"
+                                                From="0"
+                                                To="1"
+                                                Duration="0:0:0.3" />
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </EventTrigger>
+                            </TextBlock.Triggers>
+                        </TextBlock>
+                        <!--  3rd text  -->
+                        <TextBlock
+                            Width="225"
+                            Margin="38,0,-40,-85"
+                            VerticalAlignment="Bottom"
+                            Panel.ZIndex="1"
+                            FontFamily="{StaticResource DosisRegular}"
+                            FontSize="13"
+                            Opacity="0"
+                            Text="The web crawler &amp; data indexer!">
+                            <TextBlock.Triggers>
+                                <EventTrigger RoutedEvent="Grid.Loaded">
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation
+                                                BeginTime="00:00:06"
+                                                Storyboard.TargetProperty="Opacity"
+                                                From="0"
+                                                To="1"
+                                                Duration="0:0:0.3" />
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </EventTrigger>
+                            </TextBlock.Triggers>
+                        </TextBlock>
 
-                            <!--  Speech bubble  -->
-                            <Path
-                                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                                Name="speechbubble"
-                                Fill="White"
-                                Stroke="{StaticResource LightColorBrushKey}"
-                                StrokeThickness="0.4">
-                                <Path.Data>
-                                    <PathGeometry Figures="M9.90909090909091 51.36363636363637 L9.818181818181817 55.36363636363637 L6.636363636363637 58 L3.545454545454545 58.18181818181819 L0.9090909090909083 57.727272727272734 L4 59.81818181818181 L8.454545454545453 60.272727272727266 L10.90909090909091 58.81818181818181 L13.454545454545453 56.36363636363636 L15.09090909090909 52.18181818181818 L34.27272727272727 50.90909090909091 L53.45454545454545 51.45454545454545 L55.63636363636363 49.36363636363637 L55.63636363636363 45.63636363636363 L55.36363636363637 40.27272727272727 L55.81818181818182 32.09090909090909 L55 26 L51.09090909090909 23.90909090909091 L36.27272727272727 24.81818181818182 L16.454545454545453 24.454545454545453 L8.90909090909091 23.454545454545453 L6.818181818181818 32 L6.636363636363637 45.36363636363637 L7.454545454545455 50.90909090909091 Z" FillRule="NonZero" />
-                                </Path.Data>
-                                <Path.RenderTransform>
-                                    <ScaleTransform ScaleX="3.8" ScaleY="3.2" />
-                                </Path.RenderTransform>
-                                <Path.Effect>
-                                    <DropShadowEffect
-                                        BlurRadius="7"
-                                        Opacity="0.5"
-                                        ShadowDepth="2"
-                                        Color="{StaticResource DarkColor}" />
-                                </Path.Effect>
-                            </Path>
-                        </Grid>
-                    </Canvas>
+                        <!--  Speech bubble  -->
+                        <Path
+                            xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                            Name="speechbubble"
+                            Fill="White"
+                            Stroke="{StaticResource LightColorBrushKey}"
+                            StrokeThickness="0.4">
+                            <Path.Data>
+                                <PathGeometry Figures="M9.90909090909091 51.36363636363637 L9.818181818181817 55.36363636363637 L6.636363636363637 58 L3.545454545454545 58.18181818181819 L0.9090909090909083 57.727272727272734 L4 59.81818181818181 L8.454545454545453 60.272727272727266 L10.90909090909091 58.81818181818181 L13.454545454545453 56.36363636363636 L15.09090909090909 52.18181818181818 L34.27272727272727 50.90909090909091 L53.45454545454545 51.45454545454545 L55.63636363636363 49.36363636363637 L55.63636363636363 45.63636363636363 L55.36363636363637 40.27272727272727 L55.81818181818182 32.09090909090909 L55 26 L51.09090909090909 23.90909090909091 L36.27272727272727 24.81818181818182 L16.454545454545453 24.454545454545453 L8.90909090909091 23.454545454545453 L6.818181818181818 32 L6.636363636363637 45.36363636363637 L7.454545454545455 50.90909090909091 Z" FillRule="NonZero" />
+                            </Path.Data>
+                            <Path.RenderTransform>
+                                <ScaleTransform ScaleX="3.8" ScaleY="3.2" />
+                            </Path.RenderTransform>
+                            <Path.Effect>
+                                <DropShadowEffect
+                                    BlurRadius="7"
+                                    Opacity="0.5"
+                                    ShadowDepth="2"
+                                    Color="{StaticResource DarkColor}" />
+                            </Path.Effect>
+                        </Path>
+                    </Grid>
+                </Canvas>
 
-                    <!--  Guide BTN  -->
-                    <Button
-                        HorizontalAlignment="Right"
-                        VerticalAlignment="Top"
-                        Command="{Binding GoToHowToPageCommand, Mode=OneTime}"
-                        Content="{StaticResource FontAwesomeQuestionmarkIcon}"
-                        FontFamily="{StaticResource FontAwesomeSolid}"
-                        FontSize="16"
-                        Style="{StaticResource LightDarkTextButton}" />
-                </Grid>
-            </Border>
+                <!--  Guide BTN  -->
+                <Button
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Top"
+                    Command="{Binding GoToHowToPageCommand, Mode=OneTime}"
+                    Content="{StaticResource FontAwesomeQuestionmarkIcon}"
+                    FontFamily="{StaticResource FontAwesomeSolid}"
+                    FontSize="16"
+                    Style="{StaticResource LightDarkTextButton}" />
+            </Grid>
+        </Border>
 
-            <!--  Colored Row  -->
-            <Border Grid.Row="1" Padding="15,40,15,15">
-                <Border.Background>
-                    <LinearGradientBrush StartPoint="0,0" EndPoint="0.0,1.4">
-                        <GradientStop Offset="0.1" Color="{StaticResource LightColorDark}" />
-                        <GradientStop Offset="1.0" Color="{StaticResource LightColorDark}" />
-                    </LinearGradientBrush>
-                </Border.Background>
-                <Grid>
-                    <!--  Middle contour line  -->
-                    <Border
-                        Height="4"
-                        Margin="-15,-41,-15,-15"
-                        VerticalAlignment="Top">
-                        <Border.Background>
-                            <LinearGradientBrush>
-                                <GradientStop Offset="0.0" Color="{StaticResource LightColorLight}" />
-                                <GradientStop Offset="0.5" Color="Transparent" />
-                                <GradientStop Offset="0.5" Color="Transparent" />
-                                <GradientStop Offset="1.0" Color="{StaticResource LightColorLight}" />
-                            </LinearGradientBrush>
-                        </Border.Background>
-                    </Border>
-                    <!--  Colored Row Texture  -->
-                    <Border Margin="-15,-41,-15,-15">
-                        <Border.Background>
-                            <VisualBrush TileMode="Tile" Viewport="0,0,0.2,0.5">
-                                <VisualBrush.Visual>
-                                    <Image Source="/Resources/Images/texture_data_seamless.png" />
-                                </VisualBrush.Visual>
-                            </VisualBrush>
-                        </Border.Background>
-                        <Border.OpacityMask>
-                            <LinearGradientBrush StartPoint="0,1" EndPoint="0.0,0.5">
-                                <LinearGradientBrush.GradientStops>
-                                    <GradientStop Offset="0" Color="#40000000" />
-                                    <GradientStop Offset="1" Color="Transparent" />
-                                </LinearGradientBrush.GradientStops>
-                            </LinearGradientBrush>
-                        </Border.OpacityMask>
-                    </Border>
+        <!--  Colored Row  -->
+        <Border Grid.Row="1" Padding="15,40,15,15">
+            <Border.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="0.0,1.4">
+                    <GradientStop Offset="0.1" Color="{StaticResource LightColorDark}" />
+                    <GradientStop Offset="1.0" Color="{StaticResource LightColorDark}" />
+                </LinearGradientBrush>
+            </Border.Background>
+            <Grid>
+                <!--  Middle contour line  -->
+                <Border
+                    Height="4"
+                    Margin="-15,-41,-15,-15"
+                    VerticalAlignment="Top">
+                    <Border.Background>
+                        <LinearGradientBrush>
+                            <GradientStop Offset="0.0" Color="{StaticResource LightColorLight}" />
+                            <GradientStop Offset="0.5" Color="Transparent" />
+                            <GradientStop Offset="0.5" Color="Transparent" />
+                            <GradientStop Offset="1.0" Color="{StaticResource LightColorLight}" />
+                        </LinearGradientBrush>
+                    </Border.Background>
+                </Border>
+                <!--  Colored Row Texture  -->
+                <Border Margin="-15,-41,-15,-15">
+                    <Border.Background>
+                        <VisualBrush TileMode="Tile" Viewport="0,0,0.2,0.5">
+                            <VisualBrush.Visual>
+                                <Image Source="/Resources/Images/texture_data_seamless.png" />
+                            </VisualBrush.Visual>
+                        </VisualBrush>
+                    </Border.Background>
+                    <Border.OpacityMask>
+                        <LinearGradientBrush StartPoint="0,1" EndPoint="0.0,0.5">
+                            <LinearGradientBrush.GradientStops>
+                                <GradientStop Offset="0" Color="#40000000" />
+                                <GradientStop Offset="1" Color="Transparent" />
+                            </LinearGradientBrush.GradientStops>
+                        </LinearGradientBrush>
+                    </Border.OpacityMask>
+                </Border>
 
-                    <!--  Content  -->
-                    <Grid Margin="0,-15,0,0" VerticalAlignment="Top">
+                <!--  Content  -->
+                <Grid Margin="0,-15,0,0" VerticalAlignment="Top">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <!--  Title  -->
+                    <TextBlock
+                        Grid.Row="0"
+                        Margin="0,0,0,15"
+                        HorizontalAlignment="Center"
+                        FontFamily="{StaticResource Pacifico}"
+                        FontSize="48"
+                        Foreground="{StaticResource LightColorAltBrushKey}"
+                        Text="Crawly" />
+
+                    <!--  Instance Wrapper  -->
+                    <Grid
+                        Grid.Row="1"
+                        local:AnimateSlideInFromBottomProperty.Value="{Binding DataLoaded}"
+                        Visibility="Collapsed">
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
                             <RowDefinition Height="*" />
+                            <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
 
-                        <!--  Title  -->
-                        <TextBlock
+                        <!--  Data Instance View  -->
+                        <local:DataInstanceView
                             Grid.Row="0"
-                            Margin="0,0,0,15"
-                            HorizontalAlignment="Center"
-                            FontFamily="{StaticResource Pacifico}"
-                            FontSize="48"
-                            Foreground="{StaticResource LightColorAltBrushKey}"
-                            Text="Crawly" />
+                            d:DataContext="{x:Static local:DataInstanceView.DesignInstance}"
+                            ItemCommand="{Binding GoToDataInstanceCommand, Mode=OneTime}"
+                            Items="{Binding DataInstances}">
+                            <local:DataInstanceView.Style>
+                                <Style TargetType="{x:Type local:DataInstanceView}">
+                                    <Setter Property="Visibility" Value="Visible" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding DataInstances, Converter={local:CollectionHasAnyItemsConverter}}" Value="False">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </local:DataInstanceView.Style>
+                        </local:DataInstanceView>
 
-                        <!--  Instance Wrapper  -->
-                        <Grid
-                            Grid.Row="1"
-                            local:AnimateSlideInFromBottomProperty.Value="{Binding DataLoaded}"
-                            Visibility="Collapsed">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="*" />
-                                <RowDefinition Height="Auto" />
-                            </Grid.RowDefinitions>
-
-                            <!--  Data Instance View  -->
-                            <local:DataInstanceView
-                                Grid.Row="0"
-                                d:DataContext="{x:Static local:DataInstanceView.DesignInstance}"
-                                ItemCommand="{Binding GoToDataInstanceCommand, Mode=OneTime}"
-                                Items="{Binding DataInstances}">
-                                <local:DataInstanceView.Style>
-                                    <Style TargetType="{x:Type local:DataInstanceView}">
-                                        <Setter Property="Visibility" Value="Visible" />
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding DataInstances, Converter={local:CollectionHasAnyItemsConverter}}" Value="False">
-                                                <Setter Property="Visibility" Value="Collapsed" />
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </local:DataInstanceView.Style>
-                            </local:DataInstanceView>
-
-                            <!--  Create BTN  -->
-                            <Border
-                                Grid.Row="1"
-                                Width="235"
-                                Height="50"
-                                Margin="0,15,0,0"
-                                BorderThickness="7">
-                                <Border.BorderBrush>
-                                    <VisualBrush>
-                                        <VisualBrush.Visual>
-                                            <Rectangle
-                                                Width="{Binding RelativeSource={RelativeSource AncestorType={x:Type Border}}, Path=ActualWidth}"
-                                                Height="{Binding RelativeSource={RelativeSource AncestorType={x:Type Border}}, Path=ActualHeight}"
-                                                Stroke="{StaticResource DarkDarkButtonBorderBrushKey}"
-                                                StrokeDashArray="19 12"
-                                                StrokeThickness="5" />
-                                        </VisualBrush.Visual>
-                                    </VisualBrush>
-                                </Border.BorderBrush>
-                                <Button
-                                    Command="{Binding CreateNewDataInstanceCommand, Mode=OneTime}"
-                                    Content="CREATE NEW DATA INSTANCE"
-                                    FontSize="14"
-                                    Style="{StaticResource DarkDarkButton}" />
-                            </Border>
-                        </Grid>
-                        <!--  Instance Wrapper Loading  -->
+                        <!--  Create BTN  -->
                         <Border
                             Grid.Row="1"
-                            HorizontalAlignment="Center"
-                            VerticalAlignment="Top"
-                            local:AnimateSlideInFromTopGoneProperty.Value="{Binding DataLoaded, Converter={local:BooleanInvertConverter}}"
-                            Visibility="Visible">
-                            <!--  Spinner  -->
-                            <TextBlock
-                                FontSize="28"
-                                Foreground="{StaticResource LightColorAlt2BrushKey}"
-                                Opacity="0.4"
-                                Style="{StaticResource SpinningText}" />
+                            Width="235"
+                            Height="50"
+                            Margin="0,15,0,0"
+                            BorderThickness="7">
+                            <Border.BorderBrush>
+                                <VisualBrush>
+                                    <VisualBrush.Visual>
+                                        <Rectangle
+                                            Width="{Binding RelativeSource={RelativeSource AncestorType={x:Type Border}}, Path=ActualWidth}"
+                                            Height="{Binding RelativeSource={RelativeSource AncestorType={x:Type Border}}, Path=ActualHeight}"
+                                            Stroke="{StaticResource DarkDarkButtonBorderBrushKey}"
+                                            StrokeDashArray="19 12"
+                                            StrokeThickness="5" />
+                                    </VisualBrush.Visual>
+                                </VisualBrush>
+                            </Border.BorderBrush>
+                            <Button
+                                Command="{Binding CreateNewDataInstanceCommand, Mode=OneTime}"
+                                Content="CREATE NEW DATA INSTANCE"
+                                FontSize="14"
+                                Style="{StaticResource DarkDarkButton}" />
                         </Border>
                     </Grid>
-
-                    <!--  Copyright  -->
-                    <TextBlock
-                        HorizontalAlignment="Left"
-                        VerticalAlignment="Bottom"
-                        FontFamily="{StaticResource DosisSemiBold}"
-                        FontSize="12"
-                        Foreground="{StaticResource LightColorShinyBrushKey}"
-                        Text="Made by Tomáš Frixs" />
-
-                    <!--  Version  -->
-                    <TextBlock
-                        HorizontalAlignment="Right"
-                        VerticalAlignment="Bottom"
-                        FontFamily="{StaticResource DosisSemiBold}"
-                        FontSize="12"
-                        Foreground="{StaticResource LightColorShinyBrushKey}"
-                        Text="v . 1 . 0" />
+                    <!--  Instance Wrapper Loading  -->
+                    <Border
+                        Grid.Row="1"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Top"
+                        local:AnimateSlideInFromTopGoneProperty.Value="{Binding DataLoaded, Converter={local:BooleanInvertConverter}}"
+                        Visibility="Visible">
+                        <!--  Spinner  -->
+                        <TextBlock
+                            FontSize="28"
+                            Foreground="{StaticResource LightColorAlt2BrushKey}"
+                            Opacity="0.4"
+                            Style="{StaticResource SpinningText}" />
+                    </Border>
                 </Grid>
-            </Border>
-        </Grid>
-    </Border>
+
+                <!--  Copyright  -->
+                <TextBlock
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Bottom"
+                    FontFamily="{StaticResource DosisSemiBold}"
+                    FontSize="12"
+                    Foreground="{StaticResource LightColorShinyBrushKey}"
+                    Text="Made by Tomáš Frixs" />
+
+                <!--  Version  -->
+                <TextBlock
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Bottom"
+                    FontFamily="{StaticResource DosisSemiBold}"
+                    FontSize="12"
+                    Foreground="{StaticResource LightColorShinyBrushKey}"
+                    Text="v . 1 . 0" />
+            </Grid>
+        </Border>
+    </Grid>
 </local:BasePage>

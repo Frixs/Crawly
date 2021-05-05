@@ -4,10 +4,10 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.Security.Cryptography;
+using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace InformationRetrievalManager.NLP
@@ -67,7 +67,7 @@ namespace InformationRetrievalManager.NLP
         #region Interface Methods
 
         /// <inheritdoc/>
-        public async Task<(long[], long, long)> QueryAsync(string query, IReadOnlyDictionary<string, IReadOnlyDictionary<long, IReadOnlyTermInfo>> data, QueryModelType modelType, IndexProcessingConfiguration configuration, int select = 0)
+        public async Task<(long[], long, long)> QueryAsync(string query, IReadOnlyDictionary<string, IReadOnlyDictionary<long, IReadOnlyTermInfo>> data, QueryModelType modelType, IndexProcessingConfiguration configuration, int select = 0, Action<string> setProgressMessage = null, CancellationToken cancellationToken = default)
         {
             if (query == null || data == null)
                 throw new ArgumentNullException("Query data not specified!");
@@ -85,6 +85,10 @@ namespace InformationRetrievalManager.NLP
 
                 long totalDocuments = _lastTotalDocumentCount;
                 long foundDocuments = 0;
+
+                setProgressMessage?.Invoke("starting");
+
+                // Get data checksum
                 var dataChecksum = GetDataChecksum(t_data);
 
                 // If the model type is the same as the one from the last query request...
@@ -97,14 +101,14 @@ namespace InformationRetrievalManager.NLP
                         // ... check if the query is different...
                         if (!t_query.Equals(_lastQuery))
                             // If so, recalculate query
-                            _lastModel.CalculateQuery(t_query, t_data, t_configuration);
+                            _lastModel.CalculateQuery(t_query, t_data, t_configuration, setProgressMessage, cancellationToken);
                         // Otherwise, there is not need to do anything, the query data are the same as the previous request.
                     }
                     // Otherwise, recalculate everything...
                     else
                     {
-                        _lastModel.CalculateData(t_data, out totalDocuments);
-                        _lastModel.CalculateQuery(t_query, t_data, t_configuration);
+                        _lastModel.CalculateData(t_data, out totalDocuments, setProgressMessage, cancellationToken);
+                        _lastModel.CalculateQuery(t_query, t_data, t_configuration, setProgressMessage, cancellationToken);
                     }
                 }
                 // Otherwise, recalculate the whole model straight away...
@@ -126,8 +130,8 @@ namespace InformationRetrievalManager.NLP
                             break;
                     }
 
-                    _lastModel.CalculateData(t_data, out totalDocuments);
-                    _lastModel.CalculateQuery(t_query, t_data, t_configuration);
+                    _lastModel.CalculateData(t_data, out totalDocuments, setProgressMessage, cancellationToken);
+                    _lastModel.CalculateQuery(t_query, t_data, t_configuration, setProgressMessage, cancellationToken);
                 }
 
                 // Save information about last query request
@@ -136,7 +140,7 @@ namespace InformationRetrievalManager.NLP
                 _lastDataChecksum = dataChecksum;
                 _lastTotalDocumentCount = totalDocuments;
 
-                return (Results: _lastModel.CalculateBestMatch(select, out foundDocuments), FoundDocuments: foundDocuments, TotalDocuments: totalDocuments);
+                return (Results: _lastModel.CalculateBestMatch(select, out foundDocuments, setProgressMessage, cancellationToken), FoundDocuments: foundDocuments, TotalDocuments: totalDocuments);
             });
         }
 
@@ -157,15 +161,28 @@ namespace InformationRetrievalManager.NLP
         /// Gets checksum of query data
         /// </summary>
         /// <param name="data">The data (<see cref="InvertedIndex._vocabulary"/>)</param>
-        /// <returns>Checksum</returns>
+        /// <returns>Checksum or <see langword="null"/> on serialization failure.</returns>
         private byte[] GetDataChecksum(IReadOnlyDictionary<string, IReadOnlyDictionary<long, IReadOnlyTermInfo>> data)
         {
-            var bf = new BinaryFormatter();
-            using (var stream = new MemoryStream())
-            using (var md5 = MD5.Create())
+            try
             {
-                bf.Serialize(stream, data);
-                return md5.ComputeHash(stream);
+                // Create hashable data
+                List<byte> buffer = new List<byte>();
+                foreach (var item1 in data)
+                {
+                    buffer.AddRange(Encoding.ASCII.GetBytes(item1.Key));
+                    foreach (var item2 in item1.Value)
+                        buffer.AddRange(BitConverter.GetBytes(item2.Key + item2.Value.Frequency));
+                }
+
+                using (var md5 = MD5.Create())
+                {
+                    return md5.ComputeHash(buffer.ToArray());
+                }
+            }
+            catch
+            {
+                return null;
             }
         }
 

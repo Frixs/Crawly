@@ -12,9 +12,10 @@ namespace InformationRetrievalManager.Relational
         #region Limit Constants
 
         public static readonly bool Title_IsRequired = true;
-        public static readonly short Title_MaxLength = 255;
+        public static readonly short Title_MaxLength = 350;
         public static readonly string Title_DefaultValue = "";
 
+        public static readonly bool Category_AllowNull = true;
         public static readonly bool Category_IsRequired = false;
         public static readonly short Category_MaxLength = 50;
         public static readonly string Category_DefaultValue = "";
@@ -39,18 +40,18 @@ namespace InformationRetrievalManager.Relational
         public long Id { get; set; }
 
         /// <summary>
-        /// Foreign Key for <see cref="DataInstance"/>
+        /// Foreign Key for <see cref="IndexedFileReference"/>
         /// </summary>
         [ValidateIgnore]
-        public long? DataInstanceId { get; set; }
+        public long? IndexedFileReferenceId { get; set; }
 
         /// <summary>
-        /// Reference to ONE data instance // Fluent API
+        /// Reference to ONE indexed file reference // Fluent API
         /// </summary>
         [System.Text.Json.Serialization.JsonIgnore]
         [Newtonsoft.Json.JsonIgnore]
         [ValidateIgnore]
-        public DataInstanceDataModel DataInstance { get; set; }
+        public IndexedFileReferenceDataModel IndexedFileReference { get; set; }
 
         #endregion
 
@@ -67,7 +68,11 @@ namespace InformationRetrievalManager.Relational
         /// <summary>
         /// Document category
         /// </summary>
+        /// <remarks>
+        ///     Value can be <see langword="null"/>.
+        /// </remarks>
         [ValidateString(nameof(Category), typeof(IndexedDocumentDataModel),
+            pAllowNull: nameof(Category_AllowNull),
             pIsRequired: nameof(Category_IsRequired),
             pMaxLength: nameof(Category_MaxLength))]
         public string Category { get; set; }
@@ -75,6 +80,9 @@ namespace InformationRetrievalManager.Relational
         /// <summary>
         /// Document timestamp
         /// </summary>
+        /// <remarks>
+        ///     Value <see cref="DateTime.MinValue"/> = not set.
+        /// </remarks>
         [ValidateIgnore]
         public DateTime Timestamp { get; set; }
 

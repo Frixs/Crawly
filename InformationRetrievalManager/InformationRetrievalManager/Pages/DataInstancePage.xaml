@@ -15,18 +15,6 @@
     mc:Ignorable="d">
 
     <Border Padding="15">
-        <!--  Texture  -->
-        <Border.Background>
-            <VisualBrush
-                Opacity="0.7"
-                TileMode="Tile"
-                Viewport="0,0,0.5,0.5">
-                <VisualBrush.Visual>
-                    <Image Source="/Resources/Images/texture_data_seamless.png" />
-                </VisualBrush.Visual>
-            </VisualBrush>
-        </Border.Background>
-
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
@@ -90,6 +78,7 @@
                                             <Condition Binding="{Binding ConfigurationContext.ProcessingConfigurationUpdateCommandFlag, Mode=OneWay}" Value="False" />
                                             <Condition Binding="{Binding ConfigurationContext.DataInstanceNameUpdateCommandFlag, Mode=OneWay}" Value="False" />
                                             <Condition Binding="{Binding ConfigurationContext.DataInstanceDeleteCommandFlag, Mode=OneWay}" Value="False" />
+                                            <Condition Binding="{Binding DeleteIndexFlag, Mode=OneWay}" Value="False" />
                                         </MultiDataTrigger.Conditions>
                                         <Setter Property="IsEnabled" Value="True" />
                                     </MultiDataTrigger>
@@ -404,6 +393,7 @@
                                                         <Condition Binding="{Binding DataFileEntry.Value.FilePath, Converter={local:StringEmptyConverter}, Mode=OneWay}" Value="False" />
                                                         <Condition Binding="{Binding CrawlerInWork, Mode=OneWay}" Value="False" />
                                                         <Condition Binding="{Binding QueryInWorkFlag, Mode=OneWay}" Value="False" />
+                                                        <Condition Binding="{Binding DeleteIndexFlag, Mode=OneWay}" Value="False" />
                                                     </MultiDataTrigger.Conditions>
                                                     <Setter Property="IsEnabled" Value="True" />
                                                 </MultiDataTrigger>
@@ -459,6 +449,7 @@
                                     <RowDefinition Height="Auto" />
                                     <RowDefinition Height="Auto" />
                                     <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
                                     <RowDefinition Height="*" />
                                 </Grid.RowDefinitions>
 
@@ -500,7 +491,8 @@
                                             CommandParameter="{Binding IndexFileEntry.Value, Mode=OneWay}"
                                             Content="{StaticResource FontAwesomeTrashAltIcon}"
                                             FontFamily="{StaticResource FontAwesomeSolid}"
-                                            ToolTip="Delete Data">
+                                            IsEnabled="{Binding DeleteIndexFlag, Converter={local:BooleanInvertConverter}, Mode=OneWay}"
+                                            ToolTip="Delete Index">
                                             <Button.Style>
                                                 <Style BasedOn="{StaticResource DarkLightButton}" TargetType="{x:Type Button}">
                                                     <Setter Property="Visibility" Value="Visible" />
@@ -571,6 +563,7 @@
                                                         <Condition Binding="{Binding IndexFileEntry.Value.FilePath, Converter={local:StringEmptyConverter}, Mode=OneWay}" Value="False" />
                                                         <Condition Binding="{Binding QueryEntry.Value, Converter={local:StringEmptyConverter}, Mode=OneWay}" Value="False" />
                                                         <Condition Binding="{Binding IndexProcessingInWorkFlag, Mode=OneWay}" Value="False" />
+                                                        <Condition Binding="{Binding DeleteIndexFlag, Mode=OneWay}" Value="False" />
                                                     </MultiDataTrigger.Conditions>
                                                     <Setter Property="IsEnabled" Value="True" />
                                                 </MultiDataTrigger>
@@ -604,9 +597,25 @@
                                     </local:IntegerEntry.Style>
                                 </local:IntegerEntry>
 
+                                <!--  Progress Wrapper  -->
+                                <Grid Grid.Row="2" local:AnimateFadeInProperty.Value="{Binding QueryInWorkFlag, Mode=OneWay}">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+
+                                    <!--  Progress (bar) Status  -->
+                                    <TextBlock
+                                        Grid.Row="0"
+                                        Margin="0,5,0,0"
+                                        HorizontalAlignment="Center"
+                                        FontFamily="{StaticResource DosisExtraBold}"
+                                        FontSize="15"
+                                        Text="{Binding QueryProgress, Mode=OneWay}" />
+                                </Grid>
+
                                 <!--  Query Error Message  -->
                                 <TextBlock
-                                    Grid.Row="2"
+                                    Grid.Row="3"
                                     Margin="0,10,0,0"
                                     HorizontalAlignment="Center"
                                     FontFamily="{StaticResource DosisMedium}"
@@ -628,7 +637,7 @@
 
                                 <!--  View Results BTN  -->
                                 <Button
-                                    Grid.Row="3"
+                                    Grid.Row="4"
                                     Margin="0,15,0,0"
                                     HorizontalAlignment="Center"
                                     Command="{Binding ShowViewCommand, Mode=OneTime}"
