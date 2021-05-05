@@ -92,7 +92,7 @@ namespace InformationRetrievalManager.NLP
 
                 // The IDF calculation
                 _termIdf[term.Key] = Math.Log(documents.Count / termDocCount, 10);
-                setProgressMessage?.Invoke($"data IDF calculation: {i}/{data.Count}");
+                setProgressMessage?.Invoke($"data IDF calculation - {i}/{data.Count}");
             }
             totalDocuments = documents.Count;
 
@@ -109,7 +109,7 @@ namespace InformationRetrievalManager.NLP
                     break;
 
                 docVectors[documentId] = CalculateDocumentVector(data, documentId, cancellationToken);
-                setProgressMessage?.Invoke($"calculating data document vectors: {i}/{documents.Count}");
+                setProgressMessage?.Invoke($"calculating data vectors - {i}/{documents.Count}");
             }
 
             // Save the vectors
@@ -134,7 +134,7 @@ namespace InformationRetrievalManager.NLP
             // (Re)Initialize the values
             _queryVector = null;
 
-            setProgressMessage?.Invoke("calculating query document vector");
+            setProgressMessage?.Invoke("calculating query vector");
 
             // Process the query and indexate it for vocabulary
             var processing = new IndexProcessing("__tfidf",
@@ -184,7 +184,7 @@ namespace InformationRetrievalManager.NLP
                 results.Add(
                     (document.Key, CalculateCosSimilarity(queryVector, document.Value))
                     );
-                setProgressMessage?.Invoke($"calculating cosine similarity: {i}/{documentVectors.Count}");
+                setProgressMessage?.Invoke($"calculating cos-similarity - {i}/{documentVectors.Count}");
             }
 
             // Sort and return result

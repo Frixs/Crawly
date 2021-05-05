@@ -74,7 +74,7 @@ namespace InformationRetrievalManager.NLP
                 if (cancellationToken.IsCancellationRequested)
                     break;
 
-                setProgressMessage?.Invoke($"counting documents: {i}/{data.Count}");
+                setProgressMessage?.Invoke($"counting documents - {i}/{data.Count}");
             }
 
             // Save the document count
@@ -119,7 +119,7 @@ namespace InformationRetrievalManager.NLP
                 if (cancellationToken.IsCancellationRequested)
                     break;
 
-                setProgressMessage?.Invoke($"getting documents IDs: {i}/{data.Count}");
+                setProgressMessage?.Invoke($"getting document IDs - {i}/{data.Count}");
             }
 
             // Query parser
@@ -155,7 +155,7 @@ namespace InformationRetrievalManager.NLP
                         // document accepted
                         results.Add(documentId);
 
-                    setProgressMessage?.Invoke($"evaluating documents: {i}/{documents.Count}");
+                    setProgressMessage?.Invoke($"evaluating documents - {i}/{documents.Count}");
                 }
 
                 // Sort
