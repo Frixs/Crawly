@@ -4,10 +4,9 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.Security.Cryptography;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -158,15 +157,28 @@ namespace InformationRetrievalManager.NLP
         /// Gets checksum of query data
         /// </summary>
         /// <param name="data">The data (<see cref="InvertedIndex._vocabulary"/>)</param>
-        /// <returns>Checksum</returns>
+        /// <returns>Checksum or <see langword="null"/> on serialization failure.</returns>
         private byte[] GetDataChecksum(IReadOnlyDictionary<string, IReadOnlyDictionary<long, IReadOnlyTermInfo>> data)
         {
-            var bf = new BinaryFormatter();
-            using (var stream = new MemoryStream())
-            using (var md5 = MD5.Create())
+            try
             {
-                bf.Serialize(stream, data);
-                return md5.ComputeHash(stream);
+                // Create hashable data
+                List<byte> buffer = new List<byte>();
+                foreach (var item1 in data)
+                {
+                    buffer.AddRange(Encoding.ASCII.GetBytes(item1.Key));
+                    foreach (var item2 in item1.Value)
+                        buffer.AddRange(BitConverter.GetBytes(item2.Key + item2.Value.Frequency));
+                }
+
+                using (var md5 = MD5.Create())
+                {
+                    return md5.ComputeHash(buffer.ToArray());
+                }
+            }
+            catch
+            {
+                return null;
             }
         }
 

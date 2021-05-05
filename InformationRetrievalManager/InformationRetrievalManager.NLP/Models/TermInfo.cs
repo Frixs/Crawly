@@ -1,16 +1,17 @@
-﻿using System;
+﻿using MessagePack;
 
 namespace InformationRetrievalManager.NLP
 {
     /// <summary>
     /// <see cref="IReadOnlyTermInfo"/> + ability to set values.
     /// </summary>
-    [Serializable]
-    public class TermInfo : IReadOnlyTermInfo
+    [MessagePackObject]
+    public sealed class TermInfo : IReadOnlyTermInfo
     {
         #region Public Properties
 
         /// <inheritdoc/>
+        [Key(0)]
         public int Frequency { get; set; } = -1;
 
         #endregion
