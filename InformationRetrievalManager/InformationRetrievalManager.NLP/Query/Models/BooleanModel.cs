@@ -143,8 +143,10 @@ namespace InformationRetrievalManager.NLP
             if (queryParsed != null)
             {
                 var results = new List<long>();
+                i = 0;
                 foreach (var documentId in documents)
                 {
+                    i++;
                     // Check for cancelation
                     if (cancellationToken.IsCancellationRequested)
                         break;
@@ -152,6 +154,8 @@ namespace InformationRetrievalManager.NLP
                     if (queryParsed.Evaluate(new DocumentTermEvaluator(documentId, data, processingConfiguration)))
                         // document accepted
                         results.Add(documentId);
+
+                    setProgressMessage?.Invoke($"evaluating documents: {i}/{documents.Count}");
                 }
 
                 // Sort
