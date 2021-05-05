@@ -648,11 +648,10 @@ namespace InformationRetrievalManager
                                     i++;
                                     doc.IndexedFileReferenceId = fileReference.Id;
                                     _uow.IndexedDocuments.Insert(doc);
+                                    _uow.SaveChanges(); // Save immediately to make sure the docs will have their IDs in ASC order by the current order
                                     IndexProcessingProgress = $"Preparing documents... ({i}/{indexedDocuments.Count})";
                                 }
-                                IndexProcessingProgress = "Storing documents... (it might take a while)";
-                                _uow.SaveChanges();
-
+                                
                                 // Create index specific document array
                                 IndexDocument[] docs = new IndexDocument[fileReference.IndexedDocuments.Count];
                                 i = 0;
