@@ -142,7 +142,7 @@ namespace InformationRetrievalManager.NLP
             // If the query is successfully parsed...
             if (queryParsed != null)
             {
-                var results = new List<long>();
+                var results = new SortedSet<long>(new DocumentComparer());
                 i = 0;
                 foreach (var documentId in documents)
                 {
@@ -159,7 +159,7 @@ namespace InformationRetrievalManager.NLP
                 }
 
                 // Sort
-                _queryResults = results.OrderBy(o => o).ToArray();
+                _queryResults = results.ToArray();
 
                 // Log it
                 _logger?.LogDebugSource("Query has been successfully calculated and data prepared.");
@@ -279,6 +279,24 @@ namespace InformationRetrievalManager.NLP
                         break;
                     }
                 }
+
+                return result;
+            }
+        }
+
+        #endregion
+
+        #region Comparer Class
+
+        /// <summary>
+        /// Document comparer to skip necessary sorting
+        /// </summary>
+        private class DocumentComparer : IComparer<long>
+        {
+            public int Compare(long x, long y)
+            {
+                // By ID
+                int result = x.CompareTo(y);
 
                 return result;
             }

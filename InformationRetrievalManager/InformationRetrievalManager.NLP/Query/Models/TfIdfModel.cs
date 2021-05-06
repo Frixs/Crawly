@@ -172,7 +172,7 @@ namespace InformationRetrievalManager.NLP
                 throw new InvalidOperationException("Query vector is not defined!");
 
             // Calculate cosine similarity for each document...
-            var results = new List<(long DocumentId, double Relevance)>();
+            var results = new SortedSet<(long DocumentId, double Relevance)>(new DocumentComparer());
             long i = 0;
             foreach (var document in documentVectors)
             {
@@ -189,8 +189,6 @@ namespace InformationRetrievalManager.NLP
 
             // Sort and return result
             setProgressMessage?.Invoke("retrieving results");
-            //results.Sort((x, y) => y.Relevance.CompareTo(x.Relevance));
-            results = results.OrderByDescending(o => o.Relevance).ThenBy(o => o.DocumentId).ToList();
             foundDocuments = results.Count;
             if (select > 0)
                 return results.Select(o => o.DocumentId).Take(select).ToArray();
@@ -322,6 +320,28 @@ namespace InformationRetrievalManager.NLP
             }
 
             return result.ToDictionary(o => o.Key, o => (IReadOnlyDictionary<long, IReadOnlyTermInfo>)o.Value.ToDictionary(x => x.Key, x => (IReadOnlyTermInfo)x.Value)); ;
+        }
+
+        #endregion
+
+        #region Comparer Class
+
+        /// <summary>
+        /// Document comparer to skip necessary sorting
+        /// </summary>
+        private class DocumentComparer : IComparer<(long DocumentId, double Relevance)>
+        {
+            public int Compare((long DocumentId, double Relevance) x, (long DocumentId, double Relevance) y)
+            {
+                // Firstly by relevance
+                int result = y.Relevance.CompareTo(x.Relevance);
+
+                // Then by document ID
+                if (result == 0)
+                    result = x.DocumentId.CompareTo(y.DocumentId);
+
+                return result;
+            }
         }
 
         #endregion
