@@ -12,9 +12,10 @@ namespace InformationRetrievalManager.NLP
         /// Put a term into a inverted index vocabulary.
         /// </summary>
         /// <param name="term">The term</param>
-        /// <param name="documentId">Document ID</param>
-        /// <exception cref="ArgumentNullException">If term is null or empty or document ID is not positive number.</exception>
-        void Put(string term, long documentId);
+        /// <param name="document">The document</param>
+        /// <exception cref="ArgumentNullException">If term is null or empty or document is null.</exception>
+        /// <exception cref="ArgumentException">If document ID is not positive number.</exception>
+        void Put(string term, IndexDocument document);
 
         /// <summary>
         ///     <para>
@@ -41,7 +42,8 @@ namespace InformationRetrievalManager.NLP
         ///         On the other hand, if the manager is not defined (<see cref="null"/>) the method does nothing and the in-memory data remains the same.
         ///     </para>
         /// </summary>
+        /// <param name="setProgressMessage">Action to retrieve progress data ("what is going on during processing").</param>
         /// <returns>Returns <see langword="true"/> on successful save, otherwise <see langword="false"/>.</returns>
-        bool Save();
+        bool Save(Action<string> setProgressMessage = null);
     }
 }

@@ -1,7 +1,7 @@
 ﻿namespace InformationRetrievalManager.NLP
 {
     /// <summary>
-    /// Model containing the data about term in vocabulary in <see cref="InvertedIndex"/>.
+    /// Model made as a wrapper for term data that are intedent to be stored as <see cref="InvertedIndex"/>.
     /// </summary>
     public interface IReadOnlyTermInfo
     {

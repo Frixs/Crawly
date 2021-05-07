@@ -11,20 +11,12 @@ namespace InformationRetrievalManager.NLP
         #region Public Properties
 
         /// <inheritdoc/>
-        [Key(0)]
+        [Key(nameof(TermInfo) + nameof(Frequency))]
         public int Frequency { get; set; } = -1;
 
         #endregion
 
         #region Constructor
-
-        /// <summary>
-        /// Default constructor
-        /// </summary>
-        /// <remarks>
-        ///     Should not be used outside of serialization/deserialization !!!
-        /// </remarks>
-        public TermInfo() { }
 
         /// <summary>
         /// Constructor with property sets

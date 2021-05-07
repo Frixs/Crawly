@@ -45,11 +45,6 @@ namespace InformationRetrievalManager.NLP
         /// </summary>
         private byte[] _lastDataChecksum = null;
 
-        /// <summary>
-        /// Last saved number of total document searched from the document calculation.
-        /// </summary>
-        private long _lastTotalDocumentCount = 0;
-
         #endregion
 
         #region Constructor
@@ -67,7 +62,7 @@ namespace InformationRetrievalManager.NLP
         #region Interface Methods
 
         /// <inheritdoc/>
-        public async Task<(long[], long, long)> QueryAsync(string query, IReadOnlyDictionary<string, IReadOnlyDictionary<long, IReadOnlyTermInfo>> data, QueryModelType modelType, IndexProcessingConfiguration configuration, int select = 0, Action<string> setProgressMessage = null, CancellationToken cancellationToken = default)
+        public async Task<(long[] Results, long FoundDocuments, long TotalDocuments)> QueryAsync(string query, InvertedIndex.ReadOnlyData data, QueryModelType modelType, IndexProcessingConfiguration configuration, int select = 0, Action<string> setProgressMessage = null, CancellationToken cancellationToken = default)
         {
             if (query == null || data == null)
                 throw new ArgumentNullException("Query data not specified!");
@@ -83,7 +78,6 @@ namespace InformationRetrievalManager.NLP
                 var t_modelType = modelType;
                 var t_configuration = configuration;
 
-                long totalDocuments = _lastTotalDocumentCount;
                 long foundDocuments = 0;
 
                 setProgressMessage?.Invoke("starting");
@@ -101,14 +95,14 @@ namespace InformationRetrievalManager.NLP
                         // ... check if the query is different...
                         if (!t_query.Equals(_lastQuery))
                             // If so, recalculate query
-                            _lastModel.CalculateQuery(t_query, t_data, t_configuration, setProgressMessage, cancellationToken);
+                            _lastModel.CalculateQuery(t_data, t_query, t_configuration, setProgressMessage, cancellationToken);
                         // Otherwise, there is not need to do anything, the query data are the same as the previous request.
                     }
                     // Otherwise, recalculate everything...
                     else
                     {
-                        _lastModel.CalculateData(t_data, out totalDocuments, setProgressMessage, cancellationToken);
-                        _lastModel.CalculateQuery(t_query, t_data, t_configuration, setProgressMessage, cancellationToken);
+                        _lastModel.CalculateData(t_data, setProgressMessage, cancellationToken);
+                        _lastModel.CalculateQuery(t_data, t_query, t_configuration, setProgressMessage, cancellationToken);
                     }
                 }
                 // Otherwise, recalculate the whole model straight away...
@@ -130,17 +124,16 @@ namespace InformationRetrievalManager.NLP
                             break;
                     }
 
-                    _lastModel.CalculateData(t_data, out totalDocuments, setProgressMessage, cancellationToken);
-                    _lastModel.CalculateQuery(t_query, t_data, t_configuration, setProgressMessage, cancellationToken);
+                    _lastModel.CalculateData(t_data, setProgressMessage, cancellationToken);
+                    _lastModel.CalculateQuery(t_data, t_query, t_configuration, setProgressMessage, cancellationToken);
                 }
 
                 // Save information about last query request
                 _lastModelType = t_modelType;
                 _lastQuery = t_query;
                 _lastDataChecksum = dataChecksum;
-                _lastTotalDocumentCount = totalDocuments;
-
-                return (Results: _lastModel.CalculateBestMatch(select, out foundDocuments, setProgressMessage, cancellationToken), FoundDocuments: foundDocuments, TotalDocuments: totalDocuments);
+                
+                return (_lastModel.CalculateBestMatch(t_data, select, out foundDocuments, setProgressMessage, cancellationToken), foundDocuments, data.Documents.Count);
             });
         }
 
@@ -160,19 +153,18 @@ namespace InformationRetrievalManager.NLP
         /// <summary>
         /// Gets checksum of query data
         /// </summary>
-        /// <param name="data">The data (<see cref="InvertedIndex._vocabulary"/>)</param>
+        /// <param name="data">The data (<see cref="InvertedIndex._data"/>)</param>
         /// <returns>Checksum or <see langword="null"/> on serialization failure.</returns>
-        private byte[] GetDataChecksum(IReadOnlyDictionary<string, IReadOnlyDictionary<long, IReadOnlyTermInfo>> data)
+        private byte[] GetDataChecksum(InvertedIndex.ReadOnlyData data)
         {
             try
             {
                 // Create hashable data
                 List<byte> buffer = new List<byte>();
-                foreach (var item1 in data)
+                foreach (var item in data.Documents)
                 {
-                    buffer.AddRange(Encoding.ASCII.GetBytes(item1.Key));
-                    foreach (var item2 in item1.Value)
-                        buffer.AddRange(BitConverter.GetBytes(item2.Key + item2.Value.Frequency));
+                    buffer.AddRange(BitConverter.GetBytes(item.Key));
+                    buffer.AddRange(Encoding.ASCII.GetBytes(item.Value.ToString()));
                 }
 
                 using (var md5 = MD5.Create())

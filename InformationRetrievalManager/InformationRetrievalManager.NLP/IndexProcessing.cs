@@ -1,7 +1,6 @@
 ﻿using InformationRetrievalManager.Core;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
 using System.Threading;
 
 namespace InformationRetrievalManager.NLP
@@ -167,25 +166,29 @@ namespace InformationRetrievalManager.NLP
             // Load indexed data
             if (load && !cancellationToken.IsCancellationRequested)
             {
-                setProgressMessage?.Invoke("loading");
+                setProgressMessage?.Invoke("Loading index...");
                 _invertedIndex.Load();
             }
-            
+
             // Indexate documents
             for (long i = 0; i < documents.Length; ++i)
             {
                 if (cancellationToken.IsCancellationRequested)
                     break;
-                
+
                 IndexDocument(documents[i], false, false);
-                setProgressMessage?.Invoke($"{i}/{documents.Length}");
+                setProgressMessage?.Invoke($"Indexing... ({i}/{documents.Length})");
             }
 
             // Save indexed data
             if (save && !cancellationToken.IsCancellationRequested)
             {
-                setProgressMessage?.Invoke("saving");
-                _invertedIndex.Save();
+                setProgressMessage?.Invoke("Saving index...");
+                Action<string> savingProgressMessage = null;
+                if (setProgressMessage != null)
+                    savingProgressMessage = (value) => setProgressMessage?.Invoke($"Saving index... ({value})");
+
+                _invertedIndex.Save(savingProgressMessage);
             }
         }
 
@@ -209,7 +212,7 @@ namespace InformationRetrievalManager.NLP
                 _invertedIndex.Load();
 
             // Process the data
-            _ = Process(docContent, document.Id, _invertedIndex);
+            _ = Process(docContent, document, _invertedIndex);
 
             // Save indexed data
             if (save)
@@ -220,8 +223,8 @@ namespace InformationRetrievalManager.NLP
         /// Run process for the text independently of the rest of this instance (documents) and get the indexed vocabulary instantly.
         /// </summary>
         /// <param name="text">The text</param>
-        /// <returns>Indexed vocabulary based on the <paramref name="text"/>. The structure is the same as <see cref="InvertedIndex._vocabulary"/> with the only document here (ID=0).</returns>
-        public IReadOnlyDictionary<string, IReadOnlyDictionary<long, IReadOnlyTermInfo>> IndexText(string text)
+        /// <returns>Indexed (generates ReadOnly!) data based on the <paramref name="text"/>. The structure is the same as <see cref="InvertedIndex._data"/> with the only document here (ID=0).</returns>
+        public InvertedIndex.ReadOnlyData IndexText(string text)
         {
             if (text == null)
                 throw new ArgumentNullException("Text not specified!");
@@ -230,10 +233,10 @@ namespace InformationRetrievalManager.NLP
             var ii = new InvertedIndex(Name + "(query)", default, null, _logger);
 
             // Process the text data
-            _ = Process(text, 0, ii);
+            _ = Process(text, new IndexDocument(0, string.Empty, string.Empty, string.Empty, default, string.Empty), ii); // Create mock index document -we do not care about indexed document data
 
             // Return the vocabulary straight back
-            return ii.GetReadOnlyVocabulary();
+            return ii.GetReadOnlyData();
         }
 
         /// <summary>
@@ -246,7 +249,7 @@ namespace InformationRetrievalManager.NLP
             if (text == null)
                 throw new ArgumentNullException("Text not specified!");
 
-            return Process(text, -1);
+            return Process(text, null);
         }
 
         /// <summary>
@@ -286,10 +289,10 @@ namespace InformationRetrievalManager.NLP
         /// Process specific text by the processing settings and indexate it according to <paramref name="documentId"/> (only if <paramref name="invertedIndex"/> is defined).
         /// </summary>
         /// <param name="text">The text</param>
-        /// <param name="documentId">The document ID for indexation (If <paramref name="invertedIndex"/> is not defined, indexation will not proceed and this parameter will be ignored).</param>
+        /// <param name="document">The document for indexation (If <paramref name="invertedIndex"/> is not defined, indexation will not proceed and this parameter will be ignored).</param>
         /// <param name="invertedIndex">Inverted index instance used for the indexation.</param>
         /// <returns>Processed terms</returns>
-        private string[] Process(string text, long documentId, IInvertedIndex invertedIndex = null)
+        private string[] Process(string text, IndexDocument document, IInvertedIndex invertedIndex = null)
         {
             // To lower
             if (ToLowerCase)
@@ -321,7 +324,7 @@ namespace InformationRetrievalManager.NLP
 
                 // Indexate it
                 if (invertedIndex != null)
-                    invertedIndex.Put(terms[i], documentId);
+                    invertedIndex.Put(terms[i], document);
             }
 
             return terms;

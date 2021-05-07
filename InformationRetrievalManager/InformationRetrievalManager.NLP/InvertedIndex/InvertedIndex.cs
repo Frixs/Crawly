@@ -1,5 +1,6 @@
 ﻿using InformationRetrievalManager.Core;
 using Ixs.DNA;
+using MessagePack;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -22,13 +23,9 @@ namespace InformationRetrievalManager.NLP
         #region Private Members
 
         /// <summary>
-        /// Vocabulary of the inverted index.
+        /// Index data structure
         /// </summary>
-        /// <remarks>
-        ///     SortedDictionary { Key=term, Value=posting list },
-        ///     posting list aka Dictionary { Key=DocumentId, Value=TermInfo obj }
-        /// </remarks>
-        private readonly SortedDictionary<string, Dictionary<long, TermInfo>> _vocabulary = new SortedDictionary<string, Dictionary<long, TermInfo>>();
+        private readonly Data _data = new Data();
 
         /// <summary>
         /// Timestamp as an additional identifier for indexation.
@@ -62,42 +59,45 @@ namespace InformationRetrievalManager.NLP
 
         #region Interface Methods
 
-        /// <summary>
         /// <inheritdoc/>
-        /// </summary>
-        /// <remarks>O(n^2)</remarks>
-        public IReadOnlyDictionary<string, IReadOnlyDictionary<long, IReadOnlyTermInfo>> GetReadOnlyVocabulary()
+        public ReadOnlyData GetReadOnlyData()
         {
-            return _vocabulary.ToDictionary(o => o.Key, o => (IReadOnlyDictionary<long, IReadOnlyTermInfo>)o.Value.ToDictionary(x => x.Key, x => (IReadOnlyTermInfo)x.Value));
+            return new ReadOnlyData(_data.Vocabulary, _data.Documents);
         }
 
         /// <inheritdoc/>
-        public void Put(string term, long documentId)
+        public void Put(string term, IndexDocument document)
         {
-            if (string.IsNullOrEmpty(term) || documentId < 0)
+            if (string.IsNullOrEmpty(term) || document == null)
                 throw new ArgumentNullException("Invalid parameters for indexing!");
+            if (document.Id < 0)
+                throw new ArgumentException("Document ID is invalid.");
 
             // Check if the term already exists...
-            if (_vocabulary.ContainsKey(term))
+            if (_data.Vocabulary.ContainsKey(term))
             {
                 // If the document is already registered for the term...
-                if (_vocabulary[term].ContainsKey(documentId))
+                if (_data.Vocabulary[term].ContainsKey(document.Id))
                 {
-                    _vocabulary[term][documentId].Frequency++;
+                    _data.Vocabulary[term][document.Id].Frequency++;
                 }
                 // Otherwise, create a new record for the document...
                 else
                 {
-                    _vocabulary[term].Add(documentId, new TermInfo(frequency: 1));
+                    _data.Vocabulary[term].Add(document.Id, new TermInfo(frequency: 1));
+                    if (!_data.Documents.ContainsKey(document.Id)) // Add only if the document does not exist in the list yet
+                        _data.Documents.Add(document.Id, new DocumentInfo(document.Timestamp));
                 }
             }
             // Otherwise, create a new record...
             else
             {
-                _vocabulary.Add(term, new Dictionary<long, TermInfo>()
+                _data.Vocabulary.Add(term, new Dictionary<long, TermInfo>()
                 {
-                    { documentId, new TermInfo(frequency: 1) }
+                    { document.Id, new TermInfo(frequency: 1) }
                 });
+                if (!_data.Documents.ContainsKey(document.Id)) // Add only if the document does not exist in the list yet
+                    _data.Documents.Add(document.Id, new DocumentInfo(document.Timestamp));
             }
         }
 
@@ -113,9 +113,9 @@ namespace InformationRetrievalManager.NLP
             bool ok = false;
 
             // Deserialize
-            var result = _fileManager.DeserializeObjectFromBinFileAsync<SortedDictionary<string, Dictionary<long, TermInfo>>>($"{Constants.IndexDataStorageDir}/{Name}/{MakeFilename()}").Result;
-            short status = result.Item1;
-            object obj = result.Item2;
+            var result = _fileManager.DeserializeObjectFromBinFileAsync<Data>($"{Constants.IndexDataStorageDir}/{Name}/{MakeFilename()}").Result;
+            short status = result.ResultStatus;
+            object obj = result.ResultData;
 
             // Check deserialization result
             if (status == 2)
@@ -125,15 +125,16 @@ namespace InformationRetrievalManager.NLP
 
             if (status == 0 && obj != null)
             {
-                // Try to load vocabulary
-                var newVocabulary = obj as SortedDictionary<string, Dictionary<long, TermInfo>>;
-                if (newVocabulary != null)
+                // Try to load index data
+                var data = obj as Data;
+                if (data != null)
                 {
                     ok = true;
 
-                    _vocabulary.Clear();
-                    foreach (var item in newVocabulary)
-                        _vocabulary.Add(item.Key, item.Value);
+                    // Clear the previous data first
+                    _data.Clear();
+                    // Load new data
+                    _data.Load(data.Vocabulary, data.Documents);
                 }
                 else
                     _logger?.LogWarningSource($"Failed to load index '{Name}'. Inconsistent data.");
@@ -148,7 +149,7 @@ namespace InformationRetrievalManager.NLP
         /// <remarks>
         ///     <see cref="_fileManager"/> must exists, otherwise <see langword="true"/> on return.
         /// </remarks>
-        public bool Save()
+        public bool Save(Action<string> setProgressMessage = null)
         {
             if (_fileManager == null)
                 return true;
@@ -156,7 +157,7 @@ namespace InformationRetrievalManager.NLP
             bool ok = false;
 
             // Serialize
-            short status = _fileManager.SerializeObjectToBinFileAsync(_vocabulary, $"{Constants.IndexDataStorageDir}/{Name}/{MakeFilename()}").Result;
+            short status = _fileManager.SerializeObjectToBinFileAsync(_data, $"{Constants.IndexDataStorageDir}/{Name}/{MakeFilename()}", setProgressMessage).Result;
 
             // Check serialization result
             if (status == 0)
@@ -168,7 +169,7 @@ namespace InformationRetrievalManager.NLP
 
             // Clear vocabulary from memory if it is saved successfully
             if (ok)
-                _vocabulary.Clear();
+                _data.Clear();
 
             return ok;
         }
@@ -184,6 +185,97 @@ namespace InformationRetrievalManager.NLP
         private string MakeFilename()
         {
             return $"{Name}_{_timestamp.Year}_{_timestamp.Month}_{_timestamp.Day}_{_timestamp.Hour}_{_timestamp.Minute}_{_timestamp.Second}.idx";
+        }
+
+        #endregion
+
+        #region Data Class
+
+        /// <summary>
+        /// Index data structure definition
+        /// </summary>
+        [MessagePackObject]
+        public sealed class Data
+        {
+            #region Public Properties
+
+            /// <summary>
+            /// Vocabulary of the inverted index data.
+            /// </summary>
+            /// <remarks>
+            ///     SortedDictionary { Key=term, Value=posting list }, 
+            ///     (posting list) Dictionary { Key=DocumentId, Value=TermInfo obj }
+            /// </remarks>
+            [Key(nameof(Data) + nameof(Vocabulary))]
+            public SortedDictionary<string, Dictionary<long, TermInfo>> Vocabulary { get; set; } = new SortedDictionary<string, Dictionary<long, TermInfo>>();
+
+            /// <summary>
+            /// Documents of the inverted index.
+            /// </summary>
+            /// <remarks>
+            ///     Dictionary { Key=DocumentId, Value=DocumentInfo obj }
+            /// </remarks>
+            [Key(nameof(Data) + nameof(Documents))]
+            public Dictionary<long, DocumentInfo> Documents { get; set; } = new Dictionary<long, DocumentInfo>();
+
+            #endregion
+
+            #region Public Methods
+
+            /// <summary>
+            /// Load data into the data structure.
+            /// </summary>
+            public void Load(SortedDictionary<string, Dictionary<long, TermInfo>> vocabulary, Dictionary<long, DocumentInfo> documents)
+            {
+                Vocabulary = vocabulary;
+                Documents = documents;
+            }
+
+            /// <summary>
+            /// Clear data the data.
+            /// </summary>
+            public void Clear()
+            {
+                Vocabulary.Clear();
+                Documents.Clear();
+            }
+
+            #endregion
+        }
+
+        /// <summary>
+        /// Read-only wrapper for <see cref="Data"/>.
+        /// </summary>
+        public sealed class ReadOnlyData
+        {
+            #region Public Properties
+
+            public IReadOnlyDictionary<string, IReadOnlyDictionary<long, IReadOnlyTermInfo>> Vocabulary { get; }
+            public IReadOnlyDictionary<long, IReadOnlyDocumentInfo> Documents { get; } = null;
+
+            #endregion
+
+            #region Constructor
+
+            /// <summary>
+            /// Default constructor (internal)
+            /// </summary>
+            internal ReadOnlyData(SortedDictionary<string, Dictionary<long, TermInfo>> vocabulary, Dictionary<long, DocumentInfo> documents)
+            {
+                Vocabulary = vocabulary.ToDictionary(o => o.Key, o => (IReadOnlyDictionary<long, IReadOnlyTermInfo>)o.Value.ToDictionary(x => x.Key, x => (IReadOnlyTermInfo)x.Value));
+                Documents = documents.ToDictionary(o => o.Key, o => (IReadOnlyDocumentInfo)o.Value);
+            }
+
+            /// <summary>
+            /// Constructor (internal) with setting the vocabulary only.
+            /// </summary>
+            internal ReadOnlyData(SortedDictionary<string, Dictionary<long, TermInfo>> vocabulary, IReadOnlyDictionary<long, IReadOnlyDocumentInfo> documents)
+            {
+                Vocabulary = vocabulary.ToDictionary(o => o.Key, o => (IReadOnlyDictionary<long, IReadOnlyTermInfo>)o.Value.ToDictionary(x => x.Key, x => (IReadOnlyTermInfo)x.Value));
+                Documents = documents;
+            }
+
+            #endregion
         }
 
         #endregion

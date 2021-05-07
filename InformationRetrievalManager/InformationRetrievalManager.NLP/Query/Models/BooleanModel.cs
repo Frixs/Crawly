@@ -24,7 +24,7 @@ namespace InformationRetrievalManager.NLP
         /// <summary>
         /// Results made by the query based on its data
         /// </summary>
-        private long[] _queryResults = Array.Empty<long>();
+        private SortedSet<(long DocumentId, DateTime DocumentTimestamp)> _queryResults;
 
         #endregion
 
@@ -44,83 +44,24 @@ namespace InformationRetrievalManager.NLP
         #region Interface Methods
 
         /// <inheritdoc/>
-        public void CalculateData(IReadOnlyDictionary<string, IReadOnlyDictionary<long, IReadOnlyTermInfo>> data, out long totalDocuments, Action<string> setProgressMessage = null, CancellationToken cancellationToken = default)
+        public void CalculateData(InvertedIndex.ReadOnlyData data, Action<string> setProgressMessage = null, CancellationToken cancellationToken = default)
         {
             if (data == null)
                 throw new ArgumentNullException("Data not specified!");
-
-            // Set of all document IDs found among terms
-            var documents = new HashSet<long>();
-
-            // Count all documents
-            long i = 0;
-            foreach (var term in data)
-            {
-                i++;
-
-                foreach (var termDocument in term.Value)
-                {
-                    // Check for cancelation
-                    if (cancellationToken.IsCancellationRequested)
-                        break;
-
-                    if (termDocument.Key < 0)
-                        continue;
-
-                    documents.Add(termDocument.Key);
-                }
-
-                // Check for cancelation
-                if (cancellationToken.IsCancellationRequested)
-                    break;
-
-                setProgressMessage?.Invoke($"counting documents - {i}/{data.Count}");
-            }
-
-            // Save the document count
-            totalDocuments = documents.Count;
 
             // Log it
             _logger?.LogDebugSource("Data has been successfully calculated.");
             setProgressMessage?.Invoke("data done");
         }
-
+        
         /// <inheritdoc/>
-        public void CalculateQuery(string query, IReadOnlyDictionary<string, IReadOnlyDictionary<long, IReadOnlyTermInfo>> data, IndexProcessingConfiguration processingConfiguration, Action<string> setProgressMessage = null, CancellationToken cancellationToken = default)
+        public void CalculateQuery(InvertedIndex.ReadOnlyData data, string query, IndexProcessingConfiguration processingConfiguration, Action<string> setProgressMessage = null, CancellationToken cancellationToken = default)
         {
             if (query == null || data == null)
                 throw new ArgumentNullException("Data not specified!");
 
             // (Re)Initialize the values
-            _queryResults = Array.Empty<long>();
-
-            // Set of all document IDs found among terms
-            var documents = new HashSet<long>();
-
-            // Get all document IDs
-            long i = 0;
-            foreach (var term in data)
-            {
-                i++;
-
-                foreach (var termDocument in term.Value)
-                {
-                    // Check for cancelation
-                    if (cancellationToken.IsCancellationRequested)
-                        break;
-
-                    if (termDocument.Key < 0)
-                        continue;
-
-                    documents.Add(termDocument.Key);
-                }
-
-                // Check for cancelation
-                if (cancellationToken.IsCancellationRequested)
-                    break;
-
-                setProgressMessage?.Invoke($"getting document IDs - {i}/{data.Count}");
-            }
+            _queryResults = new SortedSet<(long DocumentId, DateTime DocumentTimestamp)>();
 
             // Query parser
             var parser = new QueryBooleanExpressionParser();
@@ -142,24 +83,24 @@ namespace InformationRetrievalManager.NLP
             // If the query is successfully parsed...
             if (queryParsed != null)
             {
-                var results = new List<long>();
-                i = 0;
-                foreach (var documentId in documents)
+                var results = new SortedSet<(long DocumentId, DateTime DocumentTimestamp)>(new DocumentComparer());
+                long i = 0;
+                foreach (KeyValuePair<long, IReadOnlyDocumentInfo> doc in data.Documents) // Key = Document ID
                 {
                     i++;
                     // Check for cancelation
                     if (cancellationToken.IsCancellationRequested)
                         break;
 
-                    if (queryParsed.Evaluate(new DocumentTermEvaluator(documentId, data, processingConfiguration)))
+                    if (queryParsed.Evaluate(new DocumentTermEvaluator(doc.Key, data, processingConfiguration)))
                         // document accepted
-                        results.Add(documentId);
+                        results.Add((doc.Key, doc.Value.Timestamp));
 
-                    setProgressMessage?.Invoke($"evaluating documents - {i}/{documents.Count}");
+                    setProgressMessage?.Invoke($"evaluating documents - {i}/{data.Documents.Count}");
                 }
 
-                // Sort
-                _queryResults = results.OrderBy(o => o).ToArray();
+                // Assign to query results
+                _queryResults = results;
 
                 // Log it
                 _logger?.LogDebugSource("Query has been successfully calculated and data prepared.");
@@ -174,18 +115,24 @@ namespace InformationRetrievalManager.NLP
         }
 
         /// <inheritdoc/>
-        public long[] CalculateBestMatch(int select, out long foundDocuments, Action<string> setProgressMessage = null, CancellationToken cancellationToken = default)
+        public long[] CalculateBestMatch(InvertedIndex.ReadOnlyData data, int select, out long foundDocuments, Action<string> setProgressMessage = null, CancellationToken cancellationToken = default)
         {
+            if (data == null)
+                throw new ArgumentNullException("Data not specified!");
+
+            if (select < 0)
+                throw new InvalidCastException($"Parameter '{nameof(select)}' cannot be negative number!");
+
             // The calculations are made in the query method due to parameter limitations.
             // Cancellation is not needed here
 
             setProgressMessage?.Invoke("retrieving results");
 
-            foundDocuments = _queryResults.Length;
+            foundDocuments = _queryResults.Count;
 
             if (select > 0)
-                return _queryResults.Take(select).ToArray();
-            return _queryResults;
+                return _queryResults.Take(select).Select(o => o.DocumentId).ToArray();
+            return _queryResults.Select(o => o.DocumentId).ToArray();
         }
 
         #endregion
@@ -199,14 +146,14 @@ namespace InformationRetrievalManager.NLP
         {
             private readonly IndexProcessing _processing;
             public readonly long documentId;
-            public readonly IReadOnlyDictionary<string, IReadOnlyDictionary<long, IReadOnlyTermInfo>> data;
+            public readonly InvertedIndex.ReadOnlyData data;
 
             /// <summary>
             /// Default constructor
             /// </summary>
             /// <param name="documentId">Document ID for which the evaluation is made.</param>
-            /// <param name="data">Documents data(<see cref="InvertedIndex._vocabulary"/>)</param>
-            public DocumentTermEvaluator(long documentId, IReadOnlyDictionary<string, IReadOnlyDictionary<long, IReadOnlyTermInfo>> data, IndexProcessingConfiguration processingConfiguration)
+            /// <param name="data">Documents data(<see cref="InvertedIndex._data"/>)</param>
+            public DocumentTermEvaluator(long documentId, InvertedIndex.ReadOnlyData data, IndexProcessingConfiguration processingConfiguration)
             {
                 if (documentId < 0)
                     throw new ArgumentNullException("Invalid document ID!");
@@ -252,10 +199,10 @@ namespace InformationRetrievalManager.NLP
                 foreach (var term in terms)
                 {
                     // Chech if the term exists in the data...
-                    if (data.ContainsKey(term))
+                    if (data.Vocabulary.ContainsKey(term))
                     {
                         bool foundTerm = false;
-                        foreach (var termDocument in data[term])
+                        foreach (var termDocument in data.Vocabulary[term])
                         {
                             if (termDocument.Key == documentId)
                             {
@@ -279,6 +226,28 @@ namespace InformationRetrievalManager.NLP
                         break;
                     }
                 }
+
+                return result;
+            }
+        }
+
+        #endregion
+
+        #region Comparer Class
+
+        /// <summary>
+        /// Document comparer to skip necessary sorting
+        /// </summary>
+        private class DocumentComparer : IComparer<(long DocumentId, DateTime DocumentTimestamp)>
+        {
+            public int Compare((long DocumentId, DateTime DocumentTimestamp) x, (long DocumentId, DateTime DocumentTimestamp) y)
+            {
+                // By Timestamp
+                int result = y.DocumentTimestamp.CompareTo(x.DocumentTimestamp);
+
+                // Then by document ID
+                if (result == 0)
+                    result = x.DocumentId.CompareTo(y.DocumentId);
 
                 return result;
             }

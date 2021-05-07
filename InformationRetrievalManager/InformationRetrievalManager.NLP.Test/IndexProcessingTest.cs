@@ -65,7 +65,7 @@ namespace InformationRetrievalManager.NLP.Test
             #region Act
 
             _processing.IndexDocument(text);
-            var vocabulary = _processing.InvertedIndex.GetReadOnlyVocabulary();
+            var vocabulary = _processing.InvertedIndex.GetReadOnlyData().Vocabulary;
             PrintWordFrequencies(vocabulary);
 
             #endregion
@@ -94,7 +94,7 @@ namespace InformationRetrievalManager.NLP.Test
             #region Act
 
             _processing.IndexDocument(text);
-            var vocabulary = _processing.InvertedIndex.GetReadOnlyVocabulary();
+            var vocabulary = _processing.InvertedIndex.GetReadOnlyData().Vocabulary;
             PrintWordFrequencies(vocabulary);
 
             #endregion
@@ -123,7 +123,7 @@ namespace InformationRetrievalManager.NLP.Test
             #region Act
 
             _processing.IndexDocument(text);
-            var vocabulary = _processing.InvertedIndex.GetReadOnlyVocabulary();
+            var vocabulary = _processing.InvertedIndex.GetReadOnlyData().Vocabulary;
             PrintWordFrequencies(vocabulary);
 
             #endregion
@@ -157,7 +157,7 @@ namespace InformationRetrievalManager.NLP.Test
             _processing.IndexDocument(text1);
             _processing.IndexDocument(text2);
             _processing.IndexDocument(text3);
-            var vocabulary = _processing.InvertedIndex.GetReadOnlyVocabulary();
+            var vocabulary = _processing.InvertedIndex.GetReadOnlyData().Vocabulary;
             PrintWordFrequencies(vocabulary);
 
             #endregion
@@ -198,7 +198,7 @@ namespace InformationRetrievalManager.NLP.Test
             _processing.IndexDocument(text4);
             _processing.IndexDocument(text5);
             _processing.IndexDocument(text6);
-            var vocabulary = _processing.InvertedIndex.GetReadOnlyVocabulary();
+            var vocabulary = _processing.InvertedIndex.GetReadOnlyData().Vocabulary;
             PrintWordFrequencies(vocabulary);
 
             #endregion
@@ -232,7 +232,7 @@ namespace InformationRetrievalManager.NLP.Test
 
             _processing.IndexDocument(text1);
             _processing.IndexDocument(text2);
-            var vocabulary = _processing.InvertedIndex.GetReadOnlyVocabulary();
+            var vocabulary = _processing.InvertedIndex.GetReadOnlyData().Vocabulary;
             PrintWordFrequencies(vocabulary);
 
             #endregion
@@ -270,7 +270,7 @@ namespace InformationRetrievalManager.NLP.Test
             _processing.IndexDocument(text3);
             _processing.IndexDocument(text4);
             _processing.IndexDocument(text5);
-            var vocabulary = _processing.InvertedIndex.GetReadOnlyVocabulary();
+            var vocabulary = _processing.InvertedIndex.GetReadOnlyData().Vocabulary;
             PrintWordFrequencies(vocabulary);
 
             #endregion
@@ -309,7 +309,7 @@ namespace InformationRetrievalManager.NLP.Test
             _processing.IndexDocument(text2);
             _processing.IndexDocument(text3);
             _processing.IndexDocument(text4);
-            var vocabulary = _processing.InvertedIndex.GetReadOnlyVocabulary();
+            var vocabulary = _processing.InvertedIndex.GetReadOnlyData().Vocabulary;
             PrintWordFrequencies(vocabulary);
 
             #endregion
@@ -352,7 +352,7 @@ namespace InformationRetrievalManager.NLP.Test
             _processing.IndexDocument(text4);
             _processing.IndexDocument(text5);
             _processing.IndexDocument(text6);
-            var vocabulary = _processing.InvertedIndex.GetReadOnlyVocabulary();
+            var vocabulary = _processing.InvertedIndex.GetReadOnlyData().Vocabulary;
             PrintWordFrequencies(vocabulary);
 
             #endregion
@@ -403,7 +403,7 @@ namespace InformationRetrievalManager.NLP.Test
             _processing.IndexDocument(text2);
             _processing.IndexDocument(text3);
             _processing.IndexDocument(text4);
-            var vocabulary = _processing.InvertedIndex.GetReadOnlyVocabulary();
+            var vocabulary = _processing.InvertedIndex.GetReadOnlyData().Vocabulary;
             PrintWordFrequencies(vocabulary);
 
             #endregion
@@ -454,7 +454,7 @@ namespace InformationRetrievalManager.NLP.Test
             #region Act
 
             _processing.IndexDocument(text);
-            var vocabulary = _processing.InvertedIndex.GetReadOnlyVocabulary();
+            var vocabulary = _processing.InvertedIndex.GetReadOnlyData().Vocabulary;
             PrintWordFrequencies(vocabulary);
 
             #endregion
