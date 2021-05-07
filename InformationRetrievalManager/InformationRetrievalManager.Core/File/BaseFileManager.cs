@@ -67,7 +67,7 @@ namespace InformationRetrievalManager.Core
         }
 
         /// <inheritdoc/>
-        public async Task<short> SerializeObjectToBinFileAsync<T>(T obj, string path)
+        public async Task<short> SerializeObjectToBinFileAsync<T>(T obj, string path, Action<string> setProgressMessage = null)
         {
             if (obj == null)
                 throw new ArgumentNullException(nameof(obj));
@@ -96,18 +96,24 @@ namespace InformationRetrievalManager.Core
                         {
                             // Write the data to the file, byte by byte.
                             for (int i = 0; i < data.Length; ++i)
+                            {
                                 stream.WriteByte(data[i]);
+                                setProgressMessage?.Invoke($"{Math.Floor((i + 1) / (double)data.Length * 100)}%");
+                            }
 
-                            // Set the stream position to the beginning of the file.
-                            stream.Seek(0, SeekOrigin.Begin);
+                            //// Set the stream position to the beginning of the file.
+                            //stream.Seek(0, SeekOrigin.Begin);
 
-                            // Read and verify the data.
-                            for (int i = 0; i < stream.Length; ++i)
-                                if (data[i] != stream.ReadByte())
-                                {
-                                    result = 2;
-                                    break;
-                                }
+                            //// Read and verify the data.
+                            //for (long i = 0; i < stream.Length; ++i)
+                            //{
+                            //    if (data[i] != stream.ReadByte())
+                            //    {
+                            //        result = 2;
+                            //        break;
+                            //    }
+                            //    setProgressMessage?.Invoke($"{Math.Floor((i + 1) / (double)stream.Length * 50 + 50)}%");
+                            //}
                         }
                     }
                     catch (FileNotFoundException)

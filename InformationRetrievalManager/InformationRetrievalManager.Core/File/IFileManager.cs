@@ -35,6 +35,7 @@ namespace InformationRetrievalManager.Core
         /// </summary>
         /// <param name="obj">The object</param>
         /// <param name="path">File path</param>
+        /// <param name="setProgressMessage">Action to retrieve progress data ("what is going on during processing").</param>
         /// <returns>
         ///     Status code:
         ///         0=OK, 
@@ -47,7 +48,7 @@ namespace InformationRetrievalManager.Core
         /// <remarks>
         ///     Method uses <see cref="MessagePackSerializer"/> from external library.
         /// </remarks>
-        Task<short> SerializeObjectToBinFileAsync<T>(T obj, string path);
+        Task<short> SerializeObjectToBinFileAsync<T>(T obj, string path, Action<string> setProgressMessage = null);
 
         /// <summary>
         /// Writes the text to the specified file.

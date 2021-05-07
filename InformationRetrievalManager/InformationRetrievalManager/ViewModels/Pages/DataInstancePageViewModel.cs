@@ -665,7 +665,7 @@ namespace InformationRetrievalManager
                                 IndexProcessingProgress = "Indexing...";
                                 var processing = new IndexProcessing(_dataInstance.Id.ToString(), indexTimestamp, _dataInstance.IndexProcessingConfiguration, _fileManager, _logger);
                                 processing.IndexDocuments(docs, save: true,
-                                    setProgressMessage: (value) => IndexProcessingProgress = $"Indexing... ({value})",
+                                    setProgressMessage: (value) => IndexProcessingProgress = value,
                                     cancellationToken: _indexProcessingTokenSource.Token);
 
                                 // If the cancelation is requested...

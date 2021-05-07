@@ -42,7 +42,8 @@ namespace InformationRetrievalManager.NLP
         ///         On the other hand, if the manager is not defined (<see cref="null"/>) the method does nothing and the in-memory data remains the same.
         ///     </para>
         /// </summary>
+        /// <param name="setProgressMessage">Action to retrieve progress data ("what is going on during processing").</param>
         /// <returns>Returns <see langword="true"/> on successful save, otherwise <see langword="false"/>.</returns>
-        bool Save();
+        bool Save(Action<string> setProgressMessage = null);
     }
 }

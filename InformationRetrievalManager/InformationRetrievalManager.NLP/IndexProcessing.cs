@@ -1,7 +1,6 @@
 ﻿using InformationRetrievalManager.Core;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
 using System.Threading;
 
 namespace InformationRetrievalManager.NLP
@@ -167,25 +166,29 @@ namespace InformationRetrievalManager.NLP
             // Load indexed data
             if (load && !cancellationToken.IsCancellationRequested)
             {
-                setProgressMessage?.Invoke("loading");
+                setProgressMessage?.Invoke("Loading index...");
                 _invertedIndex.Load();
             }
-            
+
             // Indexate documents
             for (long i = 0; i < documents.Length; ++i)
             {
                 if (cancellationToken.IsCancellationRequested)
                     break;
-                
+
                 IndexDocument(documents[i], false, false);
-                setProgressMessage?.Invoke($"{i}/{documents.Length}");
+                setProgressMessage?.Invoke($"Indexing... ({i}/{documents.Length})");
             }
 
             // Save indexed data
             if (save && !cancellationToken.IsCancellationRequested)
             {
-                setProgressMessage?.Invoke("saving");
-                _invertedIndex.Save();
+                setProgressMessage?.Invoke("Saving index...");
+                Action<string> savingProgressMessage = null;
+                if (setProgressMessage != null)
+                    savingProgressMessage = (value) => setProgressMessage?.Invoke($"Saving index... ({value})");
+
+                _invertedIndex.Save(savingProgressMessage);
             }
         }
 

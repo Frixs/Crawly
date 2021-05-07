@@ -149,7 +149,7 @@ namespace InformationRetrievalManager.NLP
         /// <remarks>
         ///     <see cref="_fileManager"/> must exists, otherwise <see langword="true"/> on return.
         /// </remarks>
-        public bool Save()
+        public bool Save(Action<string> setProgressMessage = null)
         {
             if (_fileManager == null)
                 return true;
@@ -157,7 +157,7 @@ namespace InformationRetrievalManager.NLP
             bool ok = false;
 
             // Serialize
-            short status = _fileManager.SerializeObjectToBinFileAsync(_data, $"{Constants.IndexDataStorageDir}/{Name}/{MakeFilename()}").Result;
+            short status = _fileManager.SerializeObjectToBinFileAsync(_data, $"{Constants.IndexDataStorageDir}/{Name}/{MakeFilename()}", setProgressMessage).Result;
 
             // Check serialization result
             if (status == 0)
