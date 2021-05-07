@@ -1,6 +1,5 @@
 ﻿using InformationRetrievalManager.Core;
 using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -15,7 +14,7 @@ namespace InformationRetrievalManager.NLP
         /// Query documents from the most relevant to the least.
         /// </summary>
         /// <param name="query">The query</param>
-        /// <param name="data"><see cref="InvertedIndex._vocabulary"/> - data used for query</param>
+        /// <param name="data"><see cref="InvertedIndex._data"/> - data used for query</param>
         /// <param name="modelType">Type of the model to use for querying.</param>
         /// <param name="configuration">Processing configuration to use for the query index processing.</param>
         /// <param name="select">Limit number of records to select (0 to ignore limit).</param>
@@ -28,7 +27,7 @@ namespace InformationRetrievalManager.NLP
         ///         3. No. of total searched documents.
         /// </returns>
         /// <exception cref="ArgumentNullException">Invalid parameters.</exception>
-        Task<(long[], long, long)> QueryAsync(string query, IReadOnlyDictionary<string, IReadOnlyDictionary<long, IReadOnlyTermInfo>> data, QueryModelType modelType, IndexProcessingConfiguration configuration, int select, Action<string> setProgressMessage, CancellationToken cancellationToken);
+        Task<(long[] Results, long FoundDocuments, long TotalDocuments)> QueryAsync(string query, InvertedIndex.ReadOnlyData data, QueryModelType modelType, IndexProcessingConfiguration configuration, int select, Action<string> setProgressMessage, CancellationToken cancellationToken);
 
         /// <summary>
         /// Resets model data that are saved from previous query calls. 

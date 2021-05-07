@@ -762,8 +762,8 @@ namespace InformationRetrievalManager
 
                 bool indexLoaded = false;
                 var ii = new InvertedIndex(_dataInstance.Id.ToString(), file.CreatedAt, _fileManager, _logger);
-
-                (long[], long, long) queryResult = (Array.Empty<long>(), -1, -1);
+                // Default query result
+                (long[] Results, long FoundDocuments, long TotalDocuments) queryResult = (Array.Empty<long>(), -1, -1);
 
                 await _taskManager.Run(async () =>
                 {
@@ -774,7 +774,7 @@ namespace InformationRetrievalManager
                     {
                         indexLoaded = true;
                         // Calculate the query and get results...
-                        var res = await _queryIndexManager.QueryAsync(query, ii.GetReadOnlyVocabulary(), 
+                        var res = await _queryIndexManager.QueryAsync(query, ii.GetReadOnlyData(), 
                             modelType: queryModel, _dataInstance.IndexProcessingConfiguration, select, 
                             setProgressMessage: (value) => QueryProgress = $"Processing... ({value})", 
                             cancellationToken: _queryTokenSource.Token);
@@ -802,9 +802,9 @@ namespace InformationRetrievalManager
                 }
 
                 // Go through the results...
-                for (int i = 0; i < queryResult.Item1.Length; ++i)
+                for (int i = 0; i < queryResult.Results.Length; ++i)
                 {
-                    var doc = _uow.IndexedDocuments.GetByID(queryResult.Item1[i]);
+                    var doc = _uow.IndexedDocuments.GetByID(queryResult.Results[i]);
                     if (doc != null)
                     {
                         ResultContext.Data.Add(new QueryDataResultViewContext.Result
@@ -827,8 +827,8 @@ namespace InformationRetrievalManager
                 // If no error occurred...
                 if (QueryErrorString == null)
                 {
-                    ResultContext.FoundDocuments = queryResult.Item2;
-                    ResultContext.TotalDocuments = queryResult.Item3;
+                    ResultContext.FoundDocuments = queryResult.FoundDocuments;
+                    ResultContext.TotalDocuments = queryResult.TotalDocuments;
                     // Fire update context property
                     OnPropertyChanged(nameof(ResultContext));
 

@@ -30,7 +30,7 @@ namespace InformationRetrievalManager.NLP
         /// Calculated document vectors based on the last run of <see cref="CalculateData"/>.
         /// </summary>
         private Dictionary<long, (uint Position, double Value)[]> _documentVectors = null;
-
+        
         /// <summary>
         /// Calculated query vector based on the last run of <see cref="CalculateQuery"/>.
         /// </summary>
@@ -54,7 +54,7 @@ namespace InformationRetrievalManager.NLP
         #region Interface Methods
 
         /// <inheritdoc/>
-        public void CalculateData(IReadOnlyDictionary<string, IReadOnlyDictionary<long, IReadOnlyTermInfo>> data, out long totalDocuments, Action<string> setProgressMessage = null, CancellationToken cancellationToken = default)
+        public void CalculateData(InvertedIndex.ReadOnlyData data, Action<string> setProgressMessage = null, CancellationToken cancellationToken = default)
         {
             if (data == null)
                 throw new ArgumentNullException("Data not specified!");
@@ -63,12 +63,9 @@ namespace InformationRetrievalManager.NLP
             _termIdf = new Dictionary<string, double>();
             _documentVectors = null;
 
-            // Set of all document IDs found among terms
-            var documents = new HashSet<long>();
-
             // Calculate term IDF
             long i = 0;
-            foreach (var term in data)
+            foreach (var term in data.Vocabulary)
             {
                 i++;
                 var termDocCount = 0;
@@ -83,7 +80,6 @@ namespace InformationRetrievalManager.NLP
                         continue;
 
                     termDocCount++;
-                    documents.Add(termDocument.Key);
                 }
 
                 // Check for cancelation
@@ -91,17 +87,16 @@ namespace InformationRetrievalManager.NLP
                     break;
 
                 // The IDF calculation
-                _termIdf[term.Key] = Math.Log(documents.Count / termDocCount, 10);
-                setProgressMessage?.Invoke($"data IDF calculation - {i}/{data.Count}");
+                _termIdf[term.Key] = Math.Log(data.Documents.Count / termDocCount, 10);
+                setProgressMessage?.Invoke($"data IDF calculation - {i}/{data.Vocabulary.Count}");
             }
-            totalDocuments = documents.Count;
 
             // Create array for document vectors
             var docVectors = new Dictionary<long, (uint Position, double Value)[]>();
 
             // Go through documents and create document vectors...
             i = 0;
-            foreach (var documentId in documents)
+            foreach (var documentId in data.Documents.Keys)
             {
                 i++;
                 // Check for cancelation
@@ -109,7 +104,7 @@ namespace InformationRetrievalManager.NLP
                     break;
 
                 docVectors[documentId] = CalculateDocumentVector(data, documentId, cancellationToken);
-                setProgressMessage?.Invoke($"calculating data vectors - {i}/{documents.Count}");
+                setProgressMessage?.Invoke($"calculating data vectors - {i}/{data.Documents.Count}");
             }
 
             // Save the vectors
@@ -121,7 +116,7 @@ namespace InformationRetrievalManager.NLP
         }
 
         /// <inheritdoc/>
-        public void CalculateQuery(string query, IReadOnlyDictionary<string, IReadOnlyDictionary<long, IReadOnlyTermInfo>> data, IndexProcessingConfiguration processingConfiguration, Action<string> setProgressMessage = null, CancellationToken cancellationToken = default)
+        public void CalculateQuery(InvertedIndex.ReadOnlyData data, string query, IndexProcessingConfiguration processingConfiguration, Action<string> setProgressMessage = null, CancellationToken cancellationToken = default)
         {
             if (query == null || data == null)
                 throw new ArgumentNullException("Data not specified!");
@@ -150,7 +145,7 @@ namespace InformationRetrievalManager.NLP
                 );
             var queryData = processing.IndexText(query);
 
-            _queryVector = CalculateDocumentVector(CreateQueryDataVocabulary(queryData, data), 0, cancellationToken);
+            _queryVector = CalculateDocumentVector(CreateQueryData(queryData, data), 0, cancellationToken);
 
             // Log it
             _logger?.LogDebugSource("Query has been successfully calculated into vector.");
@@ -158,10 +153,13 @@ namespace InformationRetrievalManager.NLP
         }
 
         /// <inheritdoc/>
-        public long[] CalculateBestMatch(int select, out long foundDocuments, Action<string> setProgressMessage = null, CancellationToken cancellationToken = default)
+        public long[] CalculateBestMatch(InvertedIndex.ReadOnlyData data, int select, out long foundDocuments, Action<string> setProgressMessage = null, CancellationToken cancellationToken = default)
         {
             var documentVectors = _documentVectors;
             var queryVector = _queryVector;
+
+            if (data == null)
+                throw new ArgumentNullException("Data not specified!");
 
             if (select < 0)
                 throw new InvalidCastException($"Parameter '{nameof(select)}' cannot be negative number!");
@@ -172,9 +170,9 @@ namespace InformationRetrievalManager.NLP
                 throw new InvalidOperationException("Query vector is not defined!");
 
             // Calculate cosine similarity for each document...
-            var results = new SortedSet<(long DocumentId, double Relevance)>(new DocumentComparer());
+            var results = new SortedSet<(long DocumentId, DateTime DocumentTimestamp, double Relevance)>(new DocumentComparer());
             long i = 0;
-            foreach (var document in documentVectors)
+            foreach (var document in documentVectors) // Key = document ID
             {
                 i++;
                 // Check for cancelation
@@ -182,7 +180,7 @@ namespace InformationRetrievalManager.NLP
                     break;
 
                 results.Add(
-                    (document.Key, CalculateCosSimilarity(queryVector, document.Value))
+                    (document.Key, data.Documents[document.Key].Timestamp, CalculateCosSimilarity(queryVector, document.Value))
                     );
                 setProgressMessage?.Invoke($"calculating cos-similarity - {i}/{documentVectors.Count}");
             }
@@ -191,7 +189,7 @@ namespace InformationRetrievalManager.NLP
             setProgressMessage?.Invoke("retrieving results");
             foundDocuments = results.Count;
             if (select > 0)
-                return results.Select(o => o.DocumentId).Take(select).ToArray();
+                return results.Take(select).Select(o => o.DocumentId).ToArray();
             return results.Select(o => o.DocumentId).ToArray();
         }
 
@@ -271,11 +269,11 @@ namespace InformationRetrievalManager.NLP
         /// <remarks>
         ///     Vector stores only non-zero values to optimize the TF-IDF calculation process.
         /// </remarks>
-        private (uint Position, double Value)[] CalculateDocumentVector(IReadOnlyDictionary<string, IReadOnlyDictionary<long, IReadOnlyTermInfo>> data, long documentId, CancellationToken cancellationToken = default)
+        private (uint Position, double Value)[] CalculateDocumentVector(InvertedIndex.ReadOnlyData data, long documentId, CancellationToken cancellationToken = default)
         {
             var docVector = new List<(uint Position, double Value)>();
             uint i = 0;
-            foreach (var term in data)
+            foreach (var term in data.Vocabulary)
             {
                 // Check for cancelation
                 if (cancellationToken.IsCancellationRequested)
@@ -299,27 +297,32 @@ namespace InformationRetrievalManager.NLP
         }
 
         /// <summary>
-        /// Map <paramref name="query"/> vocabulary into <paramref name="data"/> representing documents vocabulary.
+        /// Map <paramref name="query"/> vocabulary into <paramref name="documents"/> representing documents vocabulary.
         /// </summary>
-        /// <param name="query">The query vocabulary</param>
-        /// <param name="data">The document vocabulary</param>
+        /// <param name="query">The query data</param>
+        /// <param name="documents">The document data</param>
         /// <returns>Query vocabulary in scope of document vocabulary terms.</returns>
-        private IReadOnlyDictionary<string, IReadOnlyDictionary<long, IReadOnlyTermInfo>> CreateQueryDataVocabulary(IReadOnlyDictionary<string, IReadOnlyDictionary<long, IReadOnlyTermInfo>> query, IReadOnlyDictionary<string, IReadOnlyDictionary<long, IReadOnlyTermInfo>> data)
+        private InvertedIndex.ReadOnlyData CreateQueryData(InvertedIndex.ReadOnlyData query, InvertedIndex.ReadOnlyData documents)
         {
-            var result = new SortedDictionary<string, Dictionary<long, TermInfo>>();
-
-            foreach (var term in data)
+            var result = new InvertedIndex.Data();
+            
+            // Go through the document vocabulary...
+            foreach (var term in documents.Vocabulary)
             {
+                // Create default value for posting list
                 var postingList = new Dictionary<long, TermInfo>();
 
-                if (query.ContainsKey(term.Key))
-                    foreach (var document in query[term.Key])
-                        postingList.Add(document.Key, (TermInfo)document.Value);
+                // If the query vocabulary contains the same term as the documents have...
+                if (query.Vocabulary.ContainsKey(term.Key))
+                    // ...take the posting list from the query
+                    foreach (var doc in query.Vocabulary[term.Key])
+                        postingList.Add(doc.Key, (TermInfo)doc.Value);
 
-                result.Add(term.Key, postingList);
+                // Add posting list to the final result
+                result.Vocabulary.Add(term.Key, postingList);
             }
 
-            return result.ToDictionary(o => o.Key, o => (IReadOnlyDictionary<long, IReadOnlyTermInfo>)o.Value.ToDictionary(x => x.Key, x => (IReadOnlyTermInfo)x.Value)); ;
+            return new InvertedIndex.ReadOnlyData(result.Vocabulary, documents.Documents);
         }
 
         #endregion
@@ -329,12 +332,16 @@ namespace InformationRetrievalManager.NLP
         /// <summary>
         /// Document comparer to skip necessary sorting
         /// </summary>
-        private class DocumentComparer : IComparer<(long DocumentId, double Relevance)>
+        private class DocumentComparer : IComparer<(long DocumentId, DateTime DocumentTimestamp, double Relevance)>
         {
-            public int Compare((long DocumentId, double Relevance) x, (long DocumentId, double Relevance) y)
+            public int Compare((long DocumentId, DateTime DocumentTimestamp, double Relevance) x, (long DocumentId, DateTime DocumentTimestamp, double Relevance) y)
             {
                 // Firstly by relevance
                 int result = y.Relevance.CompareTo(x.Relevance);
+
+                // Then by document timestamp
+                if (result == 0)
+                    result = y.DocumentTimestamp.CompareTo(x.DocumentTimestamp);
 
                 // Then by document ID
                 if (result == 0)

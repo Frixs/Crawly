@@ -14,7 +14,7 @@ namespace InformationRetrievalManager.Core
     public class BaseFileManager : IFileManager
     {
         /// <inheritdoc/>
-        public async Task<(short, T)> DeserializeObjectFromBinFileAsync<T>(string path)
+        public async Task<(short ResultStatus, T ResultData)> DeserializeObjectFromBinFileAsync<T>(string path)
         {
             // Normalize path.
             path = NormalizedPath(path);

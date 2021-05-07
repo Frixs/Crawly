@@ -28,7 +28,7 @@ namespace InformationRetrievalManager.Core
         /// <remarks>
         ///     Method uses <see cref="MessagePackSerializer"/> from external library.
         /// </remarks>
-        Task<(short, T)> DeserializeObjectFromBinFileAsync<T>(string path);
+        Task<(short ResultStatus, T ResultData)> DeserializeObjectFromBinFileAsync<T>(string path);
 
         /// <summary>
         /// Serialize object into binary file

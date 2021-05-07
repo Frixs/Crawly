@@ -16,12 +16,12 @@ namespace InformationRetrievalManager.NLP
         string Name { get; }
 
         /// <summary>
-        /// Tranforms the index vocabulary to publicly manipulatable object.
+        /// Tranforms the index to publicly manipulatable object.
         /// </summary>
-        /// <returns>Index vocabulary</returns>
+        /// <returns>Index data</returns>
         /// <remarks>
-        ///     <see cref="InvertedIndex._vocabulary"/>
+        ///     the method transforms <see cref="InvertedIndex._data"/> into read only version (the method is NOT O(1) time complexity).
         /// </remarks>
-        IReadOnlyDictionary<string, IReadOnlyDictionary<long, IReadOnlyTermInfo>> GetReadOnlyVocabulary();
+        InvertedIndex.ReadOnlyData GetReadOnlyData();
     }
 }
