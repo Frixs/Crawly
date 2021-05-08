@@ -747,6 +747,7 @@ namespace InformationRetrievalManager
                                 if (fileReference != null)
                                 {
                                     // Commit index documents
+                                    _uow.TurnOffAutoDetectChanges(); // Turn off change auto detection to lightweight next code segment
                                     long i = 0;
                                     foreach (var doc in indexedDocuments)
                                     {
@@ -763,6 +764,8 @@ namespace InformationRetrievalManager
                                             break;
                                         }
                                     }
+                                    // Re-enable change auto detection back to default
+                                    _uow.TurnOnAutoDetectChanges();
 
                                     // Create index specific document array
                                     IndexDocument[] docs = new IndexDocument[fileReference.IndexedDocuments.Count];
@@ -785,6 +788,7 @@ namespace InformationRetrievalManager
                                     {
                                         _indexStorage.UpdateIndexFilename(_dataInstance.Id.ToString(), indexFile.CreatedAt, newIndexTimestamp);
                                         fileReference.Timestamp = newIndexTimestamp;
+                                        _uow.SaveChanges();
                                     }
 
                                     // If the cancelation is requested...

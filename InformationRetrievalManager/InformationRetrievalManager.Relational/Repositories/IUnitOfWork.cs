@@ -58,7 +58,6 @@ namespace InformationRetrievalManager.Relational
         /// Begin database transaction.
         /// </summary>
         /// <remarks>
-        ///     The transaction method turns OFF <see cref="ChangeTracker.AutoDetectChangesEnabled"/>! 
         ///     If the transaction already exists, this all will no be proceeded.
         /// </remarks>
         void BeginTransaction();
@@ -67,7 +66,6 @@ namespace InformationRetrievalManager.Relational
         /// Commit current database transaction.
         /// </summary>
         /// <remarks>
-        ///     The transaction method turns ON (re-enable) <see cref="ChangeTracker.AutoDetectChangesEnabled"/>! 
         ///     If the transaction does not exist, this all will no be proceeded.
         /// </remarks>
         void CommitTransaction();
@@ -76,10 +74,19 @@ namespace InformationRetrievalManager.Relational
         /// Rollback current database transaction.
         /// </summary>
         /// <remarks>
-        ///     The transaction method turns ON (re-enable) <see cref="ChangeTracker.AutoDetectChangesEnabled"/>! 
         ///     If the transaction does not exist, this all will no be proceeded.
         /// </remarks>
         void RollbackTransaction();
+
+        /// <summary>
+        /// Method turns ON (re-enable) <see cref="ChangeTracker.AutoDetectChangesEnabled"/>! 
+        /// </summary>
+        void TurnOnAutoDetectChanges();
+
+        /// <summary>
+        /// Method turns OFF <see cref="ChangeTracker.AutoDetectChangesEnabled"/>! 
+        /// </summary>
+        void TurnOffAutoDetectChanges();
 
         /// <summary>
         /// Makes sure the database of the context is correctly set up
