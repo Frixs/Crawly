@@ -330,7 +330,7 @@
                                         CommandParameter="{Binding DataFileEntry.Value, Mode=OneWay}"
                                         Content="{StaticResource FontAwesomeCodeIcon}"
                                         FontFamily="{StaticResource FontAwesomeSolid}"
-                                        ToolTip="Open Raw Data">
+                                        ToolTip="Open raw data">
                                         <Button.Style>
                                             <Style BasedOn="{StaticResource DarkLightButton}" TargetType="{x:Type Button}">
                                                 <Setter Property="Visibility" Value="Visible" />
@@ -359,7 +359,7 @@
                                         Content="{StaticResource FontAwesomeTrashAltIcon}"
                                         FontFamily="{StaticResource FontAwesomeSolid}"
                                         IsEnabled="{Binding CrawlerInWork, Converter={local:BooleanInvertConverter}, Mode=OneWay}"
-                                        ToolTip="Delete Data">
+                                        ToolTip="Delete data">
                                         <Button.Style>
                                             <Style BasedOn="{StaticResource DarkLightButton}" TargetType="{x:Type Button}">
                                                 <Setter Property="Visibility" Value="Visible" />
@@ -524,7 +524,7 @@
                                             Content="{StaticResource FontAwesomeTrashAltIcon}"
                                             FontFamily="{StaticResource FontAwesomeSolid}"
                                             IsEnabled="{Binding DeleteIndexFlag, Converter={local:BooleanInvertConverter}, Mode=OneWay}"
-                                            ToolTip="Delete Index">
+                                            ToolTip="Delete index">
                                             <Button.Style>
                                                 <Style BasedOn="{StaticResource DarkLightButton}" TargetType="{x:Type Button}">
                                                     <Setter Property="Visibility" Value="Visible" />
@@ -611,7 +611,7 @@
                                     Margin="182,0,0,0"
                                     HorizontalAlignment="Center"
                                     DataContext="{Binding QuerySelectLimitEntry, Mode=OneWay}"
-                                    ToolTip="Result Selection Limit">
+                                    ToolTip="Result selection limit">
                                     <local:IntegerEntry.Style>
                                         <Style TargetType="{x:Type local:IntegerEntry}">
                                             <Setter Property="IsEnabled" Value="False" />
