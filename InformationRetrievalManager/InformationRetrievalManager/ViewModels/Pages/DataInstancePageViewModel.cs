@@ -674,21 +674,8 @@ namespace InformationRetrievalManager
                 IndexProcessingProgress = "Starting...";
                 await _taskManager.Run(async () =>
                 {
-                    CrawlerDataModel[] data = null;
-                    // Deserialize JSON directly from the file
-                    try
-                    {
-                        using (StreamReader sr = File.OpenText(file.FilePath))
-                        {
-                            JsonSerializer jsonSerializer = new JsonSerializer();
-                            data = (CrawlerDataModel[])jsonSerializer.Deserialize(sr, typeof(CrawlerDataModel[]));
-                        }
-                    }
-                    catch
-                    {
-                        // Corrupted data file
-                        data = null;
-                    }
+                    // Deserialize data
+                    CrawlerDataModel[] data = DeserializeData(file);
 
                     // If any data...
                     if (data != null && data.Length > 0)
@@ -705,61 +692,12 @@ namespace InformationRetrievalManager
                         bool anyIndexedData = false;
                         for (int i = 0; i < data.Length; ++i)
                         {
-                            var model = new IndexedDocumentDataModel
-                            {
-                                Title = data[i].Title == null ? null : Regex.Replace(StringHelpers.ReplaceNewLines(data[i].Title, " "), @"[ ]+", " ").Trim(),
-                                Category = data[i].Category == null ? null : Regex.Replace(StringHelpers.ReplaceNewLines(data[i].Category, " "), @"[ ]+", " ").Trim(),
-                                Timestamp = data[i].Timestamp,
-                                SourceUrl = data[i].SourceUrl,
-                                Content = data[i].Content == null ? null : StringHelpers.ShortenWithDots(Regex.Replace(StringHelpers.ReplaceNewLines(data[i].Content, " "), @"[ ]+", " ").Trim(), IndexedDocumentDataModel.Content_MaxLength - 3)
-                            };
-
-                            // Validate, if no errors...
-                            // ...otherwise ignore non-valid documents
-                            if (ValidationHelpers.ValidateModel(model).Count == 0)
-                            {
-                                bool validForAddition = false;
-                                // If append mode is ON...
-                                // ...additional validation is required
-                                if (isAppendMode)
-                                {
-                                    if (appendMode == IndexAppendMode.Free)
-                                    {
-                                        validForAddition = true;
-                                    }
-                                    else if (appendMode == IndexAppendMode.Timestamp)
-                                    {
-                                        if (DateTime.Compare(model.Timestamp, appendTimestampThreshold) < 0)
-                                            break;
-                                        else
-                                            validForAddition = true;
-                                    }
-                                    else if (appendMode == IndexAppendMode.Title)
-                                    {
-                                        if (_uow.IndexedDocuments.Get(o => o.Title.Equals(model.Title)).Any())
-                                            break;
-                                        else
-                                            validForAddition = true;
-                                    }
-                                    else if (appendMode == IndexAppendMode.TitleAll)
-                                    {
-                                        if (!_uow.IndexedDocuments.Get(o => o.Title.Equals(model.Title)).Any())
-                                            validForAddition = true;
-                                    }
-                                }
-                                // Otherwise, all fine...
-                                else
-                                {
-                                    validForAddition = true;
-                                }
-
-                                // If document is valid for indexation...
-                                if (validForAddition)
-                                {
-                                    anyIndexedData = true;
-                                    indexedDocuments.Add(model);
-                                }
-                            }
+                            // Preprocess document
+                            var status = IndexProcessingPreprocessDocument(data[i], indexedDocuments, isAppendMode, appendMode, appendTimestampThreshold);
+                            if (status == 2)
+                                break;
+                            else if (status == 0)
+                                anyIndexedData = true;
 
                             IndexProcessingProgress = $"Preprocessing documents... ({i}/{data.Length})";
 
@@ -1642,6 +1580,112 @@ namespace InformationRetrievalManager
                 IndexFileEntry.Value = _indexFileSelection[0]; // Default selected value
                 AppendIndexFileEntry.Value = _indexFileSelection[0]; // Default selected value
             }
+        }
+
+        /// <summary>
+        /// Deserialize crawled data.
+        /// </summary>
+        /// <param name="file">The file to deserialize the data from.</param>
+        /// <returns>The data or <see langword="null"/> on failure.</returns>
+        private CrawlerDataModel[] DeserializeData(DataFileInfo file)
+        {
+            CrawlerDataModel[] data = null;
+            // Deserialize JSON directly from the file
+            try
+            {
+                using (StreamReader sr = File.OpenText(file.FilePath))
+                {
+                    JsonSerializer jsonSerializer = new JsonSerializer();
+                    data = (CrawlerDataModel[])jsonSerializer.Deserialize(sr, typeof(CrawlerDataModel[]));
+                }
+            }
+            catch
+            {
+                // Corrupted data file
+                data = null;
+            }
+
+            return data;
+        }
+
+        #endregion
+
+        #region Private Helper Methods
+
+        /// <summary>
+        /// Preprocess document data and add them into <paramref name="indexedDocuments"/> if valid.
+        /// </summary>
+        /// <param name="data">The document data.</param>
+        /// <param name="indexedDocuments">The final indexed collection.</param>
+        /// <param name="isAppendMode">Indication for append mode.</param>
+        /// <param name="appendMode">Append mode option (only required if <paramref name="appendMode"/> is <see langword="true"/>).</param>
+        /// <param name="appendTimestampThreshold">Append mode timestamp threshold (only required if <paramref name="appendMode"/> is <see langword="true"/> and <paramref name="appendMode"/> is <see cref="IndexAppendMode.Timestamp"/>).</param>
+        /// <returns>
+        ///     0=(OK), 
+        ///     1=(Document added to the final collection),
+        ///     2=(Index stop condition reached)
+        /// </returns>
+        private byte IndexProcessingPreprocessDocument(CrawlerDataModel data, Collection<IndexedDocumentDataModel> indexedDocuments, bool isAppendMode, IndexAppendMode appendMode = default, DateTime appendTimestampThreshold = default)
+        {
+            byte result = 1;
+
+            var model = new IndexedDocumentDataModel
+            {
+                Title = data.Title == null ? null : Regex.Replace(StringHelpers.ReplaceNewLines(data.Title, " "), @"[ ]+", " ").Trim(),
+                Category = data.Category == null ? null : Regex.Replace(StringHelpers.ReplaceNewLines(data.Category, " "), @"[ ]+", " ").Trim(),
+                Timestamp = data.Timestamp,
+                SourceUrl = data.SourceUrl,
+                Content = data.Content == null ? null : StringHelpers.ShortenWithDots(Regex.Replace(StringHelpers.ReplaceNewLines(data.Content, " "), @"[ ]+", " ").Trim(), IndexedDocumentDataModel.Content_MaxLength - 3)
+            };
+
+            // Validate, if no errors...
+            // ...otherwise ignore non-valid documents
+            if (ValidationHelpers.ValidateModel(model).Count == 0)
+            {
+                bool validForAddition = false;
+                // If append mode is ON...
+                // ...additional validation is required
+                if (isAppendMode)
+                {
+                    if (appendMode == IndexAppendMode.Free)
+                    {
+                        validForAddition = true;
+                    }
+                    else if (appendMode == IndexAppendMode.Timestamp)
+                    {
+                        if (DateTime.Compare(model.Timestamp, appendTimestampThreshold) < 0)
+                            result = 2;
+                        else
+                            validForAddition = true;
+                    }
+                    else if (appendMode == IndexAppendMode.Title)
+                    {
+                        if (_uow.IndexedDocuments.Get(o => o.Title.Equals(model.Title)).Any())
+                            result = 2;
+                        else
+                            validForAddition = true;
+                    }
+                    else if (appendMode == IndexAppendMode.TitleAll)
+                    {
+                        if (!_uow.IndexedDocuments.Get(o => o.Title.Equals(model.Title)).Any())
+                            validForAddition = true;
+                    }
+                }
+                // Otherwise, all fine...
+                else
+                {
+                    validForAddition = true;
+                }
+
+                // If document is valid for indexation...
+                if (validForAddition)
+                {
+                    result = 0;
+                    indexedDocuments.Add(model);
+                }
+            }
+
+            return result;
         }
 
         #endregion
