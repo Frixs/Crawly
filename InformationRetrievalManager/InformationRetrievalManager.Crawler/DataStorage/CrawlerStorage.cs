@@ -1,4 +1,5 @@
 ﻿using InformationRetrievalManager.Core;
+using Ixs.DNA;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
@@ -78,17 +79,17 @@ namespace InformationRetrievalManager.Crawler
             // Save data into files
             // HTML
             await _fileManager.WriteTextToFileAsync(
-                url + Environment.NewLine + contentHtml + Environment.NewLine + Environment.NewLine + Environment.NewLine, $"{crawledDataDirPath}/{MakeFilename(_contentHtmlFilename, crawler.CrawlingTimestamp)}", 
+                url + Environment.NewLine + contentHtml + Environment.NewLine + Environment.NewLine + Environment.NewLine, $"{crawledDataDirPath}/{MakeFilename(_contentHtmlFilename, crawler.CrawlingTimestamp)}",
                 true
                 );
             // Minified
             await _fileManager.WriteTextToFileAsync(
-                url + Environment.NewLine + contentTextMin + Environment.NewLine + Environment.NewLine + Environment.NewLine, $"{crawledDataDirPath}/{MakeFilename(_contentMinFilename, crawler.CrawlingTimestamp)}", 
+                url + Environment.NewLine + contentTextMin + Environment.NewLine + Environment.NewLine + Environment.NewLine, $"{crawledDataDirPath}/{MakeFilename(_contentMinFilename, crawler.CrawlingTimestamp)}",
                 true
                 );
             // Tidyfied
             await _fileManager.WriteTextToFileAsync(
-                url + Environment.NewLine + contentText + Environment.NewLine + Environment.NewLine + Environment.NewLine, $"{crawledDataDirPath}/{MakeFilename(_contentTidyFilename, crawler.CrawlingTimestamp)}", 
+                url + Environment.NewLine + contentText + Environment.NewLine + Environment.NewLine + Environment.NewLine, $"{crawledDataDirPath}/{MakeFilename(_contentTidyFilename, crawler.CrawlingTimestamp)}",
                 true
                 );
 
@@ -126,18 +127,25 @@ namespace InformationRetrievalManager.Crawler
 
             var result = new List<string>();
 
-            if (Directory.Exists(Constants.CrawlerDataStorageDir))
+            try
             {
-                // Get all crawler directories...
-                string[] dirs = Directory.GetDirectories(Constants.CrawlerDataStorageDir);
-                for (int i = 0; i < dirs.Length; ++i)
-                    // Find the one specific for the searched crawler...
-                    if (Path.GetFileName(dirs[i]).StartsWith(cid))
-                    {
-                        result.AddRange(
-                            Directory.GetFiles(dirs[i])
-                            );
-                    }
+                if (Directory.Exists(Constants.CrawlerDataStorageDir))
+                {
+                    // Get all crawler directories...
+                    string[] dirs = Directory.GetDirectories(Constants.CrawlerDataStorageDir);
+                    for (int i = 0; i < dirs.Length; ++i)
+                        // Find the one specific for the searched crawler...
+                        if (Path.GetFileName(dirs[i]).StartsWith(cid))
+                        {
+                            result.AddRange(
+                                Directory.GetFiles(dirs[i])
+                                );
+                        }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogErrorSource($"{ex.GetType()}: {ex.Message}");
             }
 
             return result.ToArray();
@@ -149,18 +157,25 @@ namespace InformationRetrievalManager.Crawler
             if (cid == null)
                 throw new ArgumentNullException("Crawler ID is not defined!");
 
-            if (Directory.Exists(Constants.CrawlerDataStorageDir))
+            try
             {
-                // Get all crawler directories...
-                string[] dirs = Directory.GetDirectories(Constants.CrawlerDataStorageDir);
-                for (int i = 0; i < dirs.Length; ++i)
-                    // Find the one specific for the searched crawler...
-                    if (Path.GetFileName(dirs[i]).StartsWith(cid))
-                    {
-                        var filesToDelete = Directory.GetFiles(dirs[i]).Where(o => o.Contains(MakeFilename("", fileTimestamp, ""))).ToList();
-                        foreach (var file in filesToDelete)
-                            File.Delete(file);
-                    }
+                if (Directory.Exists(Constants.CrawlerDataStorageDir))
+                {
+                    // Get all crawler directories...
+                    string[] dirs = Directory.GetDirectories(Constants.CrawlerDataStorageDir);
+                    for (int i = 0; i < dirs.Length; ++i)
+                        // Find the one specific for the searched crawler...
+                        if (Path.GetFileName(dirs[i]).StartsWith(cid))
+                        {
+                            var filesToDelete = Directory.GetFiles(dirs[i]).Where(o => o.Contains(MakeFilename("", fileTimestamp, ""))).ToList();
+                            foreach (var file in filesToDelete)
+                                File.Delete(file);
+                        }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogErrorSource($"{ex.GetType()}: {ex.Message}");
             }
         }
 

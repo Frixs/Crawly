@@ -782,25 +782,24 @@ namespace InformationRetrievalManager
                                 // Begin DB-TRANSACTION
                                 _uow.BeginTransaction();
 
+                                var utcNow = DateTime.UtcNow;
+                                var newIndexTimestamp = new DateTime(utcNow.Year, utcNow.Month, utcNow.Day, utcNow.Hour, utcNow.Minute, utcNow.Second, DateTimeKind.Utc);
+
                                 IndexProcessingProgress = "Preparing documents...";
-                                DateTime indexTimestamp = default;
                                 // Create and Cmmmit file reference
                                 IndexedFileReferenceDataModel fileReference = null;
                                 // If append mode...
                                 if (isAppendMode)
                                 {
-                                    indexTimestamp = indexFile.CreatedAt;
-                                    fileReference = _uow.IndexedFileReferences.Get(o => DateTime.Compare(o.Timestamp, indexTimestamp) == 0).FirstOrDefault();
+                                    fileReference = _uow.IndexedFileReferences.Get(o => DateTime.Compare(o.Timestamp, indexFile.CreatedAt) == 0).FirstOrDefault();
                                 }
                                 // Otherwise, create new index file
                                 else
                                 {
-                                    var utcNow = DateTime.UtcNow;
-                                    indexTimestamp = new DateTime(utcNow.Year, utcNow.Month, utcNow.Day, utcNow.Hour, utcNow.Minute, utcNow.Second, DateTimeKind.Utc);
                                     fileReference = new IndexedFileReferenceDataModel
                                     {
                                         DataInstanceId = _dataInstance.Id,
-                                        Timestamp = indexTimestamp
+                                        Timestamp = newIndexTimestamp
                                     };
                                     _uow.IndexedFileReferences.Insert(fileReference);
                                     _uow.SaveChanges();
@@ -838,10 +837,17 @@ namespace InformationRetrievalManager
 
                                     // Indexate documents
                                     IndexProcessingProgress = "Indexing...";
-                                    var processing = new IndexProcessing(_dataInstance.Id.ToString(), indexTimestamp, _dataInstance.IndexProcessingConfiguration, _fileManager, _logger);
+                                    var processing = new IndexProcessing(_dataInstance.Id.ToString(), isAppendMode ? indexFile.CreatedAt : newIndexTimestamp, _dataInstance.IndexProcessingConfiguration, _fileManager, _logger);
                                     processing.IndexDocuments(docs, save: true, load: isAppendMode,
                                         setProgressMessage: (value) => IndexProcessingProgress = value,
                                         cancellationToken: _indexProcessingTokenSource.Token);
+
+                                    // Update index timestamp if appended...
+                                    if (isAppendMode)
+                                    {
+                                        _indexStorage.UpdateIndexFilename(_dataInstance.Id.ToString(), indexFile.CreatedAt, newIndexTimestamp);
+                                        fileReference.Timestamp = newIndexTimestamp;
+                                    }
 
                                     // If the cancelation is requested...
                                     if (_indexProcessingTokenSource.Token.IsCancellationRequested)
@@ -1199,7 +1205,7 @@ namespace InformationRetrievalManager
                     // Find and delete all the index files...
                     try
                     {
-                        var filePaths = _indexStorage.GetAllIndexFiles(_dataInstance.Id.ToString());
+                        var filePaths = _indexStorage.GetIndexFiles(_dataInstance.Id.ToString());
                         for (int i = 0; i < filePaths.Length; ++i)
                             File.Delete(filePaths[i]);
                     }
@@ -1307,7 +1313,7 @@ namespace InformationRetrievalManager
                     var crawlerFilePaths = _crawlerStorage.GetAllDataFiles(_dataInstance.Id.ToString());
                     for (int i = 0; i < crawlerFilePaths.Length; ++i)
                         File.Delete(crawlerFilePaths[i]);
-                    var indexFilePaths = _indexStorage.GetAllIndexFiles(_dataInstance.Id.ToString());
+                    var indexFilePaths = _indexStorage.GetIndexFiles(_dataInstance.Id.ToString());
                     for (int i = 0; i < indexFilePaths.Length; ++i)
                         File.Delete(indexFilePaths[i]);
                 }
@@ -1409,7 +1415,7 @@ namespace InformationRetrievalManager
                     .OrderByDescending(o => o.Timestamp)
                     .ToArray();
                 // Get real files (filepaths)
-                var filePaths = _indexStorage.GetAllIndexFiles(_dataInstance.Id.ToString());
+                var filePaths = _indexStorage.GetIndexFiles(_dataInstance.Id.ToString());
 
                 // Go through the file references...
                 for (int i = fileReferences.Length - 1; i >= 0; --i)
