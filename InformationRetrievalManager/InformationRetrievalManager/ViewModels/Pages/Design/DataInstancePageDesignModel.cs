@@ -20,8 +20,9 @@
         {
             DataLoaded = true;
             CrawlerInWork = true;
-            IndexProcessingInWorkFlag = true;
-            CurrentView = View.Configuration;
+            IndexProcessingInWorkFlag = false;
+            IsAppendMode = true;
+            CurrentView = View.Main;
         }
 
         #endregion

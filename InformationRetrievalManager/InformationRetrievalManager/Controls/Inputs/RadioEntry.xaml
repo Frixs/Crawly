@@ -43,12 +43,12 @@
             Grid.Row="1"
             Margin="0,0,0,3"
             Padding="0"
-            IsEnabled="{Binding IsReadOnly, Converter={local:BooleanInvertConverter}, Mode=OneWay}"
             HorizontalAlignment="Center"
             VerticalAlignment="Center"
             Command="{Binding OnCheckCommand, Mode=OneTime}"
             IsChecked="{Binding Value}"
-            GroupName="{Binding GroupName, Mode=OneWay}" />
+            GroupName="{Binding GroupName, Mode=OneWay}"
+            IsEnabled="{Binding IsReadOnly, Converter={local:BooleanInvertConverter}, Mode=OneWay}" />
 
         <!--  Description  -->
         <TextBlock

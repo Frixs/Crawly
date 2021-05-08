@@ -33,6 +33,7 @@ namespace InformationRetrievalManager.Crawler
         /// <param name="cid">The crawler identifier</param>
         /// <returns>Array of all data files (file paths).</returns>
         /// <exception cref="ArgumentNullException">Crawler ID is not defined.</exception>
+        /// <exception cref="Exception">Unknown error - related to IO.</exception>
         /// <remarks>
         ///     Make sure to check the crawler is not crawling at the moment of getting data files.
         /// </remarks>
@@ -44,6 +45,7 @@ namespace InformationRetrievalManager.Crawler
         /// <param name="cid">The crawler identifier.</param>
         /// <param name="fileTimestamp">The file timestamp.</param>
         /// <exception cref="ArgumentNullException">Crawler ID is not defined.</exception>
+        /// <exception cref="Exception">Unknown error - related to IO.</exception>
         /// <remarks>
         ///     Make sure to check the crawler is not crawling at the moment of deleting data files.
         /// </remarks>

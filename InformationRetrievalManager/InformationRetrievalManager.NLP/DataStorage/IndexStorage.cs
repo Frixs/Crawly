@@ -1,4 +1,5 @@
 ﻿using InformationRetrievalManager.Core;
+using Ixs.DNA;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -42,19 +43,26 @@ namespace InformationRetrievalManager.NLP
 
             var result = new List<string>();
 
-            if (Directory.Exists(Constants.IndexDataStorageDir))
+            try
             {
-                // Get all crawler directories...
-                string[] dirs = Directory.GetDirectories(Constants.IndexDataStorageDir);
-                for (int i = 0; i < dirs.Length; ++i)
-                    // Find the one specific for the searched index...
-                    if (Path.GetFileName(dirs[i]).Equals(iid))
-                    {
-                        result.AddRange(
-                            Directory.GetFiles(dirs[i])
-                                .Where(o => o.EndsWith(".idx")).ToArray()
-                            );
-                    }
+                if (Directory.Exists(Constants.IndexDataStorageDir))
+                {
+                    // Get all index directories...
+                    string[] dirs = Directory.GetDirectories(Constants.IndexDataStorageDir);
+                    for (int i = 0; i < dirs.Length; ++i)
+                        // Find the one specific for the searched index...
+                        if (Path.GetFileName(dirs[i]).Equals(iid))
+                        {
+                            result.AddRange(
+                                Directory.GetFiles(dirs[i])
+                                    .Where(o => !o.StartsWith("_") && o.EndsWith(".idx")).ToArray()
+                                );
+                        }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogErrorSource($"{ex.GetType()}: {ex.Message}");
             }
 
             return result.ToArray();
@@ -66,18 +74,55 @@ namespace InformationRetrievalManager.NLP
             if (iid == null)
                 throw new ArgumentNullException("Index ID is not defined!");
 
-            if (Directory.Exists(Constants.IndexDataStorageDir))
+            try
             {
-                // Get all crawler directories...
-                string[] dirs = Directory.GetDirectories(Constants.IndexDataStorageDir);
-                for (int i = 0; i < dirs.Length; ++i)
-                    // Find the one specific for the searched index...
-                    if (Path.GetFileName(dirs[i]).Equals(iid))
-                    {
-                        var filesToDelete = Directory.GetFiles(dirs[i]).Where(o => o.Contains(MakeFilenameTimestamp(fileTimestamp))).ToList();
-                        foreach (var file in filesToDelete)
-                            File.Delete(file);
-                    }
+                if (Directory.Exists(Constants.IndexDataStorageDir))
+                {
+                    // Get all index directories...
+                    string[] dirs = Directory.GetDirectories(Constants.IndexDataStorageDir);
+                    for (int i = 0; i < dirs.Length; ++i)
+                        // Find the one specific for the searched index...
+                        if (Path.GetFileName(dirs[i]).Equals(iid))
+                        {
+                            var filesToDelete = Directory.GetFiles(dirs[i]).Where(o => o.Contains(MakeFilenameTimestamp(fileTimestamp))).ToList();
+                            foreach (var file in filesToDelete)
+                                File.Delete(file);
+                            break;
+                        }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogErrorSource($"{ex.GetType()}: {ex.Message}");
+            }
+        }
+
+        /// <inheritdoc/>
+        public void UpdateIndexFilename(string iid, DateTime oldFileTimestamp, DateTime newFileTimestamp)
+        {
+            if (iid == null)
+                throw new ArgumentNullException("Index ID is not defined!");
+
+            try
+            {
+                if (Directory.Exists(Constants.IndexDataStorageDir))
+                {
+                    // Get all index directories...
+                    string[] dirs = Directory.GetDirectories(Constants.IndexDataStorageDir);
+                    for (int i = 0; i < dirs.Length; ++i)
+                        // Find the one specific for the searched index...
+                        if (Path.GetFileName(dirs[i]).Equals(iid))
+                        {
+                            var filesToDelete = Directory.GetFiles(dirs[i]).Where(o => o.Contains(MakeFilenameTimestamp(oldFileTimestamp))).ToList();
+                            foreach (var file in filesToDelete)
+                                File.Move(file, file.Replace(MakeFilenameTimestamp(oldFileTimestamp), MakeFilenameTimestamp(newFileTimestamp)));
+                            break;
+                        }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogErrorSource($"{ex.GetType()}: {ex.Message}");
             }
         }
 

@@ -66,6 +66,14 @@ namespace InformationRetrievalManager
         private List<DataFileInfo> _indexFileSelection; //; ctor
 
         /// <summary>
+        /// Currently selected append mode.
+        /// </summary>
+        /// <remarks>
+        ///     Relies on <see cref="IsAppendMode"/>.
+        /// </remarks>
+        private IndexAppendMode _selectedAppendMode; //; ctor
+
+        /// <summary>
         /// Currently selected query model.
         /// </summary>
         private QueryModelType _selectedQueryModel; //; ctor
@@ -110,6 +118,16 @@ namespace InformationRetrievalManager
         /// Entry selection of available indexed data files.
         /// </summary>
         public ComboEntryViewModel<DataFileInfo> IndexFileEntry { get; protected set; } //; ctor
+
+        /// <summary>
+        /// Entry selection of available indexed data files (append menu).
+        /// </summary>
+        public ComboEntryViewModel<DataFileInfo> AppendIndexFileEntry { get; protected set; } //; ctor
+
+        /// <summary>
+        /// Append mode radio entry array
+        /// </summary>
+        public RadioEntryViewModel[] AppendModeEntryArray { get; protected set; } //; ctor
 
         /// <summary>
         /// Entry for query.
@@ -183,6 +201,12 @@ namespace InformationRetrievalManager
             set => CrawlerInWorkFlag = value;
         }
 
+        /// <summary>
+        /// Indicates if index is going to be appended into already existing index (<see langword="true"/>) 
+        /// or brand new index will be created (<see langword="false"/>).
+        /// </summary>
+        public bool IsAppendMode { get; set; }
+
         #endregion
 
         #region Command Flags
@@ -247,6 +271,11 @@ namespace InformationRetrievalManager
         public ICommand DeleteDataFileCommand { get; set; }
 
         /// <summary>
+        /// The command to change the view based on parameter.
+        /// </summary>
+        public ICommand ToggleAppendModeCommand { get; set; }
+
+        /// <summary>
         /// The command to start index processing.
         /// </summary>
         public ICommand StartIndexProcessingCommand { get; set; }
@@ -286,6 +315,7 @@ namespace InformationRetrievalManager
             CancelCrawlerCommand = new RelayCommand(async () => await CancelCrawlerCommandRoutineAsync());
             OpenRawDataCommand = new RelayParameterizedCommand(async (parameter) => await OpenRawDataCommandRoutineAsync(parameter));
             DeleteDataFileCommand = new RelayParameterizedCommand(async (parameter) => await DeleteDataFileCommandRoutineAsync(parameter));
+            ToggleAppendModeCommand = new RelayCommand(ToggleAppendModeCommandRoutine);
             StartIndexProcessingCommand = new RelayCommand(async () => await StartIndexProcessingCommandRoutineAsync());
             DeleteIndexFileCommand = new RelayParameterizedCommand(async (parameter) => await DeleteIndexFileCommandRoutineAsync(parameter));
             StartQueryCommand = new RelayCommand(async () => await StartQueryCommandRoutineAsync());
@@ -304,7 +334,7 @@ namespace InformationRetrievalManager
             DataFileEntry = new ComboEntryViewModel<DataFileInfo>
             {
                 Label = null,
-                Description = "Please, select data for index processing from the selection of crawled data.",
+                Description = "Please, select data for index processing from this selection of crawled data.",
                 Validation = null,
                 Value = _dataFileSelection[0],
                 ValueList = _dataFileSelection,
@@ -316,11 +346,78 @@ namespace InformationRetrievalManager
             IndexFileEntry = new ComboEntryViewModel<DataFileInfo>
             {
                 Label = null,
-                Description = "Please, select an index for querying from the selection of indexed data.",
+                Description = "Please, select an index for querying from this selection of already indexed data.",
                 Validation = null,
                 Value = _indexFileSelection[0],
                 ValueList = _indexFileSelection,
                 DisplayMemberPath = nameof(DataFileInfo.Label)
+            };
+            AppendIndexFileEntry = new ComboEntryViewModel<DataFileInfo>
+            {
+                Label = null,
+                Description = "Please, select an index for appending from this selection of already indexed data.",
+                Validation = null,
+                Value = _indexFileSelection[0],
+                ValueList = _indexFileSelection,
+                DisplayMemberPath = nameof(DataFileInfo.Label)
+            };
+
+            // Create append mode entry(ies)
+            _selectedAppendMode = IndexAppendMode.Timestamp; // Set default selection
+            AppendModeEntryArray = new RadioEntryViewModel[4]
+            {
+                new RadioEntryViewModel
+                {
+                    Label = "Free",
+                    Description = "Append all without any restrictions (intended for advanced users only).",
+                    Validation = null,
+                    Value = false,
+                    GroupName = nameof(AppendModeEntryArray),
+                    CheckAction = async () =>
+                    {
+                        _selectedAppendMode = IndexAppendMode.Free;
+                        await Task.Delay(1);
+                    }
+                },
+                new RadioEntryViewModel
+                {
+                    Label = "Timestamp",
+                    Description = "Append all until reaching the latest already indexed document.",
+                    Validation = null,
+                    Value = true, // Set default selection
+                    GroupName = nameof(AppendModeEntryArray),
+                    CheckAction = async () =>
+                    {
+                        _selectedAppendMode = IndexAppendMode.Timestamp;
+                        await Task.Delay(1);
+                    }
+                },
+                new RadioEntryViewModel
+                {
+                    Label = "Title",
+                    Description = "Append all until reaching the first duplicate document title.",
+                    Validation = null,
+                    Value = false,
+                    GroupName = nameof(AppendModeEntryArray),
+                    CheckAction = async () =>
+                    {
+                        _selectedAppendMode = IndexAppendMode.Title;
+                        await Task.Delay(1);
+                    }
+                },
+                new RadioEntryViewModel
+                {
+                    Label = "Title All",
+                    Description = "Append all except duplicate document titles (including appending data).",
+                    Validation = null,
+                    Value = false,
+                    GroupName = nameof(AppendModeEntryArray),
+                    CheckAction = async () =>
+                    {
+                        _selectedAppendMode = IndexAppendMode.TitleAll;
+                        await Task.Delay(1);
+                    }
+                }
             };
 
             // Create query input entry
@@ -544,6 +641,14 @@ namespace InformationRetrievalManager
         }
 
         /// <summary>
+        /// Toggle append mode
+        /// </summary>
+        private void ToggleAppendModeCommandRoutine()
+        {
+            IsAppendMode = !IsAppendMode;
+        }
+
+        /// <summary>
         /// Command Routine : Start index processing.
         /// </summary>
         private async Task StartIndexProcessingCommandRoutineAsync()
@@ -553,7 +658,13 @@ namespace InformationRetrievalManager
                 IndexProcessingProgress = string.Empty;
 
                 DataFileInfo file = DataFileEntry.Value;
+                bool isAppendMode = IsAppendMode;
+                IndexAppendMode appendMode = _selectedAppendMode;
+                DataFileInfo indexFile = AppendIndexFileEntry.Value;
+
                 if (file.FilePath == null) // should not happen - but it is default selection protection
+                    return;
+                if (isAppendMode && indexFile.FilePath == null) // should not happen - but it is default selection protection
                     return;
 
                 // We do not want to let it process during crawling
@@ -561,63 +672,32 @@ namespace InformationRetrievalManager
                     return;
 
                 IndexProcessingProgress = "Starting...";
-
                 await _taskManager.Run(async () =>
                 {
-                    CrawlerDataModel[] data = null;
-
-                    // Deserialize JSON directly from the file
-                    try
-                    {
-                        using (StreamReader sr = File.OpenText(file.FilePath))
-                        {
-                            JsonSerializer jsonSerializer = new JsonSerializer();
-                            data = (CrawlerDataModel[])jsonSerializer.Deserialize(sr, typeof(CrawlerDataModel[]));
-                        }
-                    }
-                    catch
-                    {
-                        // Corrupted data file
-                        data = null;
-                    }
+                    // Deserialize data
+                    CrawlerDataModel[] data = DeserializeData(file);
 
                     // If any data...
                     if (data != null && data.Length > 0)
                     {
-                        IndexProcessingProgress = "Creating index structure...";
-
                         bool dataRollback = false;
-                        DateTime indexTimestamp = DateTime.UtcNow;
 
-                        // Create new index file
-                        var fileReference = new IndexedFileReferenceDataModel
-                        {
-                            DataInstanceId = _dataInstance.Id,
-                            Timestamp = indexTimestamp
-                        };
-                        var indexedDocuments = new Collection<IndexedDocumentDataModel>();
+                        DateTime appendTimestampThreshold = default;
+                        if (isAppendMode && appendMode == IndexAppendMode.Timestamp)
+                            appendTimestampThreshold = _uow.IndexedDocuments.GetMaxTimestamp();
 
                         IndexProcessingProgress = "Preprocessing documents...";
-
+                        var indexedDocuments = new Collection<IndexedDocumentDataModel>();
                         // Prepare documents for indexation
                         bool anyIndexedData = false;
                         for (int i = 0; i < data.Length; ++i)
                         {
-                            var model = new IndexedDocumentDataModel
-                            {
-                                Title = data[i].Title == null ? null : Regex.Replace(StringHelpers.ReplaceNewLines(data[i].Title, " "), @"[ ]+", " ").Trim(),
-                                Category = data[i].Category == null ? null : Regex.Replace(StringHelpers.ReplaceNewLines(data[i].Category, " "), @"[ ]+", " ").Trim(),
-                                Timestamp = data[i].Timestamp,
-                                SourceUrl = data[i].SourceUrl,
-                                Content = data[i].Content == null ? null : StringHelpers.ShortenWithDots(Regex.Replace(StringHelpers.ReplaceNewLines(data[i].Content, " "), @"[ ]+", " ").Trim(), IndexedDocumentDataModel.Content_MaxLength - 3)
-                            };
-
-                            // Validate, if no errors...
-                            if (ValidationHelpers.ValidateModel(model).Count == 0)
-                            {
+                            // Preprocess document
+                            var status = IndexProcessingPreprocessDocument(data[i], indexedDocuments, isAppendMode, appendMode, appendTimestampThreshold);
+                            if (status == 2)
+                                break;
+                            else if (status == 0)
                                 anyIndexedData = true;
-                                indexedDocuments.Add(model);
-                            }
 
                             IndexProcessingProgress = $"Preprocessing documents... ({i}/{data.Length})";
 
@@ -628,8 +708,10 @@ namespace InformationRetrievalManager
                                 break;
                             }
                         }
+                        IndexProcessingProgress = "Preprocessing documents done!";
 
                         // If data were processed successfully (no rollback required)...
+                        // ...continue in processing...
                         if (dataRollback == false)
                         {
                             // If any documents are ready for indexation...
@@ -638,57 +720,111 @@ namespace InformationRetrievalManager
                                 // Begin DB-TRANSACTION
                                 _uow.BeginTransaction();
 
-                                // Cmmmit
+                                var utcNow = DateTime.UtcNow;
+                                var newIndexTimestamp = new DateTime(utcNow.Year, utcNow.Month, utcNow.Day, utcNow.Hour, utcNow.Minute, utcNow.Second, DateTimeKind.Utc);
+
                                 IndexProcessingProgress = "Preparing documents...";
-                                _uow.IndexedFileReferences.Insert(fileReference);
-                                _uow.SaveChanges();
-                                long i = 0;
-                                foreach (var doc in indexedDocuments)
+                                // Create and Cmmmit file reference
+                                IndexedFileReferenceDataModel fileReference = null;
+                                // If append mode...
+                                if (isAppendMode)
                                 {
-                                    i++;
-                                    doc.IndexedFileReferenceId = fileReference.Id;
-                                    _uow.IndexedDocuments.Insert(doc);
-                                    _uow.SaveChanges(); // Save immediately to make sure the docs will have their IDs in ASC order by the current order
-                                    IndexProcessingProgress = $"Preparing documents... ({i}/{indexedDocuments.Count})";
+                                    fileReference = _uow.IndexedFileReferences.Get(o => DateTime.Compare(o.Timestamp, indexFile.CreatedAt) == 0).FirstOrDefault();
                                 }
-                                
-                                // Create index specific document array
-                                IndexDocument[] docs = new IndexDocument[fileReference.IndexedDocuments.Count];
-                                i = 0;
-                                foreach (var item in fileReference.IndexedDocuments)
+                                // Otherwise, create new index file
+                                else
                                 {
-                                    docs[i] = item.ToIndexDocument();
-                                    i++;
+                                    fileReference = new IndexedFileReferenceDataModel
+                                    {
+                                        DataInstanceId = _dataInstance.Id,
+                                        Timestamp = newIndexTimestamp
+                                    };
+                                    _uow.IndexedFileReferences.Insert(fileReference);
+                                    _uow.SaveChanges();
                                 }
 
-                                // Indexate documents
-                                IndexProcessingProgress = "Indexing...";
-                                var processing = new IndexProcessing(_dataInstance.Id.ToString(), indexTimestamp, _dataInstance.IndexProcessingConfiguration, _fileManager, _logger);
-                                processing.IndexDocuments(docs, save: true,
-                                    setProgressMessage: (value) => IndexProcessingProgress = value,
-                                    cancellationToken: _indexProcessingTokenSource.Token);
-
-                                // If the cancelation is requested...
-                                if (_indexProcessingTokenSource.Token.IsCancellationRequested)
+                                // If file reference (index) exists (no problems)...
+                                if (fileReference != null)
                                 {
+                                    // Commit index documents
+                                    _uow.TurnOffAutoDetectChanges(); // Turn off change auto detection to lightweight next code segment
+                                    long i = 0;
+                                    foreach (var doc in indexedDocuments)
+                                    {
+                                        i++;
+                                        doc.IndexedFileReferenceId = fileReference.Id;
+                                        _uow.IndexedDocuments.Insert(doc);
+                                        _uow.SaveChanges(); // Save immediately to make sure the docs will have their IDs in ASC order by the current order
+                                        IndexProcessingProgress = $"Preparing documents... ({i}/{indexedDocuments.Count})";
+
+                                        // Check for cancelation
+                                        if (_indexProcessingTokenSource.Token.IsCancellationRequested)
+                                        {
+                                            dataRollback = true;
+                                            break;
+                                        }
+                                    }
+                                    // Re-enable change auto detection back to default
+                                    _uow.TurnOnAutoDetectChanges();
+
+                                    // Create index specific document array
+                                    IndexDocument[] docs = new IndexDocument[fileReference.IndexedDocuments.Count];
+                                    i = 0;
+                                    foreach (var item in fileReference.IndexedDocuments)
+                                    {
+                                        docs[i] = item.ToIndexDocument();
+                                        i++;
+                                    }
+
+                                    // Indexate documents
+                                    IndexProcessingProgress = "Indexing...";
+                                    var processing = new IndexProcessing(_dataInstance.Id.ToString(), isAppendMode ? indexFile.CreatedAt : newIndexTimestamp, _dataInstance.IndexProcessingConfiguration, _fileManager, _logger);
+                                    processing.IndexDocuments(docs, save: true, load: isAppendMode,
+                                        setProgressMessage: (value) => IndexProcessingProgress = value,
+                                        cancellationToken: _indexProcessingTokenSource.Token);
+
+                                    // Update index timestamp if appended...
+                                    if (isAppendMode)
+                                    {
+                                        _indexStorage.UpdateIndexFilename(_dataInstance.Id.ToString(), indexFile.CreatedAt, newIndexTimestamp);
+                                        fileReference.Timestamp = newIndexTimestamp;
+                                        _uow.SaveChanges();
+                                    }
+
+                                    // If the cancelation is requested...
+                                    if (_indexProcessingTokenSource.Token.IsCancellationRequested)
+                                    {
+                                        dataRollback = true;
+                                        // Rollback DB-TRANSACTION
+                                        _uow.RollbackTransaction();
+                                    }
+                                    // Otherwise, everythings fine...
+                                    else
+                                    {
+                                        IndexProcessingProgress = "Committing index...";
+                                        // Commit DB-TRANSACTION
+                                        _uow.CommitTransaction();
+                                    }
+                                }
+                                // Otherwise, corrupted index file...
+                                else
+                                {
+                                    _logger.LogErrorSource($"[{_dataInstance.Name}({_dataInstance.Id})]: Trying to load corrupted index file!");
+
                                     dataRollback = true;
                                     // Rollback DB-TRANSACTION
                                     _uow.RollbackTransaction();
                                 }
-                                // Otherwise, everythings fine...
-                                else
-                                {
-                                    IndexProcessingProgress = "Committing index...";
-                                    // Commit DB-TRANSACTION
-                                    _uow.CommitTransaction();
-                                }
 
-                                _logger.LogDebugSource("Index processing done!");
                                 IndexProcessingProgress = "Done!";
+                                _logger.LogDebugSource($"[{_dataInstance.Name}({_dataInstance.Id})]: Index processing done!");
                             }
                             // Otherwise no documents are ready (corrupted)...
                             else
+                            {
                                 IndexProcessingProgress = "No documents are valid for indexation!";
+                                _logger.LogWarningSource($"[{_dataInstance.Name}({_dataInstance.Id})]: No documents are valid for indexation!");
+                            }
                         }
 
                         // If rollback is requested...
@@ -774,9 +910,9 @@ namespace InformationRetrievalManager
                     {
                         indexLoaded = true;
                         // Calculate the query and get results...
-                        var res = await _queryIndexManager.QueryAsync(query, ii.GetReadOnlyData(), 
-                            modelType: queryModel, _dataInstance.IndexProcessingConfiguration, select, 
-                            setProgressMessage: (value) => QueryProgress = $"Processing... ({value})", 
+                        var res = await _queryIndexManager.QueryAsync(query, ii.GetReadOnlyData(),
+                            modelType: queryModel, _dataInstance.IndexProcessingConfiguration, select,
+                            setProgressMessage: (value) => QueryProgress = $"Processing... ({value})",
                             cancellationToken: _queryTokenSource.Token);
 
                         QueryProgress = "Preparing results...";
@@ -1308,6 +1444,21 @@ namespace InformationRetrievalManager
             // Load data/values into the configuration context
             ConfigurationContext.Set(_dataInstance.CrawlerConfiguration, _dataInstance.IndexProcessingConfiguration, _dataInstance.Name);
 
+            // Set index append mode restrictions based on the configuration
+            // ... if the datetime is not set as a parameter for crawler, change default append model selection
+            if (string.IsNullOrWhiteSpace(_dataInstance.CrawlerConfiguration.SiteArticleDateTimeXPath))
+            {
+                AppendModeEntryArray[1].IsReadOnly = true;
+                AppendModeEntryArray[1].Value = false;
+                AppendModeEntryArray[2].Value = true;
+                _selectedAppendMode = IndexAppendMode.Title;
+            }
+            else
+            {
+                AppendModeEntryArray[1].IsReadOnly = false; // If configuration got changed and data reloaded...
+                // The rest is set in constructor.
+            }
+
             // Additional small delay to support GUI for lazy load
             await Task.Delay(300);
 
@@ -1430,8 +1581,118 @@ namespace InformationRetrievalManager
 
             // Update the file selection entry
             IndexFileEntry.ValueList = _indexFileSelection;
+            AppendIndexFileEntry.ValueList = _indexFileSelection;
             if (resetToDefaultSelection)
+            {
                 IndexFileEntry.Value = _indexFileSelection[0]; // Default selected value
+                AppendIndexFileEntry.Value = _indexFileSelection[0]; // Default selected value
+            }
+        }
+
+        /// <summary>
+        /// Deserialize crawled data.
+        /// </summary>
+        /// <param name="file">The file to deserialize the data from.</param>
+        /// <returns>The data or <see langword="null"/> on failure.</returns>
+        private CrawlerDataModel[] DeserializeData(DataFileInfo file)
+        {
+            CrawlerDataModel[] data = null;
+            // Deserialize JSON directly from the file
+            try
+            {
+                using (StreamReader sr = File.OpenText(file.FilePath))
+                {
+                    JsonSerializer jsonSerializer = new JsonSerializer();
+                    data = (CrawlerDataModel[])jsonSerializer.Deserialize(sr, typeof(CrawlerDataModel[]));
+                }
+            }
+            catch
+            {
+                // Corrupted data file
+                data = null;
+            }
+
+            return data;
+        }
+
+        #endregion
+
+        #region Private Helper Methods
+
+        /// <summary>
+        /// Preprocess document data and add them into <paramref name="indexedDocuments"/> if valid.
+        /// </summary>
+        /// <param name="data">The document data.</param>
+        /// <param name="indexedDocuments">The final indexed collection.</param>
+        /// <param name="isAppendMode">Indication for append mode.</param>
+        /// <param name="appendMode">Append mode option (only required if <paramref name="appendMode"/> is <see langword="true"/>).</param>
+        /// <param name="appendTimestampThreshold">Append mode timestamp threshold (only required if <paramref name="appendMode"/> is <see langword="true"/> and <paramref name="appendMode"/> is <see cref="IndexAppendMode.Timestamp"/>).</param>
+        /// <returns>
+        ///     0=(OK), 
+        ///     1=(Document added to the final collection),
+        ///     2=(Index stop condition reached)
+        /// </returns>
+        private byte IndexProcessingPreprocessDocument(CrawlerDataModel data, Collection<IndexedDocumentDataModel> indexedDocuments, bool isAppendMode, IndexAppendMode appendMode = default, DateTime appendTimestampThreshold = default)
+        {
+            byte result = 1;
+
+            var model = new IndexedDocumentDataModel
+            {
+                Title = data.Title == null ? null : Regex.Replace(StringHelpers.ReplaceNewLines(data.Title, " "), @"[ ]+", " ").Trim(),
+                Category = data.Category == null ? null : Regex.Replace(StringHelpers.ReplaceNewLines(data.Category, " "), @"[ ]+", " ").Trim(),
+                Timestamp = data.Timestamp,
+                SourceUrl = data.SourceUrl,
+                Content = data.Content == null ? null : StringHelpers.ShortenWithDots(Regex.Replace(StringHelpers.ReplaceNewLines(data.Content, " "), @"[ ]+", " ").Trim(), IndexedDocumentDataModel.Content_MaxLength - 3)
+            };
+
+            // Validate, if no errors...
+            // ...otherwise ignore non-valid documents
+            if (ValidationHelpers.ValidateModel(model).Count == 0)
+            {
+                bool validForAddition = false;
+                // If append mode is ON...
+                // ...additional validation is required
+                if (isAppendMode)
+                {
+                    if (appendMode == IndexAppendMode.Free)
+                    {
+                        validForAddition = true;
+                    }
+                    else if (appendMode == IndexAppendMode.Timestamp)
+                    {
+                        if (DateTime.Compare(model.Timestamp, appendTimestampThreshold) < 0)
+                            result = 2;
+                        else
+                            validForAddition = true;
+                    }
+                    else if (appendMode == IndexAppendMode.Title)
+                    {
+                        if (_uow.IndexedDocuments.Get(o => o.Title.Equals(model.Title)).Any())
+                            result = 2;
+                        else
+                            validForAddition = true;
+                    }
+                    else if (appendMode == IndexAppendMode.TitleAll)
+                    {
+                        if (!_uow.IndexedDocuments.Get(o => o.Title.Equals(model.Title)).Any())
+                            validForAddition = true;
+                    }
+                }
+                // Otherwise, all fine...
+                else
+                {
+                    validForAddition = true;
+                }
+
+                // If document is valid for indexation...
+                if (validForAddition)
+                {
+                    result = 0;
+                    indexedDocuments.Add(model);
+                }
+            }
+
+            return result;
         }
 
         #endregion

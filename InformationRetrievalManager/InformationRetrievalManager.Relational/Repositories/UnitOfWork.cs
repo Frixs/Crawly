@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace InformationRetrievalManager.Relational
@@ -53,7 +54,7 @@ namespace InformationRetrievalManager.Relational
         /// <summary>
         /// Private reference of property <see cref="IndexedDocuments"/>
         /// </summary>
-        private IRepository<IndexedDocumentDataModel> _indexedDocuments;
+        private IIndexedDocumentRepository<IndexedDocumentDataModel> _indexedDocuments;
 
         #endregion
 
@@ -85,7 +86,7 @@ namespace InformationRetrievalManager.Relational
                 (_indexedFileReferences = new IndexedFileReferenceRepository(_dbContext));
 
         /// <inheritdoc/>
-        public IRepository<IndexedDocumentDataModel> IndexedDocuments =>
+        public IIndexedDocumentRepository<IndexedDocumentDataModel> IndexedDocuments =>
             _indexedDocuments ??
                 (_indexedDocuments = new IndexedDocumentRepository(_dbContext));
 
@@ -116,7 +117,7 @@ namespace InformationRetrievalManager.Relational
         /// <inheritdoc/>
         public void UndoChanges()
         {
-            foreach (var entry in _dbContext.ChangeTracker.Entries())
+            foreach (var entry in _dbContext.ChangeTracker.Entries().ToList())
             {
                 switch (entry.State)
                 {
@@ -161,7 +162,6 @@ namespace InformationRetrievalManager.Relational
             if (_dbContext.Database.CurrentTransaction != null)
                 return;
 
-            _dbContext.ChangeTracker.AutoDetectChangesEnabled = false;
             _dbContext.Database.BeginTransaction();
             _logger.LogDebugSource($"Database transaction started!");
         }
@@ -173,7 +173,6 @@ namespace InformationRetrievalManager.Relational
                 return;
 
             _dbContext.Database.CommitTransaction();
-            _dbContext.ChangeTracker.AutoDetectChangesEnabled = true;
             _logger.LogDebugSource($"Database transaction committed!");
         }
 
@@ -184,8 +183,19 @@ namespace InformationRetrievalManager.Relational
                 return;
 
             _dbContext.Database.RollbackTransaction();
-            _dbContext.ChangeTracker.AutoDetectChangesEnabled = true;
             _logger.LogDebugSource($"Database transaction roll-backed!");
+        }
+
+        /// <inheritdoc/>
+        public void TurnOnAutoDetectChanges()
+        {
+            _dbContext.ChangeTracker.AutoDetectChangesEnabled = true;
+        }
+
+        /// <inheritdoc/>
+        public void TurnOffAutoDetectChanges()
+        {
+            _dbContext.ChangeTracker.AutoDetectChangesEnabled = false;
         }
 
         /// <inheritdoc/>

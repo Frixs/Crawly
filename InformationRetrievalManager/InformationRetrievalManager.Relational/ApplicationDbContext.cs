@@ -162,6 +162,8 @@ namespace InformationRetrievalManager.Relational
                 .WithMany(o => o.IndexedDocuments)
                 .HasForeignKey(o => o.IndexedFileReferenceId)
                 .OnDelete(DeleteBehavior.Cascade);
+            // Set up constraints
+            modelBuilder.Entity<IndexedDocumentDataModel>().HasIndex(o => o.Title);
             // Set up limits
             modelBuilder.Entity<IndexedDocumentDataModel>().Property(o => o.Title).HasMaxLength(IndexedDocumentDataModel.Title_MaxLength);
             modelBuilder.Entity<IndexedDocumentDataModel>().Property(o => o.Category).HasMaxLength(IndexedDocumentDataModel.Category_MaxLength);

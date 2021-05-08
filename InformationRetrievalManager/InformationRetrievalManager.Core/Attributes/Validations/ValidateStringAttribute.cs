@@ -171,7 +171,7 @@ namespace InformationRetrievalManager.Core
                 if (IsRequired != null && IsRequired == true)
                 {
                     // If value is empty...
-                    if (value.Length <= 0)
+                    if (string.IsNullOrWhiteSpace(value))
                         errorList.Add(new DataValidationError
                         {
                             Code = nameof(IsRequired),
