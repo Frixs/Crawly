@@ -21,6 +21,7 @@
             DataLoaded = true;
             CrawlerInWork = true;
             IndexProcessingInWorkFlag = false;
+            AppendMode = true;
             CurrentView = View.Main;
         }
 

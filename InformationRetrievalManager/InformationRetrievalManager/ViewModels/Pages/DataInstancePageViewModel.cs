@@ -66,10 +66,18 @@ namespace InformationRetrievalManager
         private List<DataFileInfo> _indexFileSelection; //; ctor
 
         /// <summary>
+        /// Currently selected append mode.
+        /// </summary>
+        /// <remarks>
+        ///     Relies on <see cref="AppendMode"/>.
+        /// </remarks>
+        private IndexAppendMode _selectedAppendMode; //; ctor
+
+        /// <summary>
         /// Currently selected query model.
         /// </summary>
         private QueryModelType _selectedQueryModel; //; ctor
-
+        
         /// <summary>
         /// Token for canceling the index processing.
         /// TODO: Improve this approach with something different (user feedback etc.).
@@ -110,6 +118,11 @@ namespace InformationRetrievalManager
         /// Entry selection of available indexed data files.
         /// </summary>
         public ComboEntryViewModel<DataFileInfo> IndexFileEntry { get; protected set; } //; ctor
+
+        /// <summary>
+        /// Append mode radio entry array
+        /// </summary>
+        public RadioEntryViewModel[] AppendModeEntryArray { get; protected set; } //; ctor
 
         /// <summary>
         /// Entry for query.
@@ -333,6 +346,64 @@ namespace InformationRetrievalManager
                 Value = _indexFileSelection[0],
                 ValueList = _indexFileSelection,
                 DisplayMemberPath = nameof(DataFileInfo.Label)
+            };
+
+            // Create append mode entry(ies)
+            _selectedAppendMode = IndexAppendMode.Timestamp; // Set default selection
+            AppendModeEntryArray = new RadioEntryViewModel[4]
+            {
+                new RadioEntryViewModel
+                {
+                    Label = "Free",
+                    Description = "Append all without any restrictions (intended for advanced users only).",
+                    Validation = null,
+                    Value = false,
+                    GroupName = nameof(AppendModeEntryArray),
+                    CheckAction = async () =>
+                    {
+                        _selectedAppendMode = IndexAppendMode.Free;
+                        await Task.Delay(1);
+                    }
+                },
+                new RadioEntryViewModel
+                {
+                    Label = "Timestamp",
+                    Description = "Append all until reaching the latest already indexed document.",
+                    Validation = null,
+                    Value = true, // Set default selection
+                    GroupName = nameof(AppendModeEntryArray),
+                    CheckAction = async () =>
+                    {
+                        _selectedAppendMode = IndexAppendMode.Timestamp;
+                        await Task.Delay(1);
+                    }
+                },
+                new RadioEntryViewModel
+                {
+                    Label = "Title",
+                    Description = "Append all until reaching the first duplicate document title.",
+                    Validation = null,
+                    Value = false,
+                    GroupName = nameof(AppendModeEntryArray),
+                    CheckAction = async () =>
+                    {
+                        _selectedAppendMode = IndexAppendMode.Title;
+                        await Task.Delay(1);
+                    }
+                },
+                new RadioEntryViewModel
+                {
+                    Label = "Title All",
+                    Description = "Append all except duplicate document titles (including appending data).",
+                    Validation = null,
+                    Value = false,
+                    GroupName = nameof(AppendModeEntryArray),
+                    CheckAction = async () =>
+                    {
+                        _selectedAppendMode = IndexAppendMode.TitleAll;
+                        await Task.Delay(1);
+                    }
+                }
             };
 
             // Create query input entry
@@ -671,7 +742,7 @@ namespace InformationRetrievalManager
                                     _uow.SaveChanges(); // Save immediately to make sure the docs will have their IDs in ASC order by the current order
                                     IndexProcessingProgress = $"Preparing documents... ({i}/{indexedDocuments.Count})";
                                 }
-                                
+
                                 // Create index specific document array
                                 IndexDocument[] docs = new IndexDocument[fileReference.IndexedDocuments.Count];
                                 i = 0;
@@ -794,9 +865,9 @@ namespace InformationRetrievalManager
                     {
                         indexLoaded = true;
                         // Calculate the query and get results...
-                        var res = await _queryIndexManager.QueryAsync(query, ii.GetReadOnlyData(), 
-                            modelType: queryModel, _dataInstance.IndexProcessingConfiguration, select, 
-                            setProgressMessage: (value) => QueryProgress = $"Processing... ({value})", 
+                        var res = await _queryIndexManager.QueryAsync(query, ii.GetReadOnlyData(),
+                            modelType: queryModel, _dataInstance.IndexProcessingConfiguration, select,
+                            setProgressMessage: (value) => QueryProgress = $"Processing... ({value})",
                             cancellationToken: _queryTokenSource.Token);
 
                         QueryProgress = "Preparing results...";
@@ -1327,6 +1398,21 @@ namespace InformationRetrievalManager
             await LoadIndexFilesAsync(true);
             // Load data/values into the configuration context
             ConfigurationContext.Set(_dataInstance.CrawlerConfiguration, _dataInstance.IndexProcessingConfiguration, _dataInstance.Name);
+
+            // Set index append mode restrictions based on the configuration
+            // ... if the datetime is not set as a parameter for crawler, change default append model selection
+            if (string.IsNullOrWhiteSpace(_dataInstance.CrawlerConfiguration.SiteArticleDateTimeXPath))
+            {
+                AppendModeEntryArray[1].IsReadOnly = true;
+                AppendModeEntryArray[1].Value = false;
+                AppendModeEntryArray[2].Value = true;
+                _selectedAppendMode = IndexAppendMode.Title;
+            }
+            else
+            {
+                AppendModeEntryArray[1].IsReadOnly = false; // If configuration got changed and data reloaded...
+                // The rest is set in constructor.
+            }
 
             // Additional small delay to support GUI for lazy load
             await Task.Delay(300);

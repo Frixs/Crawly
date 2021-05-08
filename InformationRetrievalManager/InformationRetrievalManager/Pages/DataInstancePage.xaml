@@ -311,6 +311,7 @@
                                     <RowDefinition Height="Auto" />
                                     <RowDefinition Height="Auto" />
                                     <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
                                 </Grid.RowDefinitions>
 
                                 <!--  Crawled Data Selection  -->
@@ -373,8 +374,57 @@
                                     </Button>
                                 </Grid>
 
+                                <!--  Append Mode Controls  -->
+                                <Grid
+                                    Grid.Row="1"
+                                    Margin="0,0,0,10"
+                                    local:AnimateFadeInProperty.Value="{Binding AppendMode, Mode=OneWay}"
+                                    IsEnabled="{Binding IndexProcessingInWorkFlag, Converter={local:BooleanInvertConverter}, Mode=OneWay}">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="4*" />
+                                        <ColumnDefinition Width="4*" />
+                                        <ColumnDefinition Width="4*" />
+                                        <ColumnDefinition Width="4*" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock
+                                        Grid.Row="0"
+                                        Grid.ColumnSpan="4"
+                                        HorizontalAlignment="Center"
+                                        FontFamily="{StaticResource DosisBold}"
+                                        FontSize="15"
+                                        Text="Append Mode" />
+                                    <local:RadioEntry
+                                        Grid.Row="1"
+                                        Grid.Column="0"
+                                        Margin="-10,0,-10,0"
+                                        DataContext="{Binding AppendModeEntryArray[0], Mode=OneWay}"
+                                        TextBlock.TextAlignment="Center" />
+                                    <local:RadioEntry
+                                        Grid.Row="1"
+                                        Grid.Column="1"
+                                        Margin="-10,0,-10,0"
+                                        DataContext="{Binding AppendModeEntryArray[1], Mode=OneWay}"
+                                        TextBlock.TextAlignment="Center" />
+                                    <local:RadioEntry
+                                        Grid.Row="1"
+                                        Grid.Column="2"
+                                        Margin="-10,0,-10,0"
+                                        DataContext="{Binding AppendModeEntryArray[2], Mode=OneWay}"
+                                        TextBlock.TextAlignment="Center" />
+                                    <local:RadioEntry
+                                        Grid.Row="1"
+                                        Grid.Column="3"
+                                        Margin="-10,0,-10,0"
+                                        DataContext="{Binding AppendModeEntryArray[3], Mode=OneWay}"
+                                        TextBlock.TextAlignment="Center" />
+                                </Grid>
+
                                 <!--  Index Start BTNs Wrapper  -->
-                                <Grid Grid.Row="1">
+                                <Grid Grid.Row="2">
                                     <Grid.Style>
                                         <Style TargetType="{x:Type Grid}">
                                             <Setter Property="IsEnabled" Value="False" />
@@ -435,7 +485,7 @@
                                 </Grid>
 
                                 <!--  Progress Wrapper  -->
-                                <Grid Grid.Row="2" local:AnimateFadeInProperty.Value="{Binding IndexProcessingInWorkFlag, Mode=OneWay}">
+                                <Grid Grid.Row="3" local:AnimateFadeInProperty.Value="{Binding IndexProcessingInWorkFlag, Mode=OneWay}">
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="Auto" />
                                     </Grid.RowDefinitions>
@@ -452,7 +502,7 @@
 
                                 <!--  View Configuration BTN  -->
                                 <Button
-                                    Grid.Row="3"
+                                    Grid.Row="4"
                                     Margin="0,15,0,0"
                                     HorizontalAlignment="Center"
                                     Command="{Binding ShowViewCommand, Mode=OneTime}"
