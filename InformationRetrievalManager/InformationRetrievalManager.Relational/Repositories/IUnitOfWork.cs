@@ -36,7 +36,7 @@ namespace InformationRetrievalManager.Relational
         /// <summary>
         /// Indexed document repository
         /// </summary>
-        IRepository<IndexedDocumentDataModel> IndexedDocuments { get; }
+        IIndexedDocumentRepository<IndexedDocumentDataModel> IndexedDocuments { get; }
 
         /// <summary>
         /// Commit database context changes.

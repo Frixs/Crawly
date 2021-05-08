@@ -53,7 +53,7 @@ namespace InformationRetrievalManager.Relational
         /// <summary>
         /// Private reference of property <see cref="IndexedDocuments"/>
         /// </summary>
-        private IRepository<IndexedDocumentDataModel> _indexedDocuments;
+        private IIndexedDocumentRepository<IndexedDocumentDataModel> _indexedDocuments;
 
         #endregion
 
@@ -85,7 +85,7 @@ namespace InformationRetrievalManager.Relational
                 (_indexedFileReferences = new IndexedFileReferenceRepository(_dbContext));
 
         /// <inheritdoc/>
-        public IRepository<IndexedDocumentDataModel> IndexedDocuments =>
+        public IIndexedDocumentRepository<IndexedDocumentDataModel> IndexedDocuments =>
             _indexedDocuments ??
                 (_indexedDocuments = new IndexedDocumentRepository(_dbContext));
 
