@@ -809,19 +809,22 @@ namespace InformationRetrievalManager
                                 // Otherwise, corrupted index file...
                                 else
                                 {
-                                    _logger.LogErrorSource("Trying to load corrupted index file!");
+                                    _logger.LogErrorSource($"[{_dataInstance.Name}({_dataInstance.Id})]: Trying to load corrupted index file!");
 
                                     dataRollback = true;
                                     // Rollback DB-TRANSACTION
                                     _uow.RollbackTransaction();
                                 }
 
-                                _logger.LogDebugSource("Index processing done!");
                                 IndexProcessingProgress = "Done!";
+                                _logger.LogDebugSource($"[{_dataInstance.Name}({_dataInstance.Id})]: Index processing done!");
                             }
                             // Otherwise no documents are ready (corrupted)...
                             else
+                            {
                                 IndexProcessingProgress = "No documents are valid for indexation!";
+                                _logger.LogWarningSource($"[{_dataInstance.Name}({_dataInstance.Id})]: No documents are valid for indexation!");
+                            }
                         }
 
                         // If rollback is requested...
