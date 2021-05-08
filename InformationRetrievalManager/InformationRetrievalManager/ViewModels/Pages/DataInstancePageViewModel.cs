@@ -1629,7 +1629,7 @@ namespace InformationRetrievalManager
         /// <param name="appendTimestampThreshold">Append mode timestamp threshold (only required if <paramref name="appendMode"/> is <see langword="true"/> and <paramref name="appendMode"/> is <see cref="IndexAppendMode.Timestamp"/>).</param>
         /// <returns>
         ///     0=(OK), 
-        ///     1=(Document added to the final collection),
+        ///     1=(Document NOT added to the final collection - not valid document),
         ///     2=(Index stop condition reached)
         /// </returns>
         private byte IndexProcessingPreprocessDocument(CrawlerDataModel data, Collection<IndexedDocumentDataModel> indexedDocuments, bool isAppendMode, IndexAppendMode appendMode = default, DateTime appendTimestampThreshold = default)
