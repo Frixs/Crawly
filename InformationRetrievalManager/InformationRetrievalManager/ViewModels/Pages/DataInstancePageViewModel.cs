@@ -69,7 +69,7 @@ namespace InformationRetrievalManager
         /// Currently selected append mode.
         /// </summary>
         /// <remarks>
-        ///     Relies on <see cref="AppendMode"/>.
+        ///     Relies on <see cref="IsAppendMode"/>.
         /// </remarks>
         private IndexAppendMode _selectedAppendMode; //; ctor
 
@@ -118,6 +118,11 @@ namespace InformationRetrievalManager
         /// Entry selection of available indexed data files.
         /// </summary>
         public ComboEntryViewModel<DataFileInfo> IndexFileEntry { get; protected set; } //; ctor
+
+        /// <summary>
+        /// Entry selection of available indexed data files (append menu).
+        /// </summary>
+        public ComboEntryViewModel<DataFileInfo> AppendIndexFileEntry { get; protected set; } //; ctor
 
         /// <summary>
         /// Append mode radio entry array
@@ -200,7 +205,7 @@ namespace InformationRetrievalManager
         /// Indicates if index is going to be appended into already existing index (<see langword="true"/>) 
         /// or brand new index will be created (<see langword="false"/>).
         /// </summary>
-        public bool AppendMode { get; set; }
+        public bool IsAppendMode { get; set; }
 
         #endregion
 
@@ -329,7 +334,7 @@ namespace InformationRetrievalManager
             DataFileEntry = new ComboEntryViewModel<DataFileInfo>
             {
                 Label = null,
-                Description = "Please, select data for index processing from the selection of crawled data.",
+                Description = "Please, select data for index processing from this selection of crawled data.",
                 Validation = null,
                 Value = _dataFileSelection[0],
                 ValueList = _dataFileSelection,
@@ -341,7 +346,16 @@ namespace InformationRetrievalManager
             IndexFileEntry = new ComboEntryViewModel<DataFileInfo>
             {
                 Label = null,
-                Description = "Please, select an index for querying from the selection of indexed data.",
+                Description = "Please, select an index for querying from this selection of already indexed data.",
+                Validation = null,
+                Value = _indexFileSelection[0],
+                ValueList = _indexFileSelection,
+                DisplayMemberPath = nameof(DataFileInfo.Label)
+            };
+            AppendIndexFileEntry = new ComboEntryViewModel<DataFileInfo>
+            {
+                Label = null,
+                Description = "Please, select an index for appending from this selection of already indexed data.",
                 Validation = null,
                 Value = _indexFileSelection[0],
                 ValueList = _indexFileSelection,
@@ -631,7 +645,7 @@ namespace InformationRetrievalManager
         /// </summary>
         private void ToggleAppendModeCommandRoutine()
         {
-            AppendMode = !AppendMode;
+            IsAppendMode = !IsAppendMode;
         }
 
         /// <summary>
@@ -1536,8 +1550,12 @@ namespace InformationRetrievalManager
 
             // Update the file selection entry
             IndexFileEntry.ValueList = _indexFileSelection;
+            AppendIndexFileEntry.ValueList = _indexFileSelection;
             if (resetToDefaultSelection)
+            {
                 IndexFileEntry.Value = _indexFileSelection[0]; // Default selected value
+                AppendIndexFileEntry.Value = _indexFileSelection[0]; // Default selected value
+            }
         }
 
         #endregion

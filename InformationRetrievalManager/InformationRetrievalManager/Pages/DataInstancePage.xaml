@@ -378,9 +378,10 @@
                                 <Grid
                                     Grid.Row="1"
                                     Margin="0,0,0,10"
-                                    local:AnimateFadeInProperty.Value="{Binding AppendMode, Mode=OneWay}"
+                                    local:AnimateFadeInProperty.Value="{Binding IsAppendMode, Mode=OneWay}"
                                     IsEnabled="{Binding IndexProcessingInWorkFlag, Converter={local:BooleanInvertConverter}, Mode=OneWay}">
                                     <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
                                         <RowDefinition Height="Auto" />
                                         <RowDefinition Height="Auto" />
                                     </Grid.RowDefinitions>
@@ -390,6 +391,7 @@
                                         <ColumnDefinition Width="4*" />
                                         <ColumnDefinition Width="4*" />
                                     </Grid.ColumnDefinitions>
+                                    <!--  Append Mode Radio Selection  -->
                                     <TextBlock
                                         Grid.Row="0"
                                         Grid.ColumnSpan="4"
@@ -421,6 +423,14 @@
                                         Margin="-10,0,-10,0"
                                         DataContext="{Binding AppendModeEntryArray[3], Mode=OneWay}"
                                         TextBlock.TextAlignment="Center" />
+
+                                    <!--  Index File Entry  -->
+                                    <local:ComboEntry
+                                        Grid.Row="2"
+                                        Grid.ColumnSpan="4"
+                                        Width="205"
+                                        VerticalAlignment="Top"
+                                        DataContext="{Binding AppendIndexFileEntry, Mode=OneWay}" />
                                 </Grid>
 
                                 <!--  Index Start BTNs Wrapper  -->
@@ -437,6 +447,13 @@
                                                         <Condition Binding="{Binding DeleteIndexFlag, Mode=OneWay}" Value="False" />
                                                     </MultiDataTrigger.Conditions>
                                                     <Setter Property="IsEnabled" Value="True" />
+                                                </MultiDataTrigger>
+                                                <MultiDataTrigger>
+                                                    <MultiDataTrigger.Conditions>
+                                                        <Condition Binding="{Binding IsAppendMode, Mode=OneWay}" Value="True" />
+                                                        <Condition Binding="{Binding AppendIndexFileEntry.Value.FilePath, Converter={local:StringEmptyConverter}, Mode=OneWay}" Value="True" />
+                                                    </MultiDataTrigger.Conditions>
+                                                    <Setter Property="IsEnabled" Value="False" />
                                                 </MultiDataTrigger>
                                             </Style.Triggers>
                                         </Style>
@@ -470,7 +487,7 @@
                                                     <Setter Property="Opacity" Value="0.25" />
                                                     <Setter Property="Content" Value="APPEND OFF" />
                                                     <Style.Triggers>
-                                                        <DataTrigger Binding="{Binding AppendMode}" Value="True">
+                                                        <DataTrigger Binding="{Binding IsAppendMode}" Value="True">
                                                             <Setter Property="Opacity" Value="1" />
                                                             <Setter Property="Content" Value="APPEND ON" />
                                                         </DataTrigger>
