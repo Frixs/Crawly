@@ -183,6 +183,12 @@ namespace InformationRetrievalManager
             set => CrawlerInWorkFlag = value;
         }
 
+        /// <summary>
+        /// Indicates if index is going to be appended into already existing index (<see langword="true"/>) 
+        /// or brand new index will be created (<see langword="false"/>).
+        /// </summary>
+        public bool AppendMode { get; set; }
+
         #endregion
 
         #region Command Flags
@@ -247,6 +253,11 @@ namespace InformationRetrievalManager
         public ICommand DeleteDataFileCommand { get; set; }
 
         /// <summary>
+        /// The command to change the view based on parameter.
+        /// </summary>
+        public ICommand ToggleAppendModeCommand { get; set; }
+
+        /// <summary>
         /// The command to start index processing.
         /// </summary>
         public ICommand StartIndexProcessingCommand { get; set; }
@@ -286,6 +297,7 @@ namespace InformationRetrievalManager
             CancelCrawlerCommand = new RelayCommand(async () => await CancelCrawlerCommandRoutineAsync());
             OpenRawDataCommand = new RelayParameterizedCommand(async (parameter) => await OpenRawDataCommandRoutineAsync(parameter));
             DeleteDataFileCommand = new RelayParameterizedCommand(async (parameter) => await DeleteDataFileCommandRoutineAsync(parameter));
+            ToggleAppendModeCommand = new RelayCommand(ToggleAppendModeCommandRoutine);
             StartIndexProcessingCommand = new RelayCommand(async () => await StartIndexProcessingCommandRoutineAsync());
             DeleteIndexFileCommand = new RelayParameterizedCommand(async (parameter) => await DeleteIndexFileCommandRoutineAsync(parameter));
             StartQueryCommand = new RelayCommand(async () => await StartQueryCommandRoutineAsync());
@@ -541,6 +553,14 @@ namespace InformationRetrievalManager
 
                 await Task.Delay(1);
             });
+        }
+
+        /// <summary>
+        /// Toggle append mode
+        /// </summary>
+        private void ToggleAppendModeCommandRoutine()
+        {
+            AppendMode = !AppendMode;
         }
 
         /// <summary>

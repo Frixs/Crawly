@@ -9,7 +9,7 @@
     Title="DataInstancePage"
     d:Background="{StaticResource BackgroundBrushKey}"
     d:DataContext="{x:Static local:DataInstancePageDesignModel.Instance}"
-    d:DesignHeight="1200"
+    d:DesignHeight="900"
     d:DesignWidth="960"
     x:TypeArguments="local:DataInstancePageViewModel"
     mc:Ignorable="d">
@@ -319,10 +319,11 @@
                                     Margin="0,0,0,10"
                                     IsEnabled="{Binding IndexProcessingInWorkFlag, Converter={local:BooleanInvertConverter}, Mode=OneWay}">
                                     <!--  Open Raw BTN  -->
+                                    <!--  254 = 205 + 34 + 15  -->
                                     <Button
                                         Width="34"
                                         Height="34"
-                                        Margin="0,0,258,0"
+                                        Margin="0,0,254,0"
                                         HorizontalAlignment="Center"
                                         VerticalAlignment="Top"
                                         Command="{Binding OpenRawDataCommand, Mode=OneTime}"
@@ -350,7 +351,7 @@
                                     <Button
                                         Width="34"
                                         Height="34"
-                                        Margin="258,0,0,0"
+                                        Margin="254,0,0,0"
                                         HorizontalAlignment="Center"
                                         VerticalAlignment="Top"
                                         Command="{Binding DeleteDataFileCommand, Mode=OneTime}"
@@ -372,20 +373,10 @@
                                     </Button>
                                 </Grid>
 
-                                <!--  Start Index Processing BTN  -->
-                                <Button
-                                    Grid.Row="1"
-                                    Height="36"
-                                    MinWidth="205"
-                                    Padding="15,0,15,0"
-                                    HorizontalAlignment="Center"
-                                    VerticalAlignment="Top"
-                                    local:IsBusyProperty.Value="{Binding IndexProcessingInWorkFlag, Mode=OneWay}"
-                                    Command="{Binding StartIndexProcessingCommand, Mode=OneTime}"
-                                    Content="START INDEX PROCESSING"
-                                    FontSize="16">
-                                    <Button.Style>
-                                        <Style BasedOn="{StaticResource LightColorButton}" TargetType="{x:Type Button}">
+                                <!--  Index Start BTNs Wrapper  -->
+                                <Grid Grid.Row="1">
+                                    <Grid.Style>
+                                        <Style TargetType="{x:Type Grid}">
                                             <Setter Property="IsEnabled" Value="False" />
                                             <Style.Triggers>
                                                 <MultiDataTrigger>
@@ -399,8 +390,49 @@
                                                 </MultiDataTrigger>
                                             </Style.Triggers>
                                         </Style>
-                                    </Button.Style>
-                                </Button>
+                                    </Grid.Style>
+
+                                    <!--  Start Index Processing BTN  -->
+                                    <Button
+                                        Height="36"
+                                        MinWidth="205"
+                                        Padding="15,0,15,0"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Top"
+                                        local:IsBusyProperty.Value="{Binding IndexProcessingInWorkFlag, Mode=OneWay}"
+                                        Command="{Binding StartIndexProcessingCommand, Mode=OneTime}"
+                                        Content="START INDEX PROCESSING"
+                                        FontSize="16"
+                                        Style="{StaticResource LightColorButton}" />
+
+                                    <!--  Append Mode Switch BTN  -->
+                                    <Grid
+                                        Width="90"
+                                        Margin="0,0,295,0"
+                                        HorizontalAlignment="Center">
+                                        <Button
+                                            Margin="0,0,7.5,0"
+                                            HorizontalAlignment="Right"
+                                            Command="{Binding ToggleAppendModeCommand, Mode=OneTime}"
+                                            FontSize="12">
+                                            <Button.Style>
+                                                <Style BasedOn="{StaticResource LightDarkTextButton}" TargetType="{x:Type Button}">
+                                                    <Setter Property="Opacity" Value="0.25" />
+                                                    <Setter Property="Content" Value="APPEND OFF" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding AppendMode}" Value="True">
+                                                            <Setter Property="Opacity" Value="1" />
+                                                            <Setter Property="Content" Value="APPEND ON" />
+                                                        </DataTrigger>
+                                                        <Trigger Property="IsEnabled" Value="False">
+                                                            <Setter Property="Opacity" Value="0.25" />
+                                                        </Trigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Button.Style>
+                                        </Button>
+                                    </Grid>
+                                </Grid>
 
                                 <!--  Progress Wrapper  -->
                                 <Grid Grid.Row="2" local:AnimateFadeInProperty.Value="{Binding IndexProcessingInWorkFlag, Mode=OneWay}">
@@ -484,7 +516,7 @@
                                         <Button
                                             Width="34"
                                             Height="34"
-                                            Margin="258,0,0,0"
+                                            Margin="254,0,0,0"
                                             HorizontalAlignment="Center"
                                             VerticalAlignment="Top"
                                             Command="{Binding DeleteIndexFileCommand, Mode=OneTime}"
