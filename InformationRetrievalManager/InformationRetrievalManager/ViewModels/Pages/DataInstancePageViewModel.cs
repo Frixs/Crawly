@@ -77,7 +77,7 @@ namespace InformationRetrievalManager
         /// Currently selected query model.
         /// </summary>
         private QueryModelType _selectedQueryModel; //; ctor
-        
+
         /// <summary>
         /// Token for canceling the index processing.
         /// TODO: Improve this approach with something different (user feedback etc.).
@@ -658,7 +658,13 @@ namespace InformationRetrievalManager
                 IndexProcessingProgress = string.Empty;
 
                 DataFileInfo file = DataFileEntry.Value;
+                bool isAppendMode = IsAppendMode;
+                IndexAppendMode appendMode = _selectedAppendMode;
+                DataFileInfo indexFile = AppendIndexFileEntry.Value;
+
                 if (file.FilePath == null) // should not happen - but it is default selection protection
+                    return;
+                if (isAppendMode && indexFile.FilePath == null) // should not happen - but it is default selection protection
                     return;
 
                 // We do not want to let it process during crawling
@@ -666,11 +672,9 @@ namespace InformationRetrievalManager
                     return;
 
                 IndexProcessingProgress = "Starting...";
-
                 await _taskManager.Run(async () =>
                 {
                     CrawlerDataModel[] data = null;
-
                     // Deserialize JSON directly from the file
                     try
                     {
@@ -689,21 +693,14 @@ namespace InformationRetrievalManager
                     // If any data...
                     if (data != null && data.Length > 0)
                     {
-                        IndexProcessingProgress = "Creating index structure...";
-
                         bool dataRollback = false;
-                        DateTime indexTimestamp = DateTime.UtcNow;
 
-                        // Create new index file
-                        var fileReference = new IndexedFileReferenceDataModel
-                        {
-                            DataInstanceId = _dataInstance.Id,
-                            Timestamp = indexTimestamp
-                        };
-                        var indexedDocuments = new Collection<IndexedDocumentDataModel>();
+                        DateTime appendTimestampThreshold = default;
+                        if (isAppendMode && appendMode == IndexAppendMode.Timestamp)
+                            appendTimestampThreshold = _uow.IndexedDocuments.GetMaxTimestamp();
 
                         IndexProcessingProgress = "Preprocessing documents...";
-
+                        var indexedDocuments = new Collection<IndexedDocumentDataModel>();
                         // Prepare documents for indexation
                         bool anyIndexedData = false;
                         for (int i = 0; i < data.Length; ++i)
@@ -718,10 +715,50 @@ namespace InformationRetrievalManager
                             };
 
                             // Validate, if no errors...
+                            // ...otherwise ignore non-valid documents
                             if (ValidationHelpers.ValidateModel(model).Count == 0)
                             {
-                                anyIndexedData = true;
-                                indexedDocuments.Add(model);
+                                bool validForAddition = false;
+                                // If append mode is ON...
+                                // ...additional validation is required
+                                if (isAppendMode)
+                                {
+                                    if (appendMode == IndexAppendMode.Free)
+                                    {
+                                        validForAddition = true;
+                                    }
+                                    else if (appendMode == IndexAppendMode.Timestamp)
+                                    {
+                                        if (DateTime.Compare(model.Timestamp, appendTimestampThreshold) < 0)
+                                            break;
+                                        else
+                                            validForAddition = true;
+                                    }
+                                    else if (appendMode == IndexAppendMode.Title)
+                                    {
+                                        if (_uow.IndexedDocuments.Get(o => o.Title.Equals(model.Title)).Any())
+                                            break;
+                                        else
+                                            validForAddition = true;
+                                    }
+                                    else if (appendMode == IndexAppendMode.TitleAll)
+                                    {
+                                        if (!_uow.IndexedDocuments.Get(o => o.Title.Equals(model.Title)).Any())
+                                            validForAddition = true;
+                                    }
+                                }
+                                // Otherwise, all fine...
+                                else
+                                {
+                                    validForAddition = true;
+                                }
+
+                                // If document is valid for indexation...
+                                if (validForAddition)
+                                {
+                                    anyIndexedData = true;
+                                    indexedDocuments.Add(model);
+                                }
                             }
 
                             IndexProcessingProgress = $"Preprocessing documents... ({i}/{data.Length})";
@@ -733,8 +770,10 @@ namespace InformationRetrievalManager
                                 break;
                             }
                         }
+                        IndexProcessingProgress = "Preprocessing documents done!";
 
                         // If data were processed successfully (no rollback required)...
+                        // ...continue in processing...
                         if (dataRollback == false)
                         {
                             // If any documents are ready for indexation...
@@ -743,49 +782,90 @@ namespace InformationRetrievalManager
                                 // Begin DB-TRANSACTION
                                 _uow.BeginTransaction();
 
-                                // Cmmmit
                                 IndexProcessingProgress = "Preparing documents...";
-                                _uow.IndexedFileReferences.Insert(fileReference);
-                                _uow.SaveChanges();
-                                long i = 0;
-                                foreach (var doc in indexedDocuments)
+                                DateTime indexTimestamp = default;
+                                // Create and Cmmmit file reference
+                                IndexedFileReferenceDataModel fileReference = null;
+                                // If append mode...
+                                if (isAppendMode)
                                 {
-                                    i++;
-                                    doc.IndexedFileReferenceId = fileReference.Id;
-                                    _uow.IndexedDocuments.Insert(doc);
-                                    _uow.SaveChanges(); // Save immediately to make sure the docs will have their IDs in ASC order by the current order
-                                    IndexProcessingProgress = $"Preparing documents... ({i}/{indexedDocuments.Count})";
+                                    indexTimestamp = indexFile.CreatedAt;
+                                    fileReference = _uow.IndexedFileReferences.Get(o => DateTime.Compare(o.Timestamp, indexTimestamp) == 0).FirstOrDefault();
+                                }
+                                // Otherwise, create new index file
+                                else
+                                {
+                                    var utcNow = DateTime.UtcNow;
+                                    indexTimestamp = new DateTime(utcNow.Year, utcNow.Month, utcNow.Day, utcNow.Hour, utcNow.Minute, utcNow.Second, DateTimeKind.Utc);
+                                    fileReference = new IndexedFileReferenceDataModel
+                                    {
+                                        DataInstanceId = _dataInstance.Id,
+                                        Timestamp = indexTimestamp
+                                    };
+                                    _uow.IndexedFileReferences.Insert(fileReference);
+                                    _uow.SaveChanges();
                                 }
 
-                                // Create index specific document array
-                                IndexDocument[] docs = new IndexDocument[fileReference.IndexedDocuments.Count];
-                                i = 0;
-                                foreach (var item in fileReference.IndexedDocuments)
+                                // If file reference (index) exists (no problems)...
+                                if (fileReference != null)
                                 {
-                                    docs[i] = item.ToIndexDocument();
-                                    i++;
+                                    // Commit index documents
+                                    long i = 0;
+                                    foreach (var doc in indexedDocuments)
+                                    {
+                                        i++;
+                                        doc.IndexedFileReferenceId = fileReference.Id;
+                                        _uow.IndexedDocuments.Insert(doc);
+                                        _uow.SaveChanges(); // Save immediately to make sure the docs will have their IDs in ASC order by the current order
+                                        IndexProcessingProgress = $"Preparing documents... ({i}/{indexedDocuments.Count})";
+
+                                        // Check for cancelation
+                                        if (_indexProcessingTokenSource.Token.IsCancellationRequested)
+                                        {
+                                            dataRollback = true;
+                                            break;
+                                        }
+                                    }
+
+                                    // Create index specific document array
+                                    IndexDocument[] docs = new IndexDocument[fileReference.IndexedDocuments.Count];
+                                    i = 0;
+                                    foreach (var item in fileReference.IndexedDocuments)
+                                    {
+                                        docs[i] = item.ToIndexDocument();
+                                        i++;
+                                    }
+
+                                    // Indexate documents
+                                    IndexProcessingProgress = "Indexing...";
+                                    var processing = new IndexProcessing(_dataInstance.Id.ToString(), indexTimestamp, _dataInstance.IndexProcessingConfiguration, _fileManager, _logger);
+                                    processing.IndexDocuments(docs, save: true, load: isAppendMode,
+                                        setProgressMessage: (value) => IndexProcessingProgress = value,
+                                        cancellationToken: _indexProcessingTokenSource.Token);
+
+                                    // If the cancelation is requested...
+                                    if (_indexProcessingTokenSource.Token.IsCancellationRequested)
+                                    {
+                                        dataRollback = true;
+                                        // Rollback DB-TRANSACTION
+                                        _uow.RollbackTransaction();
+                                    }
+                                    // Otherwise, everythings fine...
+                                    else
+                                    {
+                                        IndexProcessingProgress = "Committing index...";
+                                        // Commit DB-TRANSACTION
+                                        _uow.CommitTransaction();
+                                    }
                                 }
-
-                                // Indexate documents
-                                IndexProcessingProgress = "Indexing...";
-                                var processing = new IndexProcessing(_dataInstance.Id.ToString(), indexTimestamp, _dataInstance.IndexProcessingConfiguration, _fileManager, _logger);
-                                processing.IndexDocuments(docs, save: true,
-                                    setProgressMessage: (value) => IndexProcessingProgress = value,
-                                    cancellationToken: _indexProcessingTokenSource.Token);
-
-                                // If the cancelation is requested...
-                                if (_indexProcessingTokenSource.Token.IsCancellationRequested)
+                                // Otherwise, corrupted index file...
+                                else
                                 {
+                                    _logger.LogErrorSource("Trying to load corrupted index file!");
+
                                     dataRollback = true;
                                     // Rollback DB-TRANSACTION
                                     _uow.RollbackTransaction();
-                                }
-                                // Otherwise, everythings fine...
-                                else
-                                {
-                                    IndexProcessingProgress = "Committing index...";
-                                    // Commit DB-TRANSACTION
-                                    _uow.CommitTransaction();
                                 }
 
                                 _logger.LogDebugSource("Index processing done!");

@@ -448,13 +448,6 @@
                                                     </MultiDataTrigger.Conditions>
                                                     <Setter Property="IsEnabled" Value="True" />
                                                 </MultiDataTrigger>
-                                                <MultiDataTrigger>
-                                                    <MultiDataTrigger.Conditions>
-                                                        <Condition Binding="{Binding IsAppendMode, Mode=OneWay}" Value="True" />
-                                                        <Condition Binding="{Binding AppendIndexFileEntry.Value.FilePath, Converter={local:StringEmptyConverter}, Mode=OneWay}" Value="True" />
-                                                    </MultiDataTrigger.Conditions>
-                                                    <Setter Property="IsEnabled" Value="False" />
-                                                </MultiDataTrigger>
                                             </Style.Triggers>
                                         </Style>
                                     </Grid.Style>
@@ -469,8 +462,22 @@
                                         local:IsBusyProperty.Value="{Binding IndexProcessingInWorkFlag, Mode=OneWay}"
                                         Command="{Binding StartIndexProcessingCommand, Mode=OneTime}"
                                         Content="START INDEX PROCESSING"
-                                        FontSize="16"
-                                        Style="{StaticResource LightColorButton}" />
+                                        FontSize="16">
+                                        <Button.Style>
+                                            <Style BasedOn="{StaticResource LightColorButton}" TargetType="{x:Type Button}">
+                                                <Setter Property="IsEnabled" Value="True" />
+                                                <Style.Triggers>
+                                                    <MultiDataTrigger>
+                                                        <MultiDataTrigger.Conditions>
+                                                            <Condition Binding="{Binding IsAppendMode, Mode=OneWay}" Value="True" />
+                                                            <Condition Binding="{Binding AppendIndexFileEntry.Value.FilePath, Converter={local:StringEmptyConverter}, Mode=OneWay}" Value="True" />
+                                                        </MultiDataTrigger.Conditions>
+                                                        <Setter Property="IsEnabled" Value="False" />
+                                                    </MultiDataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Button.Style>
+                                    </Button>
 
                                     <!--  Append Mode Switch BTN  -->
                                     <Grid
