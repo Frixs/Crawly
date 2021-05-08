@@ -13,7 +13,7 @@ namespace InformationRetrievalManager.NLP
         /// <param name="iid">The index identifier.</param>
         /// <returns>Array of all index files (file paths).</returns>
         /// <exception cref="ArgumentNullException">Identifier is not defined.</exception>
-        string[] GetIndexFiles(string iid);
+        string[] GetAllIndexFiles(string iid);
 
         /// <summary>
         /// Delete files according to index identifier and file timestmap.

@@ -35,7 +35,7 @@ namespace InformationRetrievalManager.NLP
         #region Interface Methods
 
         /// <inheritdoc/>
-        public string[] GetIndexFiles(string iid)
+        public string[] GetAllIndexFiles(string iid)
         {
             if (iid == null)
                 throw new ArgumentNullException("Index ID is not defined!");

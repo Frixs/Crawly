@@ -1014,7 +1014,7 @@ namespace InformationRetrievalManager
                     // Find and delete all the index files...
                     try
                     {
-                        var filePaths = _indexStorage.GetIndexFiles(_dataInstance.Id.ToString());
+                        var filePaths = _indexStorage.GetAllIndexFiles(_dataInstance.Id.ToString());
                         for (int i = 0; i < filePaths.Length; ++i)
                             File.Delete(filePaths[i]);
                     }
@@ -1122,7 +1122,7 @@ namespace InformationRetrievalManager
                     var crawlerFilePaths = _crawlerStorage.GetAllDataFiles(_dataInstance.Id.ToString());
                     for (int i = 0; i < crawlerFilePaths.Length; ++i)
                         File.Delete(crawlerFilePaths[i]);
-                    var indexFilePaths = _indexStorage.GetIndexFiles(_dataInstance.Id.ToString());
+                    var indexFilePaths = _indexStorage.GetAllIndexFiles(_dataInstance.Id.ToString());
                     for (int i = 0; i < indexFilePaths.Length; ++i)
                         File.Delete(indexFilePaths[i]);
                 }
@@ -1224,7 +1224,7 @@ namespace InformationRetrievalManager
                     .OrderByDescending(o => o.Timestamp)
                     .ToArray();
                 // Get real files (filepaths)
-                var filePaths = _indexStorage.GetIndexFiles(_dataInstance.Id.ToString());
+                var filePaths = _indexStorage.GetAllIndexFiles(_dataInstance.Id.ToString());
 
                 // Go through the file references...
                 for (int i = fileReferences.Length - 1; i >= 0; --i)
