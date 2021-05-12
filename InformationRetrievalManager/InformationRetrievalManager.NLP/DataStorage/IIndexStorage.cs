@@ -23,7 +23,7 @@ namespace InformationRetrievalManager.NLP
         /// <param name="fileTimestamp">The file timestamp.</param>
         /// <exception cref="ArgumentNullException">Identifier is not defined.</exception>
         /// <exception cref="Exception">Unknown error - related to IO.</exception>
-        void DeleteIndexFiles(string iid, DateTime fileTimestamp);
+        void DeleteFiles(string iid, DateTime fileTimestamp);
 
         /// <summary>
         /// Update index filename

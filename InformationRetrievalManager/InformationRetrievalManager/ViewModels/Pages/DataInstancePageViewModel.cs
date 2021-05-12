@@ -860,7 +860,7 @@ namespace InformationRetrievalManager
                 DataFileInfo fileInfo = parameter as DataFileInfo;
 
                 if (fileInfo != null && fileInfo.FilePath != null && File.Exists(fileInfo.FilePath))
-                    _indexStorage.DeleteIndexFiles(_dataInstance.Id.ToString(), fileInfo.CreatedAt);
+                    _indexStorage.DeleteFiles(_dataInstance.Id.ToString(), fileInfo.CreatedAt);
 
                 await LoadIndexFilesAsync(true);
             });

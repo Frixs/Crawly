@@ -69,7 +69,7 @@ namespace InformationRetrievalManager.NLP
         }
 
         /// <inheritdoc/>
-        public void DeleteIndexFiles(string iid, DateTime fileTimestamp)
+        public void DeleteFiles(string iid, DateTime fileTimestamp)
         {
             if (iid == null)
                 throw new ArgumentNullException("Index ID is not defined!");
