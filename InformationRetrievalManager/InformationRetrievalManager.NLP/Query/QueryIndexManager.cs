@@ -68,7 +68,7 @@ namespace InformationRetrievalManager.NLP
         /// <inheritdoc/>
         public async Task<(byte Status, (long[] Data, long FoundDocuments, long TotalDocuments) Result)> QueryAsync(
             string query,
-            InvertedIndex index,
+            IInvertedIndex index,
             QueryModelType modelType,
             IndexProcessingConfiguration configuration,
             int select = 0,
@@ -129,7 +129,7 @@ namespace InformationRetrievalManager.NLP
         /// <returns>The tuple of the 2. return parameter of <see cref="QueryAsync"/>.</returns>
         private (long[] Data, long FoundDocuments, long TotalDocuments) ProcessQuery(
             string query,
-            InvertedIndex index,
+            IInvertedIndex index,
             QueryModelType modelType,
             IndexProcessingConfiguration configuration,
             int select,
@@ -137,7 +137,9 @@ namespace InformationRetrievalManager.NLP
             CancellationToken cancellationToken = default)
         {
             setProgressMessage?.Invoke("starting");
+            _logger.LogTraceSource("Starting query process...");
 
+            IQueryModel usedModel = null;
             long foundDocuments = 0;
 
             // Get index data
@@ -145,37 +147,54 @@ namespace InformationRetrievalManager.NLP
             // Get data checksum
             var dataChecksum = GetDataChecksum(data);
 
-            // If the model type is the same as the one from the last query request...
-            if (modelType == _lastModelType)
+            // Check if we are doing query above the same data as previously...
+            if (_lastDataChecksum != null && dataChecksum.SequenceEqual(_lastDataChecksum))
             {
-                // If the data are equal to the last used one...
-                if (dataChecksum.SequenceEqual(_lastDataChecksum))
+                _logger.LogTraceSource("Query processing is starting to calculate on the same data...");
+
+                // Previous data are the same, so take the previous model...
+                usedModel = _lastModel;
+
+                // If the model type matches as the previous one calculated...
+                if (modelType == _lastModelType)
                 {
-                    // If so, the data are equal to the last one...
+                    // If so, the model is the same as the last one...
                     // ... check if the query is different...
                     if (!query.Equals(_lastQuery))
+                    {
+                        _logger.LogTraceSource("Query processing is calculating query. Data are alredy calculated.");
                         // If so, recalculate query
-                        _lastModel.CalculateQuery(data, query, configuration, setProgressMessage, cancellationToken);
+                        usedModel.CalculateQuery(data, query, configuration, setProgressMessage, cancellationToken);
+                    }
                     // Otherwise, there is not need to do anything, the query data are the same as the previous request.
+                    else
+                    {
+                        _logger.LogTraceSource("Query processing is not calculating anything. It is already calculated.");
+                    }
                 }
-                // Otherwise, recalculate everything...
+                // Otherwise, different query model, recalculate everything...
                 else
                 {
-                    _lastModel.CalculateData(data, setProgressMessage, cancellationToken);
-                    _lastModel.CalculateQuery(data, query, configuration, setProgressMessage, cancellationToken);
+                    _logger.LogTraceSource("Query processing is calculating all.");
+                    // Calculate
+                    usedModel.CalculateData(data, setProgressMessage, cancellationToken);
+                    usedModel.CalculateQuery(data, query, configuration, setProgressMessage, cancellationToken);
                 }
             }
-            // Otherwise, recalculate the whole model straight away...
+            // Otherwise, different (new) data for calculation...
             else
             {
+                _logger.LogTraceSource("Query processing is starting to calculate new data...");
+
+                // Create new query model
                 switch (modelType)
                 {
                     case QueryModelType.TfIdf:
-                        _lastModel = new TfIdfModel(_logger);
+                        usedModel = new TfIdfModel(_logger);
                         break;
 
                     case QueryModelType.Boolean:
-                        _lastModel = new BooleanModel(_logger);
+                        usedModel = new BooleanModel(_logger);
                         break;
 
                     default:
@@ -183,17 +202,47 @@ namespace InformationRetrievalManager.NLP
                         _logger.LogCriticalSource("Model is out of range!");
                         break;
                 }
+                setProgressMessage?.Invoke("loading calculations");
+                // Load the calculations (if any)
+                usedModel.LoadCalculations(_indexStorage, index);
 
-                _lastModel.CalculateData(data, setProgressMessage, cancellationToken);
-                _lastModel.CalculateQuery(data, query, configuration, setProgressMessage, cancellationToken);
+                // Check if data are already calculated (if loaded calculations already set it)
+                // If not.. calculate everything...
+                if (!usedModel.DataCalculated)
+                {
+                    _logger.LogTraceSource("Query processing is calculating all.");
+                    // Calculate
+                    usedModel.CalculateData(data, setProgressMessage, cancellationToken);
+                    usedModel.CalculateQuery(data, query, configuration, setProgressMessage, cancellationToken);
+                }
+                // Otherwise, data are already calculated, check query...
+                // ...if the query is not calculated, calculate it...
+                else if (!usedModel.QueryCalculated)
+                {
+                    _logger.LogTraceSource("Query processing is calculating query. Data are alredy calculated.");
+                    // Calculate
+                    usedModel.CalculateQuery(data, query, configuration, setProgressMessage, cancellationToken);
+                }
             }
 
-            // Save information about last query request
-            _lastModelType = modelType;
-            _lastQuery = query;
-            _lastDataChecksum = dataChecksum;
+            // Save information about last query request (if no cancellation)
+            if (!cancellationToken.IsCancellationRequested)
+            {
+                _logger.LogTraceSource("Query processing is saving data.");
 
-            return (_lastModel.CalculateBestMatch(data, select, out foundDocuments, setProgressMessage, cancellationToken), foundDocuments, data.Documents.Count);
+                // Save calculations
+                usedModel.SaveCalculations(_indexStorage, index);
+                
+                // Save information
+                _lastModel = usedModel;
+                _lastModelType = modelType;
+                _lastQuery = query;
+                _lastDataChecksum = dataChecksum;
+            }
+
+            _logger.LogTraceSource("Query processing is calculating the result.");
+            // Result
+            return (usedModel.CalculateBestMatch(data, select, out foundDocuments, setProgressMessage, cancellationToken), foundDocuments, data.Documents.Count);
         }
 
         /// <summary>

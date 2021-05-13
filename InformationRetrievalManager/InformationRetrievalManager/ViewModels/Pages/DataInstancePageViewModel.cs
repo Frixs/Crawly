@@ -786,7 +786,8 @@ namespace InformationRetrievalManager
                                     // Update index timestamp if appended...
                                     if (isAppendMode)
                                     {
-                                        _indexStorage.UpdateIndexFilename(_dataInstance.Id.ToString(), indexFile.CreatedAt, newIndexTimestamp);
+                                        _indexStorage.DeleteIndexedDataFiles(_dataInstance.Id.ToString(), indexFile.CreatedAt);
+                                        _indexStorage.UpdateFilenames(_dataInstance.Id.ToString(), indexFile.CreatedAt, newIndexTimestamp);
                                         fileReference.Timestamp = newIndexTimestamp;
                                         _uow.SaveChanges();
                                     }

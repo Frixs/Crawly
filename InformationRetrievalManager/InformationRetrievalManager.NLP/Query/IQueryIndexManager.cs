@@ -29,7 +29,7 @@ namespace InformationRetrievalManager.NLP
         ///             3. No. of total searched documents.
         /// </returns>
         /// <exception cref="ArgumentNullException">Invalid parameters.</exception>
-        Task<(byte Status, (long[] Data, long FoundDocuments, long TotalDocuments) Result)> QueryAsync(string query, InvertedIndex index, QueryModelType modelType, IndexProcessingConfiguration configuration, int select, Action<string> setProgressMessage, CancellationToken cancellationToken);
+        Task<(byte Status, (long[] Data, long FoundDocuments, long TotalDocuments) Result)> QueryAsync(string query, IInvertedIndex index, QueryModelType modelType, IndexProcessingConfiguration configuration, int select, Action<string> setProgressMessage, CancellationToken cancellationToken);
 
         /// <summary>
         /// Resets model data that are saved from previous query calls. 

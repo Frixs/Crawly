@@ -39,6 +39,9 @@ namespace InformationRetrievalManager.NLP
         /// <inheritdoc/>
         public string Name { get; }
 
+        /// <inheritdoc/>
+        public DateTime Timestamp => _timestamp;
+
         #endregion
 
         #region Constructor

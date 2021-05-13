@@ -33,28 +33,31 @@ namespace InformationRetrievalManager.Core
 
                     try
                     {
-                        byte[] data;
-                        using (FileStream stream = File.Open(path, FileMode.Open))
+                        if (File.Exists(path))
                         {
-                            byte[] buffer = new byte[16 * 1024];
-                            using (MemoryStream ms = new MemoryStream())
+                            byte[] data;
+                            using (FileStream stream = File.Open(path, FileMode.Open))
                             {
-                                int read;
-                                while ((read = stream.Read(buffer, 0, buffer.Length)) > 0)
-                                    ms.Write(buffer, 0, read);
-                                data = ms.ToArray();
+                                byte[] buffer = new byte[16 * 1024];
+                                using (MemoryStream ms = new MemoryStream())
+                                {
+                                    int read;
+                                    while ((read = stream.Read(buffer, 0, buffer.Length)) > 0)
+                                        ms.Write(buffer, 0, read);
+                                    data = ms.ToArray();
+                                }
                             }
-                        }
 
-                        resultObj = MessagePackSerializer.Deserialize<T>(data);
-                    }
-                    catch (FileNotFoundException)
-                    {
-                        resultStatus = 1;
+                            resultObj = MessagePackSerializer.Deserialize<T>(data);
+                        }
+                        else
+                        {
+                            resultStatus = 1;
+                        }
                     }
                     catch (IOException)
                     {
-                        resultStatus = 1;
+                        resultStatus = 3;
                     }
                     catch (Exception)
                     {
@@ -116,13 +119,9 @@ namespace InformationRetrievalManager.Core
                             //}
                         }
                     }
-                    catch (FileNotFoundException)
-                    {
-                        result = 1;
-                    }
                     catch (IOException)
                     {
-                        result = 1;
+                        result = 3;
                     }
                     catch (Exception)
                     {
