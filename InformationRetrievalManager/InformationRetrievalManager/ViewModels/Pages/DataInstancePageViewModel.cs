@@ -896,51 +896,32 @@ namespace InformationRetrievalManager
                 if (IndexProcessingInWorkFlag)
                     return;
 
-                bool indexLoaded = false;
+                // Calculate the query and get results...
                 var ii = new InvertedIndex(_dataInstance.Id.ToString(), file.CreatedAt, _fileManager, _logger);
-                // Default query result
-                (long[] Results, long FoundDocuments, long TotalDocuments) queryResult = (Array.Empty<long>(), -1, -1);
-
-                await _taskManager.Run(async () =>
+                var queryResult = await _queryIndexManager.QueryAsync(query, ii,
+                    modelType: queryModel, _dataInstance.IndexProcessingConfiguration, select,
+                    setProgressMessage: (value) => QueryProgress = value,
+                    cancellationToken: _queryTokenSource.Token);
+                // If success...
+                if (queryResult.Status == 0)
                 {
-                    // Load data
-                    QueryProgress = "Loading index...";
-                    // If success....
-                    if (ii.Load())
-                    {
-                        indexLoaded = true;
-                        // Calculate the query and get results...
-                        var res = await _queryIndexManager.QueryAsync(query, ii.GetReadOnlyData(),
-                            modelType: queryModel, _dataInstance.IndexProcessingConfiguration, select,
-                            setProgressMessage: (value) => QueryProgress = $"Processing... ({value})",
-                            cancellationToken: _queryTokenSource.Token);
-
-                        QueryProgress = "Preparing results...";
-
-                        if (!_queryTokenSource.Token.IsCancellationRequested)
-                            queryResult = res; // Get the results if not cancelled
-                        else
-                            _queryIndexManager.ResetLastModelData(); // Reset the query manager last data if cancelled
-                    }
-                    // Otherwise, loading failed...
-                    else
-                    {
-                        indexLoaded = false;
-                        QueryErrorString = "Index file is corrupted!";
-                    }
-                });
-
+                    QueryProgress = "Preparing results...";
+                }
                 // If the index did not load...
-                if (!indexLoaded)
+                else // == 1
                 {
+                    QueryErrorString = "Index file is corrupted!";
                     // Corrupted file => delete it
                     await DeleteIndexFileCommandRoutineAsync(file);
                 }
 
                 // Go through the results...
-                for (int i = 0; i < queryResult.Results.Length; ++i)
+                for (int i = 0; i < queryResult.Result.Data.Length; ++i)
                 {
-                    var doc = _uow.IndexedDocuments.GetByID(queryResult.Results[i]);
+                    if (_queryTokenSource.Token.IsCancellationRequested)
+                        break;
+
+                    var doc = _uow.IndexedDocuments.GetByID(queryResult.Result.Data[i]);
                     if (doc != null)
                     {
                         ResultContext.Data.Add(new QueryDataResultViewContext.Result
@@ -961,16 +942,20 @@ namespace InformationRetrievalManager
                 }
 
                 // If no error occurred...
-                if (QueryErrorString == null)
+                if (QueryErrorString == null && !_queryTokenSource.Token.IsCancellationRequested)
                 {
-                    ResultContext.FoundDocuments = queryResult.FoundDocuments;
-                    ResultContext.TotalDocuments = queryResult.TotalDocuments;
+                    ResultContext.FoundDocuments = queryResult.Result.FoundDocuments;
+                    ResultContext.TotalDocuments = queryResult.Result.TotalDocuments;
                     // Fire update context property
                     OnPropertyChanged(nameof(ResultContext));
 
                     // Automatically move the user to the result view
                     CurrentView = View.Results;
                 }
+
+                // Reset the query manager last data if cancelled
+                if (_queryTokenSource.Token.IsCancellationRequested)
+                    _queryIndexManager.ResetLastModelData();
 
                 QueryProgress = "Done!";
             });

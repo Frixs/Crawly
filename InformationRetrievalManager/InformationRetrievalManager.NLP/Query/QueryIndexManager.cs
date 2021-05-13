@@ -20,6 +20,8 @@ namespace InformationRetrievalManager.NLP
         #region Private Members (Injects)
 
         private readonly ILogger _logger;
+        private readonly ITaskManager _taskManager;
+        private readonly IIndexStorage _indexStorage;
 
         #endregion
 
@@ -52,9 +54,11 @@ namespace InformationRetrievalManager.NLP
         /// <summary>
         /// Default constructor
         /// </summary>
-        public QueryIndexManager(ILogger logger)
+        public QueryIndexManager(ILogger logger, ITaskManager taskManager, IIndexStorage indexStorage)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _taskManager = taskManager ?? throw new ArgumentNullException(nameof(taskManager));
+            _indexStorage = indexStorage ?? throw new ArgumentNullException(nameof(indexStorage));
         }
 
         #endregion
@@ -62,78 +66,47 @@ namespace InformationRetrievalManager.NLP
         #region Interface Methods
 
         /// <inheritdoc/>
-        public async Task<(long[] Results, long FoundDocuments, long TotalDocuments)> QueryAsync(string query, InvertedIndex.ReadOnlyData data, QueryModelType modelType, IndexProcessingConfiguration configuration, int select = 0, Action<string> setProgressMessage = null, CancellationToken cancellationToken = default)
+        public async Task<(byte Status, (long[] Data, long FoundDocuments, long TotalDocuments) Result)> QueryAsync(
+            string query,
+            InvertedIndex index,
+            QueryModelType modelType,
+            IndexProcessingConfiguration configuration,
+            int select = 0,
+            Action<string> setProgressMessage = null,
+            CancellationToken cancellationToken = default)
         {
-            if (query == null || data == null)
+            if (query == null || index == null)
                 throw new ArgumentNullException("Query data not specified!");
 
             if (select < 0)
                 throw new InvalidCastException($"Parameter '{nameof(select)}' cannot be negative number!");
 
             // Lock the task.
-            return await AsyncLock.LockResultAsync(nameof(QueryIndexManager) + nameof(QueryAsync), () =>
+            return await AsyncLock.LockResultAsync<(byte, (long[], long, long))>(nameof(QueryIndexManager) + nameof(QueryAsync), async () =>
             {
                 var t_query = query;
-                var t_data = data;
+                var t_index = index;
                 var t_modelType = modelType;
                 var t_configuration = configuration;
 
-                long foundDocuments = 0;
+                // Set default result value
+                (byte Status, (long[] Data, long FoundDocuments, long TotalDocuments) Result) result = (1, (Array.Empty<long>(), -1, -1));
 
-                setProgressMessage?.Invoke("starting");
-
-                // Get data checksum
-                var dataChecksum = GetDataChecksum(t_data);
-
-                // If the model type is the same as the one from the last query request...
-                if (t_modelType == _lastModelType)
+                // Run the process in separate thread...
+                await _taskManager.Run(() =>
                 {
-                    // If the data are equal to the last used one...
-                    if (dataChecksum.SequenceEqual(_lastDataChecksum))
+                    setProgressMessage?.Invoke("Loading index...");
+
+                    // If loading index succeeded...
+                    if (t_index.Load())
                     {
-                        // If so, the data are equal to the last one...
-                        // ... check if the query is different...
-                        if (!t_query.Equals(_lastQuery))
-                            // If so, recalculate query
-                            _lastModel.CalculateQuery(t_data, t_query, t_configuration, setProgressMessage, cancellationToken);
-                        // Otherwise, there is not need to do anything, the query data are the same as the previous request.
+                        // Process the query
+                        var data = ProcessQuery(t_query, t_index, t_modelType, t_configuration, select, (value) => setProgressMessage?.Invoke($"Processing... ({value})"), cancellationToken);
+                        result = (0, data);
                     }
-                    // Otherwise, recalculate everything...
-                    else
-                    {
-                        _lastModel.CalculateData(t_data, setProgressMessage, cancellationToken);
-                        _lastModel.CalculateQuery(t_data, t_query, t_configuration, setProgressMessage, cancellationToken);
-                    }
-                }
-                // Otherwise, recalculate the whole model straight away...
-                else
-                {
-                    switch (t_modelType)
-                    {
-                        case QueryModelType.TfIdf:
-                            _lastModel = new TfIdfModel(_logger);
-                            break;
+                });
 
-                        case QueryModelType.Boolean:
-                            _lastModel = new BooleanModel(_logger);
-                            break;
-
-                        default:
-                            Debugger.Break();
-                            _logger.LogCriticalSource("Model is out of range!");
-                            break;
-                    }
-
-                    _lastModel.CalculateData(t_data, setProgressMessage, cancellationToken);
-                    _lastModel.CalculateQuery(t_data, t_query, t_configuration, setProgressMessage, cancellationToken);
-                }
-
-                // Save information about last query request
-                _lastModelType = t_modelType;
-                _lastQuery = t_query;
-                _lastDataChecksum = dataChecksum;
-                
-                return (_lastModel.CalculateBestMatch(t_data, select, out foundDocuments, setProgressMessage, cancellationToken), foundDocuments, data.Documents.Count);
+                return result;
             });
         }
 
@@ -149,6 +122,79 @@ namespace InformationRetrievalManager.NLP
         #endregion
 
         #region Private Methods
+
+        /// <summary>
+        /// Process method for: <see cref="QueryAsync"/>.
+        /// </summary>
+        /// <returns>The tuple of the 2. return parameter of <see cref="QueryAsync"/>.</returns>
+        private (long[] Data, long FoundDocuments, long TotalDocuments) ProcessQuery(
+            string query,
+            InvertedIndex index,
+            QueryModelType modelType,
+            IndexProcessingConfiguration configuration,
+            int select,
+            Action<string> setProgressMessage = null,
+            CancellationToken cancellationToken = default)
+        {
+            setProgressMessage?.Invoke("starting");
+
+            long foundDocuments = 0;
+
+            // Get index data
+            var data = index.GetReadOnlyData();
+            // Get data checksum
+            var dataChecksum = GetDataChecksum(data);
+
+            // If the model type is the same as the one from the last query request...
+            if (modelType == _lastModelType)
+            {
+                // If the data are equal to the last used one...
+                if (dataChecksum.SequenceEqual(_lastDataChecksum))
+                {
+                    // If so, the data are equal to the last one...
+                    // ... check if the query is different...
+                    if (!query.Equals(_lastQuery))
+                        // If so, recalculate query
+                        _lastModel.CalculateQuery(data, query, configuration, setProgressMessage, cancellationToken);
+                    // Otherwise, there is not need to do anything, the query data are the same as the previous request.
+                }
+                // Otherwise, recalculate everything...
+                else
+                {
+                    _lastModel.CalculateData(data, setProgressMessage, cancellationToken);
+                    _lastModel.CalculateQuery(data, query, configuration, setProgressMessage, cancellationToken);
+                }
+            }
+            // Otherwise, recalculate the whole model straight away...
+            else
+            {
+                switch (modelType)
+                {
+                    case QueryModelType.TfIdf:
+                        _lastModel = new TfIdfModel(_logger);
+                        break;
+
+                    case QueryModelType.Boolean:
+                        _lastModel = new BooleanModel(_logger);
+                        break;
+
+                    default:
+                        Debugger.Break();
+                        _logger.LogCriticalSource("Model is out of range!");
+                        break;
+                }
+
+                _lastModel.CalculateData(data, setProgressMessage, cancellationToken);
+                _lastModel.CalculateQuery(data, query, configuration, setProgressMessage, cancellationToken);
+            }
+
+            // Save information about last query request
+            _lastModelType = modelType;
+            _lastQuery = query;
+            _lastDataChecksum = dataChecksum;
+
+            return (_lastModel.CalculateBestMatch(data, select, out foundDocuments, setProgressMessage, cancellationToken), foundDocuments, data.Documents.Count);
+        }
 
         /// <summary>
         /// Gets checksum of query data

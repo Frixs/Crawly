@@ -11,10 +11,10 @@ namespace InformationRetrievalManager.NLP
     public interface IQueryIndexManager
     {
         /// <summary>
-        /// Query documents from the most relevant to the least.
+        /// Query documents from the most relevant to the least. The process is run in separate thread.
         /// </summary>
         /// <param name="query">The query</param>
-        /// <param name="data"><see cref="InvertedIndex._data"/> - data used for query</param>
+        /// <param name="index">Reference to the index of which data are queried.</param>
         /// <param name="modelType">Type of the model to use for querying.</param>
         /// <param name="configuration">Processing configuration to use for the query index processing.</param>
         /// <param name="select">Limit number of records to select (0 to ignore limit).</param>
@@ -22,12 +22,14 @@ namespace InformationRetrievalManager.NLP
         /// <param name="cancellationToken">Cancellation token for interrupting the process.</param>
         /// <returns>
         ///     Tuple:
-        ///         1: Array of document IDs sorted from the most relevant to the least (secondary by document ID ASC). 
-        ///         2: No. of ofund documents. 
-        ///         3. No. of total searched documents.
+        ///         1. Status (0 = OK, 1 = Index load failure)
+        ///         2. Tuple:
+        ///             1: Array of document IDs sorted from the most relevant to the least  (not <see langword="null"/>). 
+        ///             2: No. of ofund documents. 
+        ///             3. No. of total searched documents.
         /// </returns>
         /// <exception cref="ArgumentNullException">Invalid parameters.</exception>
-        Task<(long[] Results, long FoundDocuments, long TotalDocuments)> QueryAsync(string query, InvertedIndex.ReadOnlyData data, QueryModelType modelType, IndexProcessingConfiguration configuration, int select, Action<string> setProgressMessage, CancellationToken cancellationToken);
+        Task<(byte Status, (long[] Data, long FoundDocuments, long TotalDocuments) Result)> QueryAsync(string query, InvertedIndex index, QueryModelType modelType, IndexProcessingConfiguration configuration, int select, Action<string> setProgressMessage, CancellationToken cancellationToken);
 
         /// <summary>
         /// Resets model data that are saved from previous query calls. 
