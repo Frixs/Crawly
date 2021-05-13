@@ -38,13 +38,22 @@ namespace InformationRetrievalManager.NLP
 
         #endregion
 
+        #region Interface Properties
+
+        /// <inheritdoc/>
+        public bool DataCalculated { get; private set; }
+
+        /// <inheritdoc/>
+        public bool QueryCalculated { get; private set; }
+
+        #endregion
+
         #region Constructor
 
         /// <summary>
         /// Default constructor
         /// </summary>
-        /// <param name="logger">Logger instance - not required, if not defined, the logger does log nothing</param>
-        public TfIdfModel(ILogger logger = null)
+        public TfIdfModel(ILogger logger)
         {
             _logger = logger;
         }
@@ -110,6 +119,9 @@ namespace InformationRetrievalManager.NLP
             // Save the vectors
             _documentVectors = docVectors;
 
+            // Set flag
+            DataCalculated = true;
+
             // Log it
             _logger?.LogDebugSource("Data has been successfully calculated into vectors.");
             setProgressMessage?.Invoke("data done");
@@ -121,6 +133,8 @@ namespace InformationRetrievalManager.NLP
             if (query == null || data == null)
                 throw new ArgumentNullException("Data not specified!");
 
+            if (!DataCalculated)
+                throw new InvalidOperationException("Data not calculated!");
             if (_termIdf == null)
                 throw new InvalidOperationException("Term IDF map is not defined!");
             if (_documentVectors == null)
@@ -147,6 +161,9 @@ namespace InformationRetrievalManager.NLP
 
             _queryVector = CalculateDocumentVector(CreateQueryData(queryData, data), 0, cancellationToken);
 
+            // Set flag
+            QueryCalculated = true;
+
             // Log it
             _logger?.LogDebugSource("Query has been successfully calculated into vector.");
             setProgressMessage?.Invoke("query done");
@@ -164,6 +181,8 @@ namespace InformationRetrievalManager.NLP
             if (select < 0)
                 throw new InvalidCastException($"Parameter '{nameof(select)}' cannot be negative number!");
 
+            if (!DataCalculated || !QueryCalculated)
+                throw new InvalidOperationException("Data or Query not calculated!");
             if (documentVectors == null)
                 throw new InvalidOperationException("Document vectors are not defined!");
             if (queryVector == null)
@@ -191,6 +210,34 @@ namespace InformationRetrievalManager.NLP
             if (select > 0)
                 return results.Take(select).Select(o => o.DocumentId).ToArray();
             return results.Select(o => o.DocumentId).ToArray();
+        }
+
+        /// <inheritdoc/>
+        public void LoadCalculations(IIndexStorageIndexedSerializable storage, IReadOnlyInvertedIndex index)
+        {
+            Tuple<
+                Dictionary<string, double>,
+                Dictionary<long, (uint Position, double Value)[]>
+                > loadResult = null;
+
+            var status = storage.DeserializeIndexedDataFromFile(index.Name, index.Timestamp, GetType().Name.ToLower(), out loadResult);
+            if (status == 0)
+            {
+                _termIdf = loadResult.Item1;
+                _documentVectors = loadResult.Item2;
+                DataCalculated = true;
+            }
+        }
+
+        /// <inheritdoc/>
+        public void SaveCalculations(IIndexStorageIndexedSerializable storage, IReadOnlyInvertedIndex index)
+        {
+            var data = new Tuple<
+                Dictionary<string, double>,
+                Dictionary<long, (uint Position, double Value)[]>
+                >(_termIdf, _documentVectors);
+
+            storage.SerializeIndexedDataIntoFile(index.Name, index.Timestamp, GetType().Name.ToLower(), data);
         }
 
         #endregion

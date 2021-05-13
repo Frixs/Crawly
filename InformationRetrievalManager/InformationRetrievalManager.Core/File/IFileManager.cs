@@ -19,8 +19,9 @@ namespace InformationRetrievalManager.Core
         ///     Tuple that consists of status code and the deserialized object (it is null on error).
         ///     Status code:
         ///         0=OK, 
-        ///         1=IO exception, 
+        ///         1=Index does not exist, 
         ///         2=Serialization error,
+        ///         3=IO exception, 
         /// </returns>
         /// <exception cref="FileNotFoundException"></exception>
         /// <exception cref="IOException"></exception>
@@ -39,8 +40,8 @@ namespace InformationRetrievalManager.Core
         /// <returns>
         ///     Status code:
         ///         0=OK, 
-        ///         1=IO exception, 
         ///         2=Serialization error,
+        ///         3=IO exception, 
         /// </returns>
         /// <exception cref="FileNotFoundException"></exception>
         /// <exception cref="IOException"></exception>

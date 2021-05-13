@@ -28,13 +28,22 @@ namespace InformationRetrievalManager.NLP
 
         #endregion
 
+        #region Interface Properties
+
+        /// <inheritdoc/>
+        public bool DataCalculated { get; private set; }
+
+        /// <inheritdoc/>
+        public bool QueryCalculated { get; private set; }
+
+        #endregion
+
         #region Constructor
 
         /// <summary>
         /// Default constructor
         /// </summary>
-        /// <param name="logger">Logger instance - not required, if not defined, the logger does log nothing</param>
-        public BooleanModel(ILogger logger = null)
+        public BooleanModel(ILogger logger)
         {
             _logger = logger;
         }
@@ -48,6 +57,9 @@ namespace InformationRetrievalManager.NLP
         {
             if (data == null)
                 throw new ArgumentNullException("Data not specified!");
+
+            // Set flag
+            DataCalculated = true;
 
             // Log it
             _logger?.LogDebugSource("Data has been successfully calculated.");
@@ -102,6 +114,9 @@ namespace InformationRetrievalManager.NLP
                 // Assign to query results
                 _queryResults = results;
 
+                // Set flag
+                QueryCalculated = true;
+
                 // Log it
                 _logger?.LogDebugSource("Query has been successfully calculated and data prepared.");
             }
@@ -133,6 +148,18 @@ namespace InformationRetrievalManager.NLP
             if (select > 0)
                 return _queryResults.Take(select).Select(o => o.DocumentId).ToArray();
             return _queryResults.Select(o => o.DocumentId).ToArray();
+        }
+
+        /// <inheritdoc/>
+        public void LoadCalculations(IIndexStorageIndexedSerializable storage, IReadOnlyInvertedIndex index)
+        {
+            // no for Boolean model
+        }
+
+        /// <inheritdoc/>
+        public void SaveCalculations(IIndexStorageIndexedSerializable storage, IReadOnlyInvertedIndex index)
+        {
+            // no for Boolean model
         }
 
         #endregion

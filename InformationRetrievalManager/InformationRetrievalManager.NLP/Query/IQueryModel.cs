@@ -7,8 +7,27 @@ namespace InformationRetrievalManager.NLP
     /// <summary>
     /// Query model interface
     /// </summary>
+    /// <remarks>
+    ///     This interface extends are intended to be used only by <see cref="QueryIndexManager"/>.
+    /// </remarks>
     public interface IQueryModel
     {
+        /// <summary>
+        /// Indicates if <see cref="CalculateData"/> already made a calculation.
+        /// </summary>
+        bool DataCalculated { get; }
+
+        /// <summary>
+        /// Indicates if <see cref="CalculateQuery"/> already made a calculation.
+        /// </summary>
+        /// <remarks>
+        ///     It is taken into account if the <see cref="DataCalculated"/> is set to <see langword="false"/>. 
+        ///     It is waterfall design, if data are not set, the calculation is made for data and query too 
+        ///     (i.e. this value will not be taken into account) -> check out <see cref="QueryIndexManager.ProcessQuery"/>.
+        /// </remarks>
+        bool QueryCalculated { get; }
+
+
         /// <summary>
         /// Calculates model for documents
         /// </summary>
@@ -41,5 +60,19 @@ namespace InformationRetrievalManager.NLP
         /// <returns>Sorted array of document IDs from the best matching to the least.</returns>
         /// <exception cref="InvalidOperationException">Missing parameters. <see cref="CalculateData"/> and <see cref="CalculateQuery"/> must be called beforehand.</exception>
         long[] CalculateBestMatch(InvertedIndex.ReadOnlyData data, int select, out long foundDocuments, Action<string> setProgressMessage, CancellationToken cancellationToken);
+
+        /// <summary>
+        /// Loads calculations into the model from a file.
+        /// </summary>
+        /// <param name="storage">The storage used for serialization.</param>
+        /// <param name="index">Index as a reference to get data for the <paramref name="storage"/> to be able to serialize.</param>
+        void LoadCalculations(IIndexStorageIndexedSerializable storage, IReadOnlyInvertedIndex index);
+
+        /// <summary>
+        /// Save the current model calculations into a file.
+        /// </summary>
+        /// <param name="storage">The storage used for serialization.</param>
+        /// <param name="index">Index as a reference to get data for the <paramref name="storage"/> to be able to serialize.</param>
+        void SaveCalculations(IIndexStorageIndexedSerializable storage, IReadOnlyInvertedIndex index);
     }
 }

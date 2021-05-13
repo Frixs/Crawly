@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿using System;
 
 namespace InformationRetrievalManager.NLP
 {
@@ -14,6 +14,11 @@ namespace InformationRetrievalManager.NLP
         ///     Should not be <see cref="null"/>.
         /// </remarks>
         string Name { get; }
+
+        /// <summary>
+        /// Gets the index timestamp (copy - not the reference).
+        /// </summary>
+        DateTime Timestamp { get; }
 
         /// <summary>
         /// Tranforms the index to publicly manipulatable object.
