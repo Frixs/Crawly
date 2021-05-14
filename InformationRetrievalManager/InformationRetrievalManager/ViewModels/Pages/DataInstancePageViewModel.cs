@@ -1154,6 +1154,7 @@ namespace InformationRetrievalManager
 
                         // Reaload data
                         await LoadAsync(_dataInstance.Id);
+                        _queryIndexManager.ResetLastModelData();
 
                         // Log it
                         _logger.LogInformationSource($"Index processing configuration of '{_dataInstance.Name}' ({_dataInstance.Id}) successfully updated!");

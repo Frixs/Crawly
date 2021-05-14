@@ -229,6 +229,7 @@ namespace InformationRetrievalManager.NLP
             if (!cancellationToken.IsCancellationRequested)
             {
                 _logger.LogTraceSource("Query processing is saving data.");
+                setProgressMessage?.Invoke("saving query cache");
 
                 // Save calculations
                 usedModel.SaveCalculations(_indexStorage, index);
