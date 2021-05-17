@@ -12,7 +12,7 @@ namespace InformationRetrievalManager.Core
         public static readonly ProcessingLanguage Language_DefaultValue = default;
 
         public static readonly bool CustomRegex_IsRequired = false;
-        public static readonly short CustomRegex_MaxLength = 255;
+        public static readonly ushort CustomRegex_MaxLength = 255;
         public static readonly string CustomRegex_DefaultValue = "";
 
         public static readonly char CustomStopWords_Separator = ',';

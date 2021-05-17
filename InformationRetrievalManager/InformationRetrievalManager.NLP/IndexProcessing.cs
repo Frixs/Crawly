@@ -205,7 +205,7 @@ namespace InformationRetrievalManager.NLP
                 throw new ArgumentNullException("Document not specified!");
 
             // TODO: Create better approach for this
-            string docContent = document.Category + "" + document.Title + " " + document.Content;
+            string docContent = document.Category + " " + document.Title + " " + document.Content;
 
             // Load indexed data
             if (load)

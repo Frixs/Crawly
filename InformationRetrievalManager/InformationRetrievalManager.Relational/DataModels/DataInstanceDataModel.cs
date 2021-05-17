@@ -12,7 +12,7 @@ namespace InformationRetrievalManager.Relational
         #region Limit Constants
 
         public static readonly bool Name_IsRequired = true;
-        public static readonly short Name_MaxLength = 15;
+        public static readonly ushort Name_MaxLength = 15;
         public static readonly string Name_CanContainRegex = @"^([a-zA-Z0-9])+$";
         public static readonly string Name_DefaultValue = "";
 

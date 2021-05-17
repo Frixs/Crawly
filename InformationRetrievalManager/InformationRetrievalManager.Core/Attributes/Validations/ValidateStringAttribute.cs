@@ -31,12 +31,12 @@ namespace InformationRetrievalManager.Core
         /// <summary>
         /// Min length of the string
         /// </summary>
-        public short? MinLength { get; private set; }
+        public ushort? MinLength { get; private set; }
 
         /// <summary>
         /// Max length of the string
         /// </summary>
-        public short? MaxLength { get; private set; }
+        public ushort? MaxLength { get; private set; }
 
         /// <summary>
         /// Regex - can contain
@@ -103,7 +103,7 @@ namespace InformationRetrievalManager.Core
                 {
                     var minLength = declaringType.GetField(pMinLength);
                     if (minLength != null)
-                        MinLength = (short)minLength.GetValue(null);
+                        MinLength = (ushort)minLength.GetValue(null);
                 }
 
                 // MaxLength
@@ -111,7 +111,7 @@ namespace InformationRetrievalManager.Core
                 {
                     var maxLength = declaringType.GetField(pMaxLength);
                     if (maxLength != null)
-                        MaxLength = (short)maxLength.GetValue(null);
+                        MaxLength = (ushort)maxLength.GetValue(null);
                 }
 
                 // CanContainRegex
