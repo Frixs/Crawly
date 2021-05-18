@@ -167,8 +167,18 @@
                     </Grid>
                 </Canvas>
 
+                <!--  Donate BTN  -->
+                <Button
+                    Height="28"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Top"
+                    Command="{Binding DonateCommand, Mode=OneTime}"
+                    Content="DONATE"
+                    Style="{StaticResource DonateButton}" />
+
                 <!--  Guide BTN  -->
                 <Button
+                    Height="28"
                     HorizontalAlignment="Right"
                     VerticalAlignment="Top"
                     Command="{Binding GoToHowToPageCommand, Mode=OneTime}"

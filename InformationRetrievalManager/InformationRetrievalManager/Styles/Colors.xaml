@@ -177,4 +177,24 @@
     <SolidColorBrush x:Key="LightDarkTextButtonActionForegroundBrushKey" Color="{StaticResource LightDarkTextButtonActionForeground}" />
     <!--#endregion-->
 
+    <!--#region DonateButton-->
+    <Color x:Key="DonateButtonForeground">#121517</Color>
+    <SolidColorBrush x:Key="DonateButtonForegroundBrushKey" Color="{StaticResource DonateButtonForeground}" />
+
+    <Color x:Key="DonateButtonBackground">#30421E33</Color>
+    <SolidColorBrush x:Key="DonateButtonBackgroundBrushKey" Color="{StaticResource DonateButtonBackground}" />
+
+    <Color x:Key="DonateButtonHoverForeground">#F1E2EF</Color>
+    <SolidColorBrush x:Key="DonateButtonHoverForegroundBrushKey" Color="{StaticResource DonateButtonHoverForeground}" />
+
+    <Color x:Key="DonateButtonHoverBackground">#AA143F</Color>
+    <SolidColorBrush x:Key="DonateButtonHoverBackgroundBrushKey" Color="{StaticResource DonateButtonHoverBackground}" />
+
+    <Color x:Key="DonateButtonActionForeground">#F1E2EF</Color>
+    <SolidColorBrush x:Key="DonateButtonActionForegroundBrushKey" Color="{StaticResource DonateButtonActionForeground}" />
+
+    <Color x:Key="DonateButtonActionBackground">#ec3052</Color>
+    <SolidColorBrush x:Key="DonateButtonActionBackgroundBrushKey" Color="{StaticResource DonateButtonActionBackground}" />
+    <!--#endregion-->
+
 </ResourceDictionary>

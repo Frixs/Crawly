@@ -39,6 +39,11 @@ namespace InformationRetrievalManager
 
         #region Command Flags
 
+        /// <summary>
+        /// Command flag for opening process (e.g. files or for opening web pages)
+        /// </summary>
+        public bool ProcessFlag { get; set; }
+
         #endregion
 
         #region Commands
@@ -52,6 +57,11 @@ namespace InformationRetrievalManager
         /// Command to open page with the specific data instance
         /// </summary>
         public ICommand GoToDataInstanceCommand { get; set; }
+
+        /// <summary>
+        /// The command to go to donate website.
+        /// </summary>
+        public ICommand DonateCommand { get; set; }
 
         /// <summary>
         /// Command to create a new data instance
@@ -70,6 +80,7 @@ namespace InformationRetrievalManager
             // Create commands.
             GoToHowToPageCommand = new RelayCommand(GoToHowToPageCommandRoutine);
             GoToDataInstanceCommand = new RelayParameterizedCommand((parameter) => GoToDataInstancePageCommandRoutine(parameter));
+            DonateCommand = new RelayCommand(async () => DonateCommandRoutineAsync());
             CreateNewDataInstanceCommand = new RelayCommand(GoToCreateDataInstancePageCommandRoutine);
         }
 
@@ -107,6 +118,23 @@ namespace InformationRetrievalManager
             DI.ViewModelApplication.GoToPage(ApplicationPage.DataInstance,
                 Framework.Service<DataInstancePageViewModel>().Init(long.Parse(parameter.ToString()))
                 );
+        }
+
+        /// <summary>
+        /// Command Routine : Go To Donate website
+        /// </summary>
+        /// <returns></returns>
+        private async Task DonateCommandRoutineAsync()
+        {
+            await RunCommandAsync(() => ProcessFlag, async () =>
+            {
+                string url = "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=QE2V3BNQJVG5W&source=url";
+
+                if (!string.IsNullOrEmpty(url) && url.IsURL())
+                    System.Diagnostics.Process.Start(url);
+
+                await Task.Delay(1);
+            });
         }
 
         /// <summary>
