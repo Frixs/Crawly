@@ -57,9 +57,43 @@
                 </Grid>
             </Grid>
 
-            <Grid Grid.Row="1" HorizontalAlignment="Center">
-                <TextBlock Text="WORK IN PROGRESS" />
-            </Grid>
+            <StackPanel
+                Grid.Row="1"
+                HorizontalAlignment="Center"
+                Orientation="Vertical"
+                TextBlock.TextAlignment="Center">
+                <TextBlock
+                    Margin="0,15,0,5"
+                    FontFamily="{StaticResource DosisBold}"
+                    FontSize="15"
+                    Text="CREATE DATA INSTANCE" />
+                <TextBlock FontSize="14" Text="Create a configuration for crawler and data processing and wrap it in a data instance." />
+                <TextBlock
+                    Margin="0,15,0,5"
+                    FontFamily="{StaticResource DosisBold}"
+                    FontSize="15"
+                    Text="SCRAPE DATA FROM WEBSITE" />
+                <TextBlock FontSize="14" Text="Search the website and scrape articles using configured XPaths for further processing." />
+                <TextBlock
+                    Margin="0,15,0,5"
+                    FontFamily="{StaticResource DosisBold}"
+                    FontSize="15"
+                    Text="INDEXATE DATA" />
+                <TextBlock FontSize="14" Text="Process already scraped data into searchable data index." />
+                <TextBlock
+                    Margin="0,15,0,5"
+                    FontFamily="{StaticResource DosisBold}"
+                    FontSize="15"
+                    Text="SEARCH" />
+                <TextBlock FontSize="14" Text="Use one of the available query models to search the data index." />
+
+                <Button
+                    Margin="0,60,0,0"
+                    HorizontalAlignment="Center"
+                    Command="{Binding WikiCommand}"
+                    Content="WIKI"
+                    Style="{StaticResource DarkLightButton}" />
+            </StackPanel>
         </Grid>
     </Border>
 </local:BasePage>

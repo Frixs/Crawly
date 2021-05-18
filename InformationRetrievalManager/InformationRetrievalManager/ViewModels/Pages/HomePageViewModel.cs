@@ -80,7 +80,7 @@ namespace InformationRetrievalManager
             // Create commands.
             GoToHowToPageCommand = new RelayCommand(GoToHowToPageCommandRoutine);
             GoToDataInstanceCommand = new RelayParameterizedCommand((parameter) => GoToDataInstancePageCommandRoutine(parameter));
-            DonateCommand = new RelayCommand(async () => DonateCommandRoutineAsync());
+            DonateCommand = new RelayCommand(async () => await DonateCommandRoutineAsync());
             CreateNewDataInstanceCommand = new RelayCommand(GoToCreateDataInstancePageCommandRoutine);
         }
 

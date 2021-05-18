@@ -795,7 +795,7 @@
                     Height="34"
                     Command="{Binding ShowViewCommand, Mode=OneTime}"
                     CommandParameter="0"
-                    Content="{StaticResource FontAwesomeUndoAltIcon}"
+                    Content="{StaticResource FontAwesomeArrowLeftIcon}"
                     FontFamily="{StaticResource FontAwesomeSolid}"
                     FontSize="16"
                     Style="{StaticResource DarkLightButton}" />
@@ -871,7 +871,7 @@
                     Height="34"
                     Command="{Binding ShowViewCommand, Mode=OneTime}"
                     CommandParameter="0"
-                    Content="{StaticResource FontAwesomeUndoAltIcon}"
+                    Content="{StaticResource FontAwesomeArrowLeftIcon}"
                     FontFamily="{StaticResource FontAwesomeSolid}"
                     FontSize="16">
                     <Button.Style>
