@@ -38,6 +38,12 @@ namespace InformationRetrievalManager
         public string ApplicationName { get; private set; } = "Crawly";
 
         /// <summary>
+        /// Application version. 
+        /// What user can see in the app UI, e.g.
+        /// </summary>
+        public string ApplicationVersion { get; private set; } = "v 1 . 0";
+
+        /// <summary>
         /// Window default title.
         /// Default name which is set at application start.
         /// </summary>
