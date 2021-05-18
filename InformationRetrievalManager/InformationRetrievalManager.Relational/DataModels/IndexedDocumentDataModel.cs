@@ -12,21 +12,21 @@ namespace InformationRetrievalManager.Relational
         #region Limit Constants
 
         public static readonly bool Title_IsRequired = true;
-        public static readonly short Title_MaxLength = 350;
+        public static readonly ushort Title_MaxLength = 350;
         public static readonly string Title_DefaultValue = "";
 
         public static readonly bool Category_AllowNull = true;
         public static readonly bool Category_IsRequired = false;
-        public static readonly short Category_MaxLength = 50;
+        public static readonly ushort Category_MaxLength = 50;
         public static readonly string Category_DefaultValue = "";
 
         public static readonly bool SourceUrl_IsRequired = true;
-        public static readonly short SourceUrl_MaxLength = 999;
+        public static readonly ushort SourceUrl_MaxLength = 999;
         public static readonly string SourceUrl_CanContainRegex = CrawlerConfigurationDataModel.SiteAddress_CanContainRegex;
         public static readonly string SourceUrl_DefaultValue = "";
 
         public static readonly bool Content_IsRequired = true;
-        public static readonly short Content_MaxLength = 255;
+        public static readonly ushort Content_MaxLength = ushort.MaxValue;
         public static readonly string Content_DefaultValue = "";
 
         #endregion

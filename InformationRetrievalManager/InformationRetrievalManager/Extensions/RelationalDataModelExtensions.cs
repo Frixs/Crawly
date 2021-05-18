@@ -6,9 +6,9 @@ namespace InformationRetrievalManager
     public static class RelationalDataModelExtensions
     {
         /// <summary>
-        /// Transform crawler data <see cref="IndexedDocumentDataModel"/> into <see cref="IndexDocument"/>
+        /// Transform relational data model <see cref="IndexedDocumentDataModel"/> into <see cref="IndexDocument"/>
         /// </summary>
-        /// <param name="model">The crawler model <see cref="IndexedDocumentDataModel"/></param>
+        /// <param name="model">The relational data model <see cref="IndexedDocumentDataModel"/></param>
         /// <returns>Index data model with initialized ID</returns>
         public static IndexDocument ToIndexDocument(this IndexedDocumentDataModel model)
         {

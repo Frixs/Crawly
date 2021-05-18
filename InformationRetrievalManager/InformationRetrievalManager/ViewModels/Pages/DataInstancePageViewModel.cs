@@ -686,20 +686,20 @@ namespace InformationRetrievalManager
                         if (isAppendMode && appendMode == IndexAppendMode.Timestamp)
                             appendTimestampThreshold = _uow.IndexedDocuments.GetMaxTimestamp();
 
-                        IndexProcessingProgress = "Preprocessing documents...";
-                        var indexedDocuments = new Collection<IndexedDocumentDataModel>();
+                        IndexProcessingProgress = "Validating documents...";
+                        var indexedDocumentDataModels = new Collection<IndexedDocumentDataModel>();
                         // Prepare documents for indexation
                         bool anyIndexedData = false;
                         for (int i = 0; i < data.Length; ++i)
                         {
-                            // Preprocess document
-                            var status = IndexProcessingPreprocessDocument(data[i], indexedDocuments, isAppendMode, appendMode, appendTimestampThreshold);
+                            // Validate documents and put the valid one into the inputed parameter of index document collection
+                            var status = IndexProcessingValidateDocuments(data[i], indexedDocumentDataModels, isAppendMode, appendMode, appendTimestampThreshold);
                             if (status == 2)
                                 break;
                             else if (status == 0)
                                 anyIndexedData = true;
 
-                            IndexProcessingProgress = $"Preprocessing documents... ({i}/{data.Length})";
+                            IndexProcessingProgress = $"Validating documents... ({i}/{data.Length})";
 
                             // Check for cancelation
                             if (_indexProcessingTokenSource.Token.IsCancellationRequested)
@@ -708,7 +708,7 @@ namespace InformationRetrievalManager
                                 break;
                             }
                         }
-                        IndexProcessingProgress = "Preprocessing documents done!";
+                        IndexProcessingProgress = "Validating documents done!";
 
                         // If data were processed successfully (no rollback required)...
                         // ...continue in processing...
@@ -749,13 +749,13 @@ namespace InformationRetrievalManager
                                     // Commit index documents
                                     _uow.TurnOffAutoDetectChanges(); // Turn off change auto detection to lightweight next code segment
                                     long i = 0;
-                                    foreach (var doc in indexedDocuments)
+                                    foreach (var doc in indexedDocumentDataModels)
                                     {
                                         i++;
                                         doc.IndexedFileReferenceId = fileReference.Id;
                                         _uow.IndexedDocuments.Insert(doc);
                                         _uow.SaveChanges(); // Save immediately to make sure the docs will have their IDs in ASC order by the current order
-                                        IndexProcessingProgress = $"Preparing documents... ({i}/{indexedDocuments.Count})";
+                                        IndexProcessingProgress = $"Preparing documents... ({i}/{indexedDocumentDataModels.Count})";
 
                                         // Check for cancelation
                                         if (_indexProcessingTokenSource.Token.IsCancellationRequested)
@@ -770,7 +770,7 @@ namespace InformationRetrievalManager
                                     // Create index specific document array
                                     IndexDocument[] docs = new IndexDocument[fileReference.IndexedDocuments.Count];
                                     i = 0;
-                                    foreach (var item in fileReference.IndexedDocuments)
+                                    foreach (var item in fileReference.IndexedDocuments) // All documents in the database (old + appends)
                                     {
                                         docs[i] = item.ToIndexDocument();
                                         i++;
@@ -925,14 +925,16 @@ namespace InformationRetrievalManager
                     var doc = _uow.IndexedDocuments.GetByID(queryResult.Result.Data[i]);
                     if (doc != null)
                     {
+                        // Create data for view
                         ResultContext.Data.Add(new QueryDataResultViewContext.Result
                         {
-                            Title = doc.Title,
-                            Category = doc.Category,
+                            Title = doc.Title == null ? null : Regex.Replace(StringHelpers.ReplaceNewLines(doc.Title, " "), @"[ ]+", " ").Trim(),
+                            Category = doc.Category == null ? null : Regex.Replace(StringHelpers.ReplaceNewLines(doc.Category, " "), @"[ ]+", " ").Trim(),
                             Timestamp = doc.Timestamp == DateTime.MinValue ? null : doc.Timestamp.ToString("yyyy-MM-dd HH:mm"),
                             SourceUrl = doc.SourceUrl,
-                            Content = doc.Content
+                            Content = doc.Content == null ? null : StringHelpers.ShortenWithDots(Regex.Replace(StringHelpers.ReplaceNewLines(doc.Content, " "), @"[ ]+", " ").Trim(), 255) // Max length to show to the user
                         });
+                        QueryProgress = $"Preparing results... ({i}/{queryResult.Result.Data.Length})";
                     }
                     else
                     {
@@ -1607,7 +1609,7 @@ namespace InformationRetrievalManager
         #region Private Helper Methods
 
         /// <summary>
-        /// Preprocess document data and add them into <paramref name="indexedDocuments"/> if valid.
+        /// Validate document data and add them into <paramref name="indexedDocuments"/> if valid.
         /// </summary>
         /// <param name="data">The document data.</param>
         /// <param name="indexedDocuments">The final indexed collection.</param>
@@ -1619,17 +1621,18 @@ namespace InformationRetrievalManager
         ///     1=(Document NOT added to the final collection - not valid document),
         ///     2=(Index stop condition reached)
         /// </returns>
-        private byte IndexProcessingPreprocessDocument(CrawlerDataModel data, Collection<IndexedDocumentDataModel> indexedDocuments, bool isAppendMode, IndexAppendMode appendMode = default, DateTime appendTimestampThreshold = default)
+        private byte IndexProcessingValidateDocuments(CrawlerDataModel data, Collection<IndexedDocumentDataModel> indexedDocuments, bool isAppendMode, IndexAppendMode appendMode = default, DateTime appendTimestampThreshold = default)
         {
             byte result = 1;
 
+            // Create model with and sanitize fields
             var model = new IndexedDocumentDataModel
             {
-                Title = data.Title == null ? null : Regex.Replace(StringHelpers.ReplaceNewLines(data.Title, " "), @"[ ]+", " ").Trim(),
-                Category = data.Category == null ? null : Regex.Replace(StringHelpers.ReplaceNewLines(data.Category, " "), @"[ ]+", " ").Trim(),
+                Title = data.Title?.Trim(),
+                Category = data.Category?.Trim(),
                 Timestamp = data.Timestamp,
                 SourceUrl = data.SourceUrl,
-                Content = data.Content == null ? null : StringHelpers.ShortenWithDots(Regex.Replace(StringHelpers.ReplaceNewLines(data.Content, " "), @"[ ]+", " ").Trim(), IndexedDocumentDataModel.Content_MaxLength - 3)
+                Content = data.Content?.Trim()
             };
 
             // Validate, if no errors...

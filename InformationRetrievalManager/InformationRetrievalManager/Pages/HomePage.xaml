@@ -167,8 +167,18 @@
                     </Grid>
                 </Canvas>
 
+                <!--  Donate BTN  -->
+                <Button
+                    Height="28"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Top"
+                    Command="{Binding DonateCommand, Mode=OneTime}"
+                    Content="DONATE"
+                    Style="{StaticResource DonateButton}" />
+
                 <!--  Guide BTN  -->
                 <Button
+                    Height="28"
                     HorizontalAlignment="Right"
                     VerticalAlignment="Top"
                     Command="{Binding GoToHowToPageCommand, Mode=OneTime}"
@@ -315,7 +325,7 @@
                     FontFamily="{StaticResource DosisSemiBold}"
                     FontSize="12"
                     Foreground="{StaticResource LightColorShinyBrushKey}"
-                    Text="Made by Tomáš Frixs" />
+                    Text="{Binding Value_ViewModelApplication.PublisherName, Source={x:Static local:ViewModelLocator.Instance}, Mode=OneTime, StringFormat='Made by {0}'}" />
 
                 <!--  Version  -->
                 <TextBlock
@@ -324,7 +334,7 @@
                     FontFamily="{StaticResource DosisSemiBold}"
                     FontSize="12"
                     Foreground="{StaticResource LightColorShinyBrushKey}"
-                    Text="v . 1 . 0" />
+                    Text="{Binding Value_ViewModelApplication.ApplicationVersion, Source={x:Static local:ViewModelLocator.Instance}, Mode=OneTime}" />
             </Grid>
         </Border>
     </Grid>

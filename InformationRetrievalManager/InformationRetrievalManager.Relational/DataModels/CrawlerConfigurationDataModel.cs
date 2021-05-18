@@ -11,12 +11,12 @@ namespace InformationRetrievalManager.Relational
         #region Limit Constants
 
         public static readonly bool SiteAddress_IsRequired = true;
-        public static readonly short SiteAddress_MaxLength = 350;
+        public static readonly ushort SiteAddress_MaxLength = 350;
         public static readonly string SiteAddress_CanContainRegex = @"https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)";
         public static readonly string SiteAddress_DefaultValue = "";
 
         public static readonly bool SiteSuffix_IsRequired = true;
-        public static readonly short SiteSuffix_MaxLength = 999;
+        public static readonly ushort SiteSuffix_MaxLength = 999;
         public static readonly string SiteSuffix_CanContainRegex = @"(\{0\})+";
         public static readonly string SiteSuffix_DefaultValue = "";
 
@@ -37,31 +37,31 @@ namespace InformationRetrievalManager.Relational
         public static readonly int SearchInterval_DefaultValue = 1000;
 
         public static readonly bool SiteUrlArticlesXPath_IsRequired = true;
-        public static readonly short SiteUrlArticlesXPath_MaxLength = 255;
+        public static readonly ushort SiteUrlArticlesXPath_MaxLength = 255;
         public static readonly string SiteUrlArticlesXPath_DefaultValue = "";
 
         public static readonly bool SiteArticleContentAreaXPath_IsRequired = true;
-        public static readonly short SiteArticleContentAreaXPath_MaxLength = 255;
+        public static readonly ushort SiteArticleContentAreaXPath_MaxLength = 255;
         public static readonly string SiteArticleContentAreaXPath_DefaultValue = "";
 
         public static readonly bool SiteArticleTitleXPath_IsRequired = true;
-        public static readonly short SiteArticleTitleXPath_MaxLength = 999;
+        public static readonly ushort SiteArticleTitleXPath_MaxLength = 999;
         public static readonly string SiteArticleTitleXPath_DefaultValue = "";
 
         public static readonly bool SiteArticleCategoryXPath_IsRequired = false;
-        public static readonly short SiteArticleCategoryXPath_MaxLength = 255;
+        public static readonly ushort SiteArticleCategoryXPath_MaxLength = 255;
         public static readonly string SiteArticleCategoryXPath_DefaultValue = "";
 
         public static readonly bool SiteArticleDateTimeXPath_IsRequired = false;
-        public static readonly short SiteArticleDateTimeXPath_MaxLength = 255;
+        public static readonly ushort SiteArticleDateTimeXPath_MaxLength = 255;
         public static readonly string SiteArticleDateTimeXPath_DefaultValue = "";
 
         public static readonly bool SiteArticleDateTimeFormat_IsRequired = false;
-        public static readonly short SiteArticleDateTimeFormat_MaxLength = 50;
+        public static readonly ushort SiteArticleDateTimeFormat_MaxLength = 50;
         public static readonly string SiteArticleDateTimeFormat_DefaultValue = "yyyy-MM-dd HH:mm";
 
         public static readonly bool SiteArticleDateTimeCultureInfo_IsRequired = false;
-        public static readonly short SiteArticleDateTimeCultureInfo_MaxLength = 10;
+        public static readonly ushort SiteArticleDateTimeCultureInfo_MaxLength = 10;
         public static readonly string SiteArticleDateTimeCultureInfo_DefaultValue = "en-US";
 
         #endregion

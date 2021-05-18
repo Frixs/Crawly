@@ -147,38 +147,27 @@ namespace InformationRetrievalManager.NLP
             // Get data checksum
             var dataChecksum = GetDataChecksum(data);
 
+            // If the model type matches as the previous one calculated...
             // Check if we are doing query above the same data as previously...
-            if (_lastDataChecksum != null && dataChecksum.SequenceEqual(_lastDataChecksum))
+            if (modelType == _lastModelType && _lastDataChecksum != null && dataChecksum.SequenceEqual(_lastDataChecksum))
             {
                 _logger.LogTraceSource("Query processing is starting to calculate on the same data...");
 
                 // Previous data are the same, so take the previous model...
                 usedModel = _lastModel;
 
-                // If the model type matches as the previous one calculated...
-                if (modelType == _lastModelType)
+                // If so, the model is the same as the last one...
+                // ... check if the query is different...
+                if (!query.Equals(_lastQuery))
                 {
-                    // If so, the model is the same as the last one...
-                    // ... check if the query is different...
-                    if (!query.Equals(_lastQuery))
-                    {
-                        _logger.LogTraceSource("Query processing is calculating query. Data are alredy calculated.");
-                        // If so, recalculate query
-                        usedModel.CalculateQuery(data, query, configuration, setProgressMessage, cancellationToken);
-                    }
-                    // Otherwise, there is not need to do anything, the query data are the same as the previous request.
-                    else
-                    {
-                        _logger.LogTraceSource("Query processing is not calculating anything. It is already calculated.");
-                    }
+                    _logger.LogTraceSource("Query processing is calculating query. Data are alredy calculated.");
+                    // If so, recalculate query
+                    usedModel.CalculateQuery(data, query, configuration, setProgressMessage, cancellationToken);
                 }
-                // Otherwise, different query model, recalculate everything...
+                // Otherwise, there is not need to do anything, the query data are the same as the previous request.
                 else
                 {
-                    _logger.LogTraceSource("Query processing is calculating all.");
-                    // Calculate
-                    usedModel.CalculateData(data, setProgressMessage, cancellationToken);
-                    usedModel.CalculateQuery(data, query, configuration, setProgressMessage, cancellationToken);
+                    _logger.LogTraceSource("Query processing is not calculating anything. It is already calculated.");
                 }
             }
             // Otherwise, different (new) data for calculation...
@@ -233,7 +222,7 @@ namespace InformationRetrievalManager.NLP
 
                 // Save calculations
                 usedModel.SaveCalculations(_indexStorage, index);
-                
+
                 // Save information
                 _lastModel = usedModel;
                 _lastModelType = modelType;
