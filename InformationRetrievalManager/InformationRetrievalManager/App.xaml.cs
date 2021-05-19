@@ -80,7 +80,7 @@ namespace InformationRetrievalManager
             // Setup the DNA Framework
             Framework.Construct<DefaultFrameworkConstruction>()
                 .AddFileLogger(
-                    logPath: Framework.Construction.Environment.IsDevelopment ? "logs/debug.log" : "logs/InformationRetrievalManager.log",
+                    logPath: Framework.Construction.Environment.IsDevelopment ? "logs/debug.log" : "logs/Crawly.log",
                     logLevel: (LogLevel)Enum.Parse(typeof(LogLevel), Framework.Construction.Configuration.GetSection("Logging:LogLevel:Default")?.Value ?? LogLevel.Information.ToString(), true),
                     trimSize: 50000000) // 50MB limit
                 .AddDataStore()

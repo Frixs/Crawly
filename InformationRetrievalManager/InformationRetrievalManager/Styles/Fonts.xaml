@@ -4,21 +4,21 @@
     xmlns:system="clr-namespace:System;assembly=mscorlib">
 
     <!--  Fonts: Font Awesome  -->
-    <FontFamily x:Key="FontAwesomeSolid">pack://application:,,,/InformationRetrievalManager;Component/Resources/Fonts/FontAwesome/#Font Awesome 5 Free Solid</FontFamily>
-    <FontFamily x:Key="FontAwesomeRegular">pack://application:,,,/InformationRetrievalManager;Component/Resources/Fonts/FontAwesome/#Font Awesome 5 Free Regular</FontFamily>
-    <FontFamily x:Key="FontAwesomeBrands">pack://application:,,,/InformationRetrievalManager;Component/Resources/Fonts/FontAwesome/#Font Awesome 5 Brands Regular</FontFamily>
+    <FontFamily x:Key="FontAwesomeSolid">pack://application:,,,/Crawly;Component/Resources/Fonts/FontAwesome/#Font Awesome 5 Free Solid</FontFamily>
+    <FontFamily x:Key="FontAwesomeRegular">pack://application:,,,/Crawly;Component/Resources/Fonts/FontAwesome/#Font Awesome 5 Free Regular</FontFamily>
+    <FontFamily x:Key="FontAwesomeBrands">pack://application:,,,/Crawly;Component/Resources/Fonts/FontAwesome/#Font Awesome 5 Brands Regular</FontFamily>
 
     <!--  Fonts: Pacifico  -->
-    <FontFamily x:Key="Pacifico">pack://application:,,,/InformationRetrievalManager;Component/Resources/Fonts/Pacifico/#Pacifico</FontFamily>
+    <FontFamily x:Key="Pacifico">pack://application:,,,/Crawly;Component/Resources/Fonts/Pacifico/#Pacifico</FontFamily>
 
     <!--  Fonts: Dosis  -->
-    <FontFamily x:Key="DosisExtraLight">pack://application:,,,/InformationRetrievalManager;Component/Resources/Fonts/Dosis/ExtraLight/#Dosis ExtraLight</FontFamily>
-    <FontFamily x:Key="DosisLight">pack://application:,,,/InformationRetrievalManager;Component/Resources/Fonts/Dosis/Light/#Dosis Light</FontFamily>
-    <FontFamily x:Key="DosisRegular">pack://application:,,,/InformationRetrievalManager;Component/Resources/Fonts/Dosis/#Dosis</FontFamily>
-    <FontFamily x:Key="DosisMedium">pack://application:,,,/InformationRetrievalManager;Component/Resources/Fonts/Dosis/Medium/#Dosis Medium</FontFamily>
-    <FontFamily x:Key="DosisSemiBold">pack://application:,,,/InformationRetrievalManager;Component/Resources/Fonts/Dosis/SemiBold/#Dosis SemiBold</FontFamily>
-    <FontFamily x:Key="DosisBold">pack://application:,,,/InformationRetrievalManager;Component/Resources/Fonts/Dosis/Bold/#Dosis</FontFamily>
-    <FontFamily x:Key="DosisExtraBold">pack://application:,,,/InformationRetrievalManager;Component/Resources/Fonts/Dosis/ExtraBold/#Dosis ExtraBold</FontFamily>
+    <FontFamily x:Key="DosisExtraLight">pack://application:,,,/Crawly;Component/Resources/Fonts/Dosis/ExtraLight/#Dosis ExtraLight</FontFamily>
+    <FontFamily x:Key="DosisLight">pack://application:,,,/Crawly;Component/Resources/Fonts/Dosis/Light/#Dosis Light</FontFamily>
+    <FontFamily x:Key="DosisRegular">pack://application:,,,/Crawly;Component/Resources/Fonts/Dosis/#Dosis</FontFamily>
+    <FontFamily x:Key="DosisMedium">pack://application:,,,/Crawly;Component/Resources/Fonts/Dosis/Medium/#Dosis Medium</FontFamily>
+    <FontFamily x:Key="DosisSemiBold">pack://application:,,,/Crawly;Component/Resources/Fonts/Dosis/SemiBold/#Dosis SemiBold</FontFamily>
+    <FontFamily x:Key="DosisBold">pack://application:,,,/Crawly;Component/Resources/Fonts/Dosis/Bold/#Dosis</FontFamily>
+    <FontFamily x:Key="DosisExtraBold">pack://application:,,,/Crawly;Component/Resources/Fonts/Dosis/ExtraBold/#Dosis ExtraBold</FontFamily>
 
     <!--  Set default font for these elements  -->
     <Style x:Key="BaseStyle" TargetType="{x:Type Control}">

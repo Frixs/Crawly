@@ -11,7 +11,7 @@
     MinHeight="{x:Static data:ApplicationStateDataModel.MainWindowSizeY_MinValue}"
     Background="{StaticResource BackgroundBrushKey}"
     Closing="Window_Closing"
-    Icon="/InformationRetrievalManager;component/icon.ico"
+    Icon="/Crawly;component/icon.ico"
     mc:Ignorable="d">
     <Grid>
         <!--  Texture Background  -->
