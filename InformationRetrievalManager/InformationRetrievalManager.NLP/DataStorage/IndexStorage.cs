@@ -69,6 +69,39 @@ namespace InformationRetrievalManager.NLP
         }
 
         /// <inheritdoc/>
+        public string[] GetFiles(string iid)
+        {
+            if (iid == null)
+                throw new ArgumentNullException("Index ID is not defined!");
+
+            var result = new List<string>();
+
+            try
+            {
+                if (Directory.Exists(Constants.IndexDataStorageDir))
+                {
+                    // Get all index directories...
+                    string[] dirs = Directory.GetDirectories(Constants.IndexDataStorageDir);
+                    for (int i = 0; i < dirs.Length; ++i)
+                        // Find the one specific for the searched index...
+                        if (Path.GetFileName(dirs[i]).Equals(iid))
+                        {
+                            result.AddRange(
+                                Directory.GetFiles(dirs[i])
+                                    .Where(o => o.EndsWith(".idx")).ToArray()
+                                );
+                        }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogErrorSource($"{ex.GetType()}: {ex.Message}");
+            }
+
+            return result.ToArray();
+        }
+
+        /// <inheritdoc/>
         public void DeleteFiles(string iid, DateTime fileTimestamp)
         {
             if (iid == null)
