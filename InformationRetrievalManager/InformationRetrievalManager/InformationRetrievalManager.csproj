@@ -10,7 +10,7 @@
     <ProjectGuid>{4909ECE6-5323-45BE-BC87-F28DE5DA8FA1}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <RootNamespace>InformationRetrievalManager</RootNamespace>
-    <AssemblyName>InformationRetrievalManager</AssemblyName>
+    <AssemblyName>Crawly</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -53,6 +53,9 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>icon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="GrEmit, Version=3.4.1.0, Culture=neutral, PublicKeyToken=93c84d6089a381c7, processorArchitecture=MSIL">
