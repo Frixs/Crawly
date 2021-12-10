@@ -55,6 +55,15 @@ namespace InformationRetrievalManager.Crawler
         /// </remarks>
         private string _crawlingProgressUrl = "";
 
+        /// <summary>
+        /// Update request (does not need to exist) set during current (single) crawling process.
+        /// </summary>
+        /// <remarks>
+        ///     It cannot change value during <see cref="IsCurrentlyCrawling"/> is set to <see langword="true"/>. 
+        ///     Value can be overwritten in <see cref="Start"/> and <see cref="Finish"/> back to default.
+        /// </remarks>
+        private UpdateRequest _currentUpdateRequest = null;
+
         #endregion
 
         #region Interface Properties
@@ -176,12 +185,15 @@ namespace InformationRetrievalManager.Crawler
         }
 
         /// <inheritdoc/>
-        public bool Start()
+        public bool Start(UpdateRequest updateRequest = null)
         {
             // First, make sure the process is not running in this crawler...
             // ... the same check should be in process method due to separate process running and default value set in there
             if (IsCurrentlyCrawling)
                 return false;
+
+            // Set update request
+            _currentUpdateRequest = updateRequest;
 
             // Raise the start event
             OnStartProcessEvent?.Invoke(null, EventArgs.Empty);
@@ -250,6 +262,9 @@ namespace InformationRetrievalManager.Crawler
             _crawlingProgressUrl = string.Empty;
             CrawlingTimestamp = default;
             _cancelationFlag = false;
+
+            // Reset update request
+            _currentUpdateRequest = null;
 
             // Raise the finish event
             OnFinishProcessEvent?.Invoke(null, EventArgs.Empty);
@@ -411,7 +426,7 @@ namespace InformationRetrievalManager.Crawler
         }
 
         /// <summary>
-        /// Process scanned URLs and save them
+        /// Process scanned URLs and save data.
         /// </summary>
         /// <param name="web">Web HtmlAgility instance</param>
         /// <param name="urls">The URLs</param>
@@ -459,23 +474,67 @@ namespace InformationRetrievalManager.Crawler
                         && (!string.IsNullOrEmpty(SiteArticleDateTimeXPath) ? datetime != null : true))
                     {
                         DateTime timestamp = DateTime.MinValue;
-                        // Check fi the datetime is parsable...
+                        // Check if the datetime is parsable...
                         if (datetime == null || DateTime.TryParseExact(datetime.InnerText.Trim(), SiteArticleDateTimeParseData.Format, SiteArticleDateTimeParseData.CultureInfo, System.Globalization.DateTimeStyles.None, out timestamp))
                         {
-                            // Save data
-                            await _crawlerStorage.SaveAsync(
-                                crawler: this,
-                                url: url,
-                                title: MinifyText(title.InnerText).Trim(),
-                                category: category == null ? null : MinifyText(category.InnerText).Trim(),
-                                timestamp: timestamp,
-                                contentHtml: TidyfyText(content.InnerHtml),
-                                contentTextMin: MinifyText(content.InnerText),
-                                contentText: TidyfyText(content.InnerText)
-                                );
+                            // Standard way (no update request)...
+                            if (_currentUpdateRequest == null)
+                            {
+                                // Save data
+                                await _crawlerStorage.SaveAsync(
+                                    crawler: this,
+                                    url: url,
+                                    title: MinifyText(title.InnerText).Trim(),
+                                    category: category == null ? null : MinifyText(category.InnerText).Trim(),
+                                    timestamp: timestamp,
+                                    contentHtml: TidyfyText(content.InnerHtml),
+                                    contentTextMin: MinifyText(content.InnerText),
+                                    contentText: TidyfyText(content.InnerText)
+                                    );
 
-                            // Record progress message
-                            progressMsg = "Successful page processing!";
+                                // Record progress message
+                                progressMsg = "Successful page processing!";
+                            }
+                            // Otherwise, update request process...
+                            else
+                            {
+                                bool updateRequestStop = false;
+
+                                /// SWITCH <see cref="UpdateMode"/>
+                                if (_currentUpdateRequest.Mode == UpdateMode.Timestamp)
+                                {
+                                    if (datetime == null || DateTime.Compare(timestamp, _currentUpdateRequest.ParameterTimestamp) <= 0)
+                                        updateRequestStop = true;
+                                }
+                                else if (_currentUpdateRequest.Mode == UpdateMode.Title)
+                                {
+                                    if (title.InnerText.Trim().Contains(_currentUpdateRequest.ParameterTitle))
+                                        updateRequestStop = true;
+                                }
+
+                                // If update task reaches its end (only if update request is set)...
+                                if (updateRequestStop)
+                                {
+                                    // Record progress message
+                                    progressMsg = "Update process reached the stop condition!";
+                                    // Stop
+                                    break;
+                                }
+
+                                // Save (update) data
+                                _crawlerStorage.SaveUpdate(
+                                    crawler: this,
+                                    url: url,
+                                    title: MinifyText(title.InnerText).Trim(),
+                                    category: category == null ? null : MinifyText(category.InnerText).Trim(),
+                                    timestamp: timestamp,
+                                    contentText: TidyfyText(content.InnerText),
+                                    filePath: _currentUpdateRequest.FilePath
+                                    );
+
+                                // Record progress message
+                                progressMsg = "Successful page processing!";
+                            }
                         }
                         else
                         {
@@ -520,6 +579,7 @@ namespace InformationRetrievalManager.Crawler
                 ++i;
             }
 
+            // Final progress message feedback
             UpdateProgressMessageData("URL processing done!", invoke: true);
         }
 

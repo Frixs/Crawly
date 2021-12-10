@@ -157,11 +157,15 @@ namespace InformationRetrievalManager.Crawler
         /// Start the crawling process. The process is started in a new thread.
         /// Once the processing finishes, corresponding flags will be updated.
         /// </summary>
+        /// <param name="updateRequest">
+        ///     Optinal parameter telling the engine to not create completely new data file 
+        ///     but instead create new one from existing file with new values based on the request.
+        /// </param>
         /// <returns>
         ///     <see langword="true"/> = Started successfully.
         ///     <see langword="false"/> = Unable to start because it is already running.
         /// </returns>
-        bool Start();
+        bool Start(UpdateRequest updateRequest = null);
 
         /// <summary>
         /// Cancel the crawling process (if it is in progress)

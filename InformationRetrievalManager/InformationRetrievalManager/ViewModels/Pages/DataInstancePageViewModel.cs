@@ -64,7 +64,7 @@ namespace InformationRetrievalManager
         /// <remarks>
         ///     Relies on <see cref="IsUpdateMode"/>.
         /// </remarks>
-        private CrawlerUpdateMode _selectedUpdateMode; //; ctor
+        private UpdateMode _selectedUpdateMode; //; ctor
 
         /// <summary>
         /// Collection of available data files for indexation.
@@ -369,7 +369,7 @@ namespace InformationRetrievalManager
             };
 
             // Create update mode entry(ies)
-            _selectedUpdateMode = CrawlerUpdateMode.Timestamp; // Set default selection
+            _selectedUpdateMode = UpdateMode.Timestamp; // Set default selection
             CrawlerUpdateParameterEntry.Validation = new ValidateStringAttribute("Update Parameter",
                             typeof(DataInstancePageViewModel), pIsRequired: nameof(CrawlerUpdateParameterEntry_IsRequired), pCanContainRegex: nameof(CrawlerUpdateParameterEntry_CanContainRegex));
             UpdateModeEntryArray = new RadioEntryViewModel[2]
@@ -383,9 +383,9 @@ namespace InformationRetrievalManager
                     GroupName = nameof(UpdateModeEntryArray),
                     CheckAction = async () =>
                     {
-                        _selectedUpdateMode = CrawlerUpdateMode.Timestamp;
+                        _selectedUpdateMode = UpdateMode.Timestamp;
                         CrawlerUpdateParameterEntry.Description = Localization.Resource.CrawlerUpdateParameterEntry_Description_Timestamp;
-                        CrawlerUpdateParameterEntry.Validation = new ValidateStringAttribute("Update Parameter", 
+                        CrawlerUpdateParameterEntry.Validation = new ValidateStringAttribute("Update Parameter",
                             typeof(DataInstancePageViewModel), pIsRequired: nameof(CrawlerUpdateParameterEntry_IsRequired), pCanContainRegex: nameof(CrawlerUpdateParameterEntry_CanContainRegex));
                         await Task.Delay(1);
                     }
@@ -393,13 +393,13 @@ namespace InformationRetrievalManager
                 new RadioEntryViewModel
                 {
                     Label = "Title",
-                    Description = "Update until reaching the first matching document title.",
+                    Description = "Update until reaching match in the document title.",
                     Validation = null,
                     Value = false,
                     GroupName = nameof(UpdateModeEntryArray),
                     CheckAction = async () =>
                     {
-                        _selectedUpdateMode = CrawlerUpdateMode.Title;
+                        _selectedUpdateMode = UpdateMode.Title;
                         CrawlerUpdateParameterEntry.Description = Localization.Resource.CrawlerUpdateParameterEntry_Description_Title;
                         CrawlerUpdateParameterEntry.Validation = new ValidateStringAttribute("Update Parameter", typeof(DataInstancePageViewModel), pIsRequired: nameof(CrawlerUpdateParameterEntry_IsRequired));
                         await Task.Delay(1);
@@ -636,32 +636,63 @@ namespace InformationRetrievalManager
 
             await RunCommandAsync(() => CrawlerInWorkFlag, async () =>
             {
-                // Initialize the crawler
-                _crawlerEngine = new CrawlerEngine(_dataInstance.Id.ToString());
-                _crawlerEngine.SetControls(
-                    _dataInstance.CrawlerConfiguration.SiteAddress,
-                    _dataInstance.CrawlerConfiguration.SiteSuffix,
-                    _dataInstance.CrawlerConfiguration.StartPageNo,
-                    _dataInstance.CrawlerConfiguration.MaxPageNo,
-                    _dataInstance.CrawlerConfiguration.PageNoModifier,
-                    _dataInstance.CrawlerConfiguration.SearchInterval,
-                    _dataInstance.CrawlerConfiguration.SiteUrlArticlesXPath,
-                    _dataInstance.CrawlerConfiguration.SiteArticleContentAreaXPath,
-                    _dataInstance.CrawlerConfiguration.SiteArticleTitleXPath,
-                    _dataInstance.CrawlerConfiguration.SiteArticleCategoryXPath,
-                    _dataInstance.CrawlerConfiguration.SiteArticleDateTimeXPath,
-                    new DatetimeParseData(
-                        _dataInstance.CrawlerConfiguration.SiteArticleDateTimeFormat,
-                        new CultureInfo(_dataInstance.CrawlerConfiguration.SiteArticleDateTimeCultureInfo))
-                    );
-                CrawlerProgress = string.Empty;
-                UpdateCrawlerEvents(_crawlerEngine);
+                bool ok = true;
 
-                // Start the crawler
-                _crawlerEngine.Start();
-                await _crawlerManager.AddCrawlerAsync(_crawlerEngine);
+                // Check/Create crawler engine update request
+                UpdateRequest updateRequest = null;
+                if (IsUpdateMode)
+                {
+                    // If any errors during parameter validation...
+                    if (CrawlerUpdateParameterEntry.Validation.Validate(CrawlerUpdateParameterEntry.Value, null).Count > 0)
+                    {
+                        ok = false;
+                    }
+                    // Otherwise, prepare update request...
+                    else
+                    {
+                        /// SWITCH <see cref="UpdateMode"/>
+                        if (_selectedUpdateMode == UpdateMode.Timestamp)
+                        {
+                            DateTime parameterTimestamp = DateTime.ParseExact(CrawlerUpdateParameterEntry.Value, "yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture);
+                            updateRequest = new UpdateRequest(DataFileEntry.Value.FilePath, _selectedUpdateMode, parameterTimestamp);
+                        }
+                        else if (_selectedUpdateMode == UpdateMode.Title)
+                        {
+                            updateRequest = new UpdateRequest(DataFileEntry.Value.FilePath, _selectedUpdateMode, CrawlerUpdateParameterEntry.Value);
+                        }
+                    }
+                }
 
-                OnPropertyChanged(nameof(CrawlerInWork));
+                // If no issues to run...
+                if (ok)
+                {
+                    // Initialize the crawler
+                    _crawlerEngine = new CrawlerEngine(_dataInstance.Id.ToString());
+                    _crawlerEngine.SetControls(
+                        _dataInstance.CrawlerConfiguration.SiteAddress,
+                        _dataInstance.CrawlerConfiguration.SiteSuffix,
+                        _dataInstance.CrawlerConfiguration.StartPageNo,
+                        _dataInstance.CrawlerConfiguration.MaxPageNo,
+                        _dataInstance.CrawlerConfiguration.PageNoModifier,
+                        _dataInstance.CrawlerConfiguration.SearchInterval,
+                        _dataInstance.CrawlerConfiguration.SiteUrlArticlesXPath,
+                        _dataInstance.CrawlerConfiguration.SiteArticleContentAreaXPath,
+                        _dataInstance.CrawlerConfiguration.SiteArticleTitleXPath,
+                        _dataInstance.CrawlerConfiguration.SiteArticleCategoryXPath,
+                        _dataInstance.CrawlerConfiguration.SiteArticleDateTimeXPath,
+                        new DatetimeParseData(
+                            _dataInstance.CrawlerConfiguration.SiteArticleDateTimeFormat,
+                            new CultureInfo(_dataInstance.CrawlerConfiguration.SiteArticleDateTimeCultureInfo))
+                        );
+                    CrawlerProgress = string.Empty;
+                    UpdateCrawlerEvents(_crawlerEngine);
+
+                    // Start the crawler
+                    _crawlerEngine.Start(updateRequest);
+                    await _crawlerManager.AddCrawlerAsync(_crawlerEngine);
+
+                    OnPropertyChanged(nameof(CrawlerInWork));
+                }
             });
         }
 

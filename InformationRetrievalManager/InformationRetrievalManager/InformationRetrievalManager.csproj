@@ -563,7 +563,6 @@
     </Compile>
     <Compile Include="DataTypes\ApplicationPage.cs" />
     <Compile Include="DataTypes\DataFileInfo.cs" />
-    <Compile Include="DataTypes\CrawlerUpdateMode.cs" />
     <Compile Include="DataTypes\IndexAppendMode.cs" />
     <Compile Include="DI\DI.cs" />
     <Compile Include="DI\FrameworkConstructionExtensions.cs" />
