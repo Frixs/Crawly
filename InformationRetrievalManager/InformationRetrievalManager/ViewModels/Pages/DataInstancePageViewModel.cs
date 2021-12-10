@@ -1087,7 +1087,7 @@ namespace InformationRetrievalManager
                 // Re-initialize state values
                 ConfigurationContext.FormErrorString = null;
 
-                if (CrawlerInWork || IndexProcessingInWorkFlag || QueryInWorkFlag || DeleteIndexFlag)
+                if (CrawlerInWork || IndexProcessingInWorkFlag || QueryInWorkFlag || DeleteIndexFlag || DeleteDataFlag)
                 {
                     ConfigurationContext.FormErrorString = "Cannot update configuration during processing!";
                     return;
@@ -1185,7 +1185,7 @@ namespace InformationRetrievalManager
                 // Re-initialize state values
                 ConfigurationContext.FormErrorString = null;
 
-                if (CrawlerInWork || IndexProcessingInWorkFlag || QueryInWorkFlag || DeleteIndexFlag)
+                if (CrawlerInWork || IndexProcessingInWorkFlag || QueryInWorkFlag || DeleteIndexFlag || DeleteDataFlag)
                 {
                     ConfigurationContext.FormErrorString = "Cannot update configuration during processing!";
                     return;
@@ -1257,7 +1257,7 @@ namespace InformationRetrievalManager
                 // Re-initialize state values
                 ConfigurationContext.FormErrorString = null;
 
-                if (CrawlerInWork || IndexProcessingInWorkFlag || QueryInWorkFlag || DeleteIndexFlag)
+                if (CrawlerInWork || IndexProcessingInWorkFlag || QueryInWorkFlag || DeleteIndexFlag || DeleteDataFlag)
                 {
                     ConfigurationContext.FormErrorString = "Cannot update configuration during processing!";
                     return;
@@ -1311,7 +1311,7 @@ namespace InformationRetrievalManager
                 // Re-initialize state values
                 ConfigurationContext.FormErrorString = null;
 
-                if (CrawlerInWork || IndexProcessingInWorkFlag || QueryInWorkFlag || DeleteIndexFlag)
+                if (CrawlerInWork || IndexProcessingInWorkFlag || QueryInWorkFlag || DeleteIndexFlag || DeleteDataFlag)
                 {
                     ConfigurationContext.FormErrorString = "Cannot update configuration during processing!";
                     return;
