@@ -39,6 +39,9 @@ namespace InformationRetrievalManager
 
         #region Limit Constants
 
+        public static readonly bool CrawlerUpdateParameterEntry_IsRequired = true;
+        public static readonly string CrawlerUpdateParameterEntry_CanContainRegex = @"^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1]) (2[0-3]|[01][0-9]):[0-5][0-9]$";
+
         public static readonly bool QueryEntry_IsRequired = true;
 
         #endregion
@@ -54,6 +57,14 @@ namespace InformationRetrievalManager
         /// Crawler engined currently used.
         /// </summary>
         private ICrawlerEngine _crawlerEngine = null;
+
+        /// <summary>
+        /// Currently selected update mode.
+        /// </summary>
+        /// <remarks>
+        ///     Relies on <see cref="IsUpdateMode"/>.
+        /// </remarks>
+        private CrawlerUpdateMode _selectedUpdateMode; //; ctor
 
         /// <summary>
         /// Collection of available data files for indexation.
@@ -110,6 +121,16 @@ namespace InformationRetrievalManager
         public DataInstanceConfigurationViewContext ConfigurationContext { get; } = new DataInstanceConfigurationViewContext();
 
         /// <summary>
+        /// Entry for crawler update parameter.
+        /// </summary>
+        public TextEntryViewModel CrawlerUpdateParameterEntry { get; protected set; } //; ctor
+
+        /// <summary>
+        /// Update mode radio entry array
+        /// </summary>
+        public RadioEntryViewModel[] UpdateModeEntryArray { get; protected set; } //; ctor
+
+        /// <summary>
         /// Entry selection of available data files.
         /// </summary>
         public ComboEntryViewModel<DataFileInfo> DataFileEntry { get; protected set; } //; ctor
@@ -120,11 +141,6 @@ namespace InformationRetrievalManager
         public ComboEntryViewModel<DataFileInfo> IndexFileEntry { get; protected set; } //; ctor
 
         /// <summary>
-        /// Entry selection of available indexed data files (append menu).
-        /// </summary>
-        public ComboEntryViewModel<DataFileInfo> AppendIndexFileEntry { get; protected set; } //; ctor
-
-        /// <summary>
         /// Append mode radio entry array
         /// </summary>
         public RadioEntryViewModel[] AppendModeEntryArray { get; protected set; } //; ctor
@@ -132,10 +148,6 @@ namespace InformationRetrievalManager
         /// <summary>
         /// Entry for query.
         /// </summary>
-        [ValidateString(nameof(QueryEntry), typeof(DataInstancePageViewModel),
-            pIsRequired: nameof(QueryEntry_IsRequired))]
-        [ValidateBooleanExpressionString(nameof(QueryEntry), typeof(DataInstancePageViewModel),
-            pIsRequired: nameof(QueryEntry_IsRequired))]
         public TextEntryViewModel QueryEntry { get; protected set; } //; ctor
 
         /// <summary>
@@ -202,6 +214,11 @@ namespace InformationRetrievalManager
         }
 
         /// <summary>
+        /// Indicates if crawler is going to be in update mode (<see langword="true"/>) instead of creating completely new data (<see langword="false"/>).
+        /// </summary>
+        public bool IsUpdateMode { get; set; }
+
+        /// <summary>
         /// Indicates if index is going to be appended into already existing index (<see langword="true"/>) 
         /// or brand new index will be created (<see langword="false"/>).
         /// </summary>
@@ -232,6 +249,11 @@ namespace InformationRetrievalManager
         public bool ProcessFlag { get; set; }
 
         /// <summary>
+        /// Command flag for deleting data.
+        /// </summary>
+        public bool DeleteDataFlag { get; set; }
+
+        /// <summary>
         /// Command flag for deleting index.
         /// </summary>
         public bool DeleteIndexFlag { get; set; }
@@ -249,6 +271,11 @@ namespace InformationRetrievalManager
         /// The command to open URL according to the command parameter.
         /// </summary>
         public ICommand OpenUrlCommand { get; set; }
+
+        /// <summary>
+        /// The command to change the view based on parameter.
+        /// </summary>
+        public ICommand ToggleUpdateModeCommand { get; set; }
 
         /// <summary>
         /// The command to start crawler processing.
@@ -311,6 +338,7 @@ namespace InformationRetrievalManager
             // Create commands.
             GoToHomePageCommand = new RelayCommand(GoToHomePageCommandRoutine);
             OpenUrlCommand = new RelayParameterizedCommand(async (parameter) => await OpenUrlCommandRoutineAsync(parameter));
+            ToggleUpdateModeCommand = new RelayCommand(ToggleUpdateModeCommandRoutine);
             StartCrawlerCommand = new RelayCommand(async () => await StartCrawlerCommandRoutineAsync());
             CancelCrawlerCommand = new RelayCommand(async () => await CancelCrawlerCommandRoutineAsync());
             OpenRawDataCommand = new RelayParameterizedCommand(async (parameter) => await OpenRawDataCommandRoutineAsync(parameter));
@@ -329,12 +357,62 @@ namespace InformationRetrievalManager
             ConfigurationContext.DataInstanceNameUpdateCommand = new RelayCommand(async () => await DataInstanceNameUpdateCommandRoutineAsync());
             ConfigurationContext.DataInstanceDeleteCommand = new RelayCommand(async () => await DataInstanceDeleteCommandRoutineAsync());
 
+            // Create crawler update parameter input entry
+            CrawlerUpdateParameterEntry = new TextEntryViewModel
+            {
+                Label = null,
+                Description = Localization.Resource.CrawlerUpdateParameterEntry_Description_Timestamp,
+                Validation = null,
+                Value = null,
+                Placeholder = "Update Parameter",
+                MaxLength = IndexedDocumentDataModel.Title_MaxLength
+            };
+
+            // Create update mode entry(ies)
+            _selectedUpdateMode = CrawlerUpdateMode.Timestamp; // Set default selection
+            CrawlerUpdateParameterEntry.Validation = new ValidateStringAttribute("Update Parameter",
+                            typeof(DataInstancePageViewModel), pIsRequired: nameof(CrawlerUpdateParameterEntry_IsRequired), pCanContainRegex: nameof(CrawlerUpdateParameterEntry_CanContainRegex));
+            UpdateModeEntryArray = new RadioEntryViewModel[2]
+            {
+                new RadioEntryViewModel
+                {
+                    Label = "Timestamp",
+                    Description = "Update until reaching the first document fitting under the timestamp.",
+                    Validation = null,
+                    Value = true, // Set default selection
+                    GroupName = nameof(UpdateModeEntryArray),
+                    CheckAction = async () =>
+                    {
+                        _selectedUpdateMode = CrawlerUpdateMode.Timestamp;
+                        CrawlerUpdateParameterEntry.Description = Localization.Resource.CrawlerUpdateParameterEntry_Description_Timestamp;
+                        CrawlerUpdateParameterEntry.Validation = new ValidateStringAttribute("Update Parameter", 
+                            typeof(DataInstancePageViewModel), pIsRequired: nameof(CrawlerUpdateParameterEntry_IsRequired), pCanContainRegex: nameof(CrawlerUpdateParameterEntry_CanContainRegex));
+                        await Task.Delay(1);
+                    }
+                },
+                new RadioEntryViewModel
+                {
+                    Label = "Title",
+                    Description = "Update until reaching the first matching document title.",
+                    Validation = null,
+                    Value = false,
+                    GroupName = nameof(UpdateModeEntryArray),
+                    CheckAction = async () =>
+                    {
+                        _selectedUpdateMode = CrawlerUpdateMode.Title;
+                        CrawlerUpdateParameterEntry.Description = Localization.Resource.CrawlerUpdateParameterEntry_Description_Title;
+                        CrawlerUpdateParameterEntry.Validation = new ValidateStringAttribute("Update Parameter", typeof(DataInstancePageViewModel), pIsRequired: nameof(CrawlerUpdateParameterEntry_IsRequired));
+                        await Task.Delay(1);
+                    }
+                }
+            };
+
             // Create data selection with its entry.
             _dataFileSelection = new List<DataFileInfo>() { new DataFileInfo("< Select Data File >", null, default) };
             DataFileEntry = new ComboEntryViewModel<DataFileInfo>
             {
                 Label = null,
-                Description = "Please, select data for index processing from this selection of crawled data.",
+                Description = "Please, select data from this selection of crawled data for further processing.",
                 Validation = null,
                 Value = _dataFileSelection[0],
                 ValueList = _dataFileSelection,
@@ -346,16 +424,7 @@ namespace InformationRetrievalManager
             IndexFileEntry = new ComboEntryViewModel<DataFileInfo>
             {
                 Label = null,
-                Description = "Please, select an index for querying from this selection of already indexed data.",
-                Validation = null,
-                Value = _indexFileSelection[0],
-                ValueList = _indexFileSelection,
-                DisplayMemberPath = nameof(DataFileInfo.Label)
-            };
-            AppendIndexFileEntry = new ComboEntryViewModel<DataFileInfo>
-            {
-                Label = null,
-                Description = "Please, select an index for appending from this selection of already indexed data.",
+                Description = "Please, select indexed data from this selection of indexed data for further processing.",
                 Validation = null,
                 Value = _indexFileSelection[0],
                 ValueList = _indexFileSelection,
@@ -444,7 +513,7 @@ namespace InformationRetrievalManager
 
             // Create query model entry(ies)
             _selectedQueryModel = QueryModelType.TfIdf; // Set default selection
-            QueryEntry.Validation = new ValidateStringAttribute("Query", typeof(DataInstancePageViewModel), nameof(QueryEntry_IsRequired));
+            QueryEntry.Validation = new ValidateStringAttribute("Query", typeof(DataInstancePageViewModel), pIsRequired: nameof(QueryEntry_IsRequired));
             QueryModelEntryArray = new RadioEntryViewModel[2]
             {
                 new RadioEntryViewModel
@@ -458,7 +527,7 @@ namespace InformationRetrievalManager
                     {
                         _selectedQueryModel = QueryModelType.TfIdf;
                         QueryEntry.Description = Localization.Resource.QueryEntry_Description_TfIdf;
-                        QueryEntry.Validation = new ValidateStringAttribute("Query", typeof(DataInstancePageViewModel), nameof(QueryEntry_IsRequired));
+                        QueryEntry.Validation = new ValidateStringAttribute("Query", typeof(DataInstancePageViewModel), pIsRequired: nameof(QueryEntry_IsRequired));
                         await Task.Delay(1);
                     }
                 },
@@ -473,7 +542,7 @@ namespace InformationRetrievalManager
                     {
                         _selectedQueryModel = QueryModelType.Boolean;
                         QueryEntry.Description = Localization.Resource.QueryEntry_Description_Boolean;
-                        QueryEntry.Validation = new ValidateBooleanExpressionStringAttribute("Query", typeof(DataInstancePageViewModel), nameof(QueryEntry_IsRequired));
+                        QueryEntry.Validation = new ValidateBooleanExpressionStringAttribute("Query", typeof(DataInstancePageViewModel), pIsRequired: nameof(QueryEntry_IsRequired));
                         await Task.Delay(1);
                     }
                 }
@@ -547,6 +616,14 @@ namespace InformationRetrievalManager
 
                 await Task.Delay(1);
             });
+        }
+
+        /// <summary>
+        /// Toggle update mode
+        /// </summary>
+        private void ToggleUpdateModeCommandRoutine()
+        {
+            IsUpdateMode = !IsUpdateMode;
         }
 
         /// <summary>
@@ -627,7 +704,7 @@ namespace InformationRetrievalManager
         /// <param name="parameter"><see cref="DataFileInfo"/></param>
         private async Task DeleteDataFileCommandRoutineAsync(object parameter)
         {
-            await RunCommandAsync(() => ProcessFlag, async () =>
+            await RunCommandAsync(() => DeleteDataFlag, async () =>
             {
                 var fileInfo = parameter as DataFileInfo;
 
@@ -660,7 +737,7 @@ namespace InformationRetrievalManager
                 DataFileInfo file = DataFileEntry.Value;
                 bool isAppendMode = IsAppendMode;
                 IndexAppendMode appendMode = _selectedAppendMode;
-                DataFileInfo indexFile = AppendIndexFileEntry.Value;
+                DataFileInfo indexFile = IndexFileEntry.Value;
 
                 if (file.FilePath == null) // should not happen - but it is default selection protection
                     return;
@@ -1570,11 +1647,9 @@ namespace InformationRetrievalManager
 
             // Update the file selection entry
             IndexFileEntry.ValueList = _indexFileSelection;
-            AppendIndexFileEntry.ValueList = _indexFileSelection;
             if (resetToDefaultSelection)
             {
                 IndexFileEntry.Value = _indexFileSelection[0]; // Default selected value
-                AppendIndexFileEntry.Value = _indexFileSelection[0]; // Default selected value
             }
         }
 

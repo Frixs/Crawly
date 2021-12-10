@@ -180,6 +180,7 @@
                                     <RowDefinition Height="Auto" />
                                     <RowDefinition Height="Auto" />
                                     <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
                                 </Grid.RowDefinitions>
 
                                 <!--  Start Crawler BTN  -->
@@ -193,8 +194,59 @@
                                     local:IsBusyProperty.Value="{Binding CrawlerInWork, Mode=OneWay}"
                                     Command="{Binding StartCrawlerCommand, Mode=OneTime}"
                                     Content="START CRAWLER"
-                                    FontSize="16"
-                                    Style="{StaticResource LightColorButton}" />
+                                    FontSize="16">
+                                    <Button.Style>
+                                        <Style BasedOn="{StaticResource LightColorButton}" TargetType="{x:Type Button}">
+                                            <Setter Property="IsEnabled" Value="False" />
+                                            <Style.Triggers>
+                                                <MultiDataTrigger>
+                                                    <MultiDataTrigger.Conditions>
+                                                        <Condition Binding="{Binding IsUpdateMode, Mode=OneWay}" Value="True" />
+                                                        <Condition Binding="{Binding DataFileEntry.Value.FilePath, Converter={local:StringEmptyConverter}, Mode=OneWay}" Value="False" />
+                                                        <Condition Binding="{Binding CrawlerUpdateParameterEntry.Value, Converter={local:StringEmptyConverter}, Mode=OneWay}" Value="False" />
+                                                        <Condition Binding="{Binding DeleteDataFlag, Mode=OneWay}" Value="False" />
+                                                    </MultiDataTrigger.Conditions>
+                                                    <Setter Property="IsEnabled" Value="True" />
+                                                </MultiDataTrigger>
+                                                <MultiDataTrigger>
+                                                    <MultiDataTrigger.Conditions>
+                                                        <Condition Binding="{Binding IsUpdateMode, Mode=OneWay}" Value="False" />
+                                                        <Condition Binding="{Binding DeleteDataFlag, Mode=OneWay}" Value="False" />
+                                                    </MultiDataTrigger.Conditions>
+                                                    <Setter Property="IsEnabled" Value="True" />
+                                                </MultiDataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Button.Style>
+                                </Button>
+
+                                <!--  Update Mode Switch BTN  -->
+                                <Grid
+                                    Width="90"
+                                    Margin="0,0,295,0"
+                                    HorizontalAlignment="Center"
+                                    IsEnabled="{Binding CrawlerInWork, Converter={local:BooleanInvertConverter}, Mode=OneWay}">
+                                    <Button
+                                        Margin="0,0,7.5,0"
+                                        HorizontalAlignment="Right"
+                                        Command="{Binding ToggleUpdateModeCommand, Mode=OneTime}"
+                                        FontSize="12">
+                                        <Button.Style>
+                                            <Style BasedOn="{StaticResource LightDarkTextButton}" TargetType="{x:Type Button}">
+                                                <Setter Property="Opacity" Value="0.25" />
+                                                <Setter Property="Content" Value="UPDATE MODE" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsUpdateMode}" Value="True">
+                                                        <Setter Property="Opacity" Value="1" />
+                                                    </DataTrigger>
+                                                    <Trigger Property="IsEnabled" Value="False">
+                                                        <Setter Property="Opacity" Value="0.25" />
+                                                    </Trigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Button.Style>
+                                    </Button>
+                                </Grid>
 
                                 <!--  Progress Wrapper  -->
                                 <Grid Grid.Row="1" local:AnimateFadeInProperty.Value="{Binding CrawlerInWork, Mode=OneWay}">
@@ -286,9 +338,78 @@
                                     </Grid>
                                 </Grid>
 
+                                <!--  Update Mode Controls  -->
+                                <Grid
+                                    Grid.Row="2"
+                                    Margin="0,15,0,0"
+                                    local:AnimateFadeInProperty.Value="{Binding IsUpdateMode, Mode=OneWay}"
+                                    IsEnabled="{Binding CrawlerInWork, Converter={local:BooleanInvertConverter}, Mode=OneWay}">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="2*" />
+                                        <ColumnDefinition Width="2*" />
+                                    </Grid.ColumnDefinitions>
+                                    <!--  Update Mode Radio Selection  -->
+                                    <TextBlock
+                                        Grid.Row="0"
+                                        Grid.ColumnSpan="4"
+                                        HorizontalAlignment="Center"
+                                        FontFamily="{StaticResource DosisBold}"
+                                        FontSize="15"
+                                        Text="Update Mode" />
+                                    <local:RadioEntry
+                                        Grid.Row="1"
+                                        Grid.Column="0"
+                                        Margin="-10,0,-10,0"
+                                        DataContext="{Binding UpdateModeEntryArray[0], Mode=OneWay}"
+                                        TextBlock.TextAlignment="Center" />
+                                    <local:RadioEntry
+                                        Grid.Row="1"
+                                        Grid.Column="1"
+                                        Margin="-10,0,-10,0"
+                                        DataContext="{Binding UpdateModeEntryArray[1], Mode=OneWay}"
+                                        TextBlock.TextAlignment="Center" />
+
+                                    <!--  Update Parameter Entry  -->
+                                    <local:TextEntry
+                                        Grid.Row="2"
+                                        Grid.ColumnSpan="2"
+                                        Width="385"
+                                        VerticalAlignment="Center"
+                                        DataContext="{Binding CrawlerUpdateParameterEntry, Mode=OneWay}"
+                                        TextAlignment="Center" />
+
+                                    <!--  Data File Entry  -->
+                                    <Border
+                                        Grid.Row="3"
+                                        Grid.ColumnSpan="4"
+                                        VerticalAlignment="Top">
+                                        <Border.Style>
+                                            <Style TargetType="{x:Type Border}">
+                                                <Setter Property="IsEnabled" Value="False" />
+                                                <Style.Triggers>
+                                                    <MultiDataTrigger>
+                                                        <MultiDataTrigger.Conditions>
+                                                            <Condition Binding="{Binding IndexProcessingInWorkFlag, Mode=OneWay}" Value="False" />
+                                                            <Condition Binding="{Binding DeleteDataFlag, Mode=OneWay}" Value="False" />
+                                                        </MultiDataTrigger.Conditions>
+                                                        <Setter Property="IsEnabled" Value="True" />
+                                                    </MultiDataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Border.Style>
+                                        <local:ComboEntry Width="205" DataContext="{Binding DataFileEntry, Mode=OneWay}" />
+                                    </Border>
+                                </Grid>
+
                                 <!--  View Configuration BTN  -->
                                 <Button
-                                    Grid.Row="2"
+                                    Grid.Row="3"
                                     Margin="0,15,0,0"
                                     HorizontalAlignment="Center"
                                     Command="{Binding ShowViewCommand, Mode=OneTime}"
@@ -315,10 +436,21 @@
                                 </Grid.RowDefinitions>
 
                                 <!--  Crawled Data Selection  -->
-                                <Grid
-                                    Grid.Row="0"
-                                    Margin="0,0,0,10"
-                                    IsEnabled="{Binding IndexProcessingInWorkFlag, Converter={local:BooleanInvertConverter}, Mode=OneWay}">
+                                <Grid Grid.Row="0">
+                                    <Grid.Style>
+                                        <Style TargetType="{x:Type Grid}">
+                                            <Setter Property="IsEnabled" Value="False" />
+                                            <Style.Triggers>
+                                                <MultiDataTrigger>
+                                                    <MultiDataTrigger.Conditions>
+                                                        <Condition Binding="{Binding IndexProcessingInWorkFlag, Mode=OneWay}" Value="False" />
+                                                        <Condition Binding="{Binding CrawlerInWork, Mode=OneWay}" Value="False" />
+                                                    </MultiDataTrigger.Conditions>
+                                                    <Setter Property="IsEnabled" Value="True" />
+                                                </MultiDataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Grid.Style>
                                     <!--  Open Raw BTN  -->
                                     <!--  254 = 205 + 34 + 15  -->
                                     <Button
@@ -359,7 +491,7 @@
                                         CommandParameter="{Binding DataFileEntry.Value, Mode=OneWay}"
                                         Content="{StaticResource FontAwesomeTrashAltIcon}"
                                         FontFamily="{StaticResource FontAwesomeSolid}"
-                                        IsEnabled="{Binding CrawlerInWork, Converter={local:BooleanInvertConverter}, Mode=OneWay}"
+                                        IsEnabled="{Binding DeleteDataFlag, Converter={local:BooleanInvertConverter}, Mode=OneWay}"
                                         ToolTip="Delete data">
                                         <Button.Style>
                                             <Style BasedOn="{StaticResource DarkLightButton}" TargetType="{x:Type Button}">
@@ -425,12 +557,26 @@
                                         TextBlock.TextAlignment="Center" />
 
                                     <!--  Index File Entry  -->
-                                    <local:ComboEntry
+                                    <Border
                                         Grid.Row="2"
                                         Grid.ColumnSpan="4"
-                                        Width="205"
-                                        VerticalAlignment="Top"
-                                        DataContext="{Binding AppendIndexFileEntry, Mode=OneWay}" />
+                                        VerticalAlignment="Top">
+                                        <Border.Style>
+                                            <Style TargetType="{x:Type Border}">
+                                                <Setter Property="IsEnabled" Value="False" />
+                                                <Style.Triggers>
+                                                    <MultiDataTrigger>
+                                                        <MultiDataTrigger.Conditions>
+                                                            <Condition Binding="{Binding QueryInWorkFlag, Mode=OneWay}" Value="False" />
+                                                            <Condition Binding="{Binding DeleteIndexFlag, Mode=OneWay}" Value="False" />
+                                                        </MultiDataTrigger.Conditions>
+                                                        <Setter Property="IsEnabled" Value="True" />
+                                                    </MultiDataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Border.Style>
+                                        <local:ComboEntry Width="205" DataContext="{Binding IndexFileEntry, Mode=OneWay}" />
+                                    </Border>
                                 </Grid>
 
                                 <!--  Index Start BTNs Wrapper  -->
@@ -444,6 +590,7 @@
                                                         <Condition Binding="{Binding DataFileEntry.Value.FilePath, Converter={local:StringEmptyConverter}, Mode=OneWay}" Value="False" />
                                                         <Condition Binding="{Binding CrawlerInWork, Mode=OneWay}" Value="False" />
                                                         <Condition Binding="{Binding QueryInWorkFlag, Mode=OneWay}" Value="False" />
+                                                        <Condition Binding="{Binding DeleteDataFlag, Mode=OneWay}" Value="False" />
                                                         <Condition Binding="{Binding DeleteIndexFlag, Mode=OneWay}" Value="False" />
                                                     </MultiDataTrigger.Conditions>
                                                     <Setter Property="IsEnabled" Value="True" />
@@ -470,7 +617,7 @@
                                                     <MultiDataTrigger>
                                                         <MultiDataTrigger.Conditions>
                                                             <Condition Binding="{Binding IsAppendMode, Mode=OneWay}" Value="True" />
-                                                            <Condition Binding="{Binding AppendIndexFileEntry.Value.FilePath, Converter={local:StringEmptyConverter}, Mode=OneWay}" Value="True" />
+                                                            <Condition Binding="{Binding IndexFileEntry.Value.FilePath, Converter={local:StringEmptyConverter}, Mode=OneWay}" Value="True" />
                                                         </MultiDataTrigger.Conditions>
                                                         <Setter Property="IsEnabled" Value="False" />
                                                     </MultiDataTrigger>
@@ -492,11 +639,10 @@
                                             <Button.Style>
                                                 <Style BasedOn="{StaticResource LightDarkTextButton}" TargetType="{x:Type Button}">
                                                     <Setter Property="Opacity" Value="0.25" />
-                                                    <Setter Property="Content" Value="APPEND OFF" />
+                                                    <Setter Property="Content" Value="APPEND MODE" />
                                                     <Style.Triggers>
                                                         <DataTrigger Binding="{Binding IsAppendMode}" Value="True">
                                                             <Setter Property="Opacity" Value="1" />
-                                                            <Setter Property="Content" Value="APPEND ON" />
                                                         </DataTrigger>
                                                         <Trigger Property="IsEnabled" Value="False">
                                                             <Setter Property="Opacity" Value="0.25" />
@@ -580,7 +726,7 @@
                                         <RowDefinition Height="Auto" />
                                     </Grid.RowDefinitions>
                                     <!--  Index Selection  -->
-                                    <Grid Grid.Row="0" Margin="0,0,0,10">
+                                    <Grid Grid.Row="0">
                                         <!--  Index File Entry  -->
                                         <local:ComboEntry
                                             Width="205"
@@ -639,7 +785,7 @@
                                             DataContext="{Binding QueryModelEntryArray[1], Mode=OneWay}" />
                                     </Grid>
 
-                                    <!--  Index File Entry  -->
+                                    <!--  Query Entry  -->
                                     <local:TextEntry
                                         Grid.Row="2"
                                         Width="385"
