@@ -438,7 +438,7 @@ namespace InformationRetrievalManager
                 new RadioEntryViewModel
                 {
                     Label = "Free",
-                    Description = "Append all without any restrictions (intended for advanced users only).",
+                    Description = "Append all without any further restrictions (this mode is intended for advanced users only).",
                     Validation = null,
                     Value = false,
                     GroupName = nameof(AppendModeEntryArray),
@@ -451,7 +451,7 @@ namespace InformationRetrievalManager
                 new RadioEntryViewModel
                 {
                     Label = "Timestamp",
-                    Description = "Append all until reaching the latest already indexed document.",
+                    Description = "Append all until reaching the latest already indexed document (via doc. DateTime field).",
                     Validation = null,
                     Value = true, // Set default selection
                     GroupName = nameof(AppendModeEntryArray),
@@ -464,7 +464,7 @@ namespace InformationRetrievalManager
                 new RadioEntryViewModel
                 {
                     Label = "Title",
-                    Description = "Append all until reaching the first duplicate document title.",
+                    Description = "Append documents until reaching the first duplicate document title in already indexed documents.",
                     Validation = null,
                     Value = false,
                     GroupName = nameof(AppendModeEntryArray),
@@ -477,7 +477,7 @@ namespace InformationRetrievalManager
                 new RadioEntryViewModel
                 {
                     Label = "Title All",
-                    Description = "Append all except duplicate document titles (including appending data).",
+                    Description = "Append all documents except the ones with duplicate document titles (including appending data).",
                     Validation = null,
                     Value = false,
                     GroupName = nameof(AppendModeEntryArray),
@@ -638,12 +638,17 @@ namespace InformationRetrievalManager
             {
                 bool ok = true;
 
+                DataFileInfo updateFile = DataFileEntry.Value;
+                bool isUpdateMode = IsUpdateMode;
+                UpdateMode updateMode = _selectedUpdateMode;
+                string updateParameterValue = CrawlerUpdateParameterEntry.Value;
+
                 // Check/Create crawler engine update request
                 UpdateRequest updateRequest = null;
-                if (IsUpdateMode)
+                if (isUpdateMode)
                 {
                     // If any errors during parameter validation...
-                    if (CrawlerUpdateParameterEntry.Validation.Validate(CrawlerUpdateParameterEntry.Value, null).Count > 0)
+                    if (CrawlerUpdateParameterEntry.Validation.Validate(updateParameterValue, null).Count > 0)
                     {
                         ok = false;
                     }
@@ -651,14 +656,14 @@ namespace InformationRetrievalManager
                     else
                     {
                         /// SWITCH <see cref="UpdateMode"/>
-                        if (_selectedUpdateMode == UpdateMode.Timestamp)
+                        if (updateMode == UpdateMode.Timestamp)
                         {
-                            DateTime parameterTimestamp = DateTime.ParseExact(CrawlerUpdateParameterEntry.Value, "yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture);
-                            updateRequest = new UpdateRequest(DataFileEntry.Value.FilePath, _selectedUpdateMode, parameterTimestamp);
+                            DateTime parameterTimestamp = DateTime.ParseExact(updateParameterValue, "yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture);
+                            updateRequest = new UpdateRequest(updateFile.FilePath, updateMode, parameterTimestamp);
                         }
-                        else if (_selectedUpdateMode == UpdateMode.Title)
+                        else if (updateMode == UpdateMode.Title)
                         {
-                            updateRequest = new UpdateRequest(DataFileEntry.Value.FilePath, _selectedUpdateMode, CrawlerUpdateParameterEntry.Value);
+                            updateRequest = new UpdateRequest(updateFile.FilePath, updateMode, updateParameterValue);
                         }
                     }
                 }
