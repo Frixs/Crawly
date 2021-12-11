@@ -377,7 +377,7 @@ namespace InformationRetrievalManager
                 new RadioEntryViewModel
                 {
                     Label = "Timestamp",
-                    Description = "Update until reaching the first document fitting under the timestamp.",
+                    Description = "Update only newer crawling documents than the timestamp specifies (crawling documents must have specified DateTime field for this mode).",
                     Validation = null,
                     Value = true, // Set default selection
                     GroupName = nameof(UpdateModeEntryArray),
@@ -393,7 +393,7 @@ namespace InformationRetrievalManager
                 new RadioEntryViewModel
                 {
                     Label = "Title",
-                    Description = "Update until reaching match in the document title.",
+                    Description = "Update only crawling documents with no match with the parameter in their title. Once any document title contains the parameter text then the update stops.",
                     Validation = null,
                     Value = false,
                     GroupName = nameof(UpdateModeEntryArray),
@@ -424,7 +424,7 @@ namespace InformationRetrievalManager
             IndexFileEntry = new ComboEntryViewModel<DataFileInfo>
             {
                 Label = null,
-                Description = "Please, select indexed data from this selection of indexed data for further processing.",
+                Description = "Please, select data from this selection of indexed data for further processing.",
                 Validation = null,
                 Value = _indexFileSelection[0],
                 ValueList = _indexFileSelection,
@@ -1619,6 +1619,9 @@ namespace InformationRetrievalManager
 
                     for (int i = 0; i < CrawlerProgressMsgs.Length; ++i)
                         CrawlerProgressMsgs[i] = CrawlerProgressUrls[i] = string.Empty;
+
+                    OnPropertyChanged(nameof(CrawlerProgressMsgs));
+                    OnPropertyChanged(nameof(CrawlerProgressUrls));
 
                     // Load data files
                     await LoadDataFilesAsync(true);

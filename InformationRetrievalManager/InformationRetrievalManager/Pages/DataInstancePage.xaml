@@ -139,7 +139,7 @@
                         HorizontalAlignment="Center"
                         FontFamily="{StaticResource DosisRegular}"
                         FontSize="15"
-                        Text="Configuration" />
+                        Text="Processing" />
 
                     <TextBlock
                         Grid.Column="1"

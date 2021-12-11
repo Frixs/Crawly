@@ -164,20 +164,16 @@ namespace InformationRetrievalManager.Crawler
                 SourceUrl = url,
                 Category = category,
                 Timestamp = timestamp,
-                Content = "yyy"//contentText
+                Content = contentText
             };
             string json = JsonConvert.SerializeObject(model);
 
             // Append to JSON file
             using (var fs = new FileStream($"{crawledDataDirPath}/{dataFilename}", FileMode.Open))
             {
-                // TODO !!! does not work
                 var jsonByted = System.Text.Encoding.UTF8.GetBytes($"{json},");
-                fs.Seek(1 - _updateRequestDatedDataoffset, SeekOrigin.End); // We are expecting, the first character is the array bracket
-                fs.Write(jsonByted, 0, jsonByted.Length); // Include a leading comma character if required
-                //fs.Write(System.Text.Encoding.UTF8.GetBytes("]"), 0, 1);
-                fs.Seek(0, SeekOrigin.End);
-                fs.SetLength(fs.Position);
+                var offset = fs.Seek(1 - _updateRequestDatedDataoffset, SeekOrigin.End); // We are expecting, the first character is array bracket
+                _fileManager.InsertIntoFile(fs, offset, jsonByted);
             }
         }
 

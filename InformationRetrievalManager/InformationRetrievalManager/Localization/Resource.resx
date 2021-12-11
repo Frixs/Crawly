@@ -121,7 +121,7 @@
     <value>Enter timestamp in the following format: yyyy-MM-dd HH:mm.</value>
   </data>
   <data name="CrawlerUpdateParameterEntry_Description_Title" xml:space="preserve">
-    <value>Enter document title.</value>
+    <value>Enter text for checking existence in the document title.</value>
   </data>
   <data name="QueryEntry_Description_Boolean" xml:space="preserve">
     <value>Ask with logical operators AND, OR, and NOT with the ability to prioritize them with brackets. Searched documents must contain/match the logical expression.</value>

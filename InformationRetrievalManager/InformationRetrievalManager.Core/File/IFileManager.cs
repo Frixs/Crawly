@@ -82,6 +82,15 @@ namespace InformationRetrievalManager.Core
         List<string> ReadLines(string path);
 
         /// <summary>
+        /// Insert data in middle of the file.
+        /// </summary>
+        /// <param name="stream">The file stream</param>
+        /// <param name="offset">Offset we wish to write at.</param>
+        /// <param name="extraBytes">Bytes to write.</param>
+        /// <param name="maxBufferSize">Specify size of the buffer used for insertion.</param>
+        void InsertIntoFile(FileStream stream, long offset, byte[] extraBytes, int maxBufferSize = 8192 * 1024);
+
+        /// <summary>
         /// Check if the file is in use or not.
         /// </summary>
         /// <param name="file"></param>

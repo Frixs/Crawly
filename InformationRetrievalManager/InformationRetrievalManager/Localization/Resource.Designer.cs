@@ -70,7 +70,7 @@ namespace InformationRetrievalManager.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Enter document title..
+        ///   Looks up a localized string similar to Enter text for checking existence in the document title..
         /// </summary>
         internal static string CrawlerUpdateParameterEntry_Description_Title {
             get {

@@ -581,6 +581,7 @@ namespace InformationRetrievalManager.Crawler
 
             // Final progress message feedback
             UpdateProgressMessageData("URL processing done!", invoke: true);
+            await Task.Delay(SearchInterval);
         }
 
         /// <summary>
