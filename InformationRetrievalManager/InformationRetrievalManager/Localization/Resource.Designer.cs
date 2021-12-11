@@ -61,6 +61,24 @@ namespace InformationRetrievalManager.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Enter timestamp in the following format: yyyy-MM-dd HH:mm..
+        /// </summary>
+        internal static string CrawlerUpdateParameterEntry_Description_Timestamp {
+            get {
+                return ResourceManager.GetString("CrawlerUpdateParameterEntry_Description_Timestamp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enter text for checking existence in the document title..
+        /// </summary>
+        internal static string CrawlerUpdateParameterEntry_Description_Title {
+            get {
+                return ResourceManager.GetString("CrawlerUpdateParameterEntry_Description_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Ask with logical operators AND, OR, and NOT with the ability to prioritize them with brackets. Searched documents must contain/match the logical expression..
         /// </summary>
         internal static string QueryEntry_Description_Boolean {

@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 namespace InformationRetrievalManager.Crawler
 {
     /// <summary>
-    /// Singleton boxing for managing crawler data
+    /// Boxing for managing crawler data
     /// </summary>
     public sealed class CrawlerStorage : ICrawlerStorage
     {
@@ -27,22 +27,30 @@ namespace InformationRetrievalManager.Crawler
         /// <summary>
         /// Filename base for HTML parsed data
         /// </summary>
-        private string _contentHtmlFilename = "html";
+        private const string _contentHtmlFilename = "html";
 
         /// <summary>
         /// Filename base for minified parsed data
         /// </summary>
-        private string _contentMinFilename = "min";
+        private const string _contentMinFilename = "min";
 
         /// <summary>
         /// Filename base for normal (tidy) based data
         /// </summary>
-        private string _contentTidyFilename = "tidy";
+        private const string _contentTidyFilename = "tidy";
 
         /// <summary>
         /// Filename base for organized data
         /// </summary>
-        private string _dataFilename = "data";
+        private const string _dataFilename = "data";
+
+        /// <summary>
+        /// Offset (byte size) of the dated data that are being updated.
+        /// </summary>
+        /// <remarks>
+        ///     -1 to set it to init state
+        /// </remarks>
+        private long _updateRequestDatedDataoffset = -1;
 
         #endregion
 
@@ -62,7 +70,8 @@ namespace InformationRetrievalManager.Crawler
         #region Interface Methods
 
         /// <inheritdoc/>
-        public async Task SaveAsync(ICrawlerEngine crawler, string url, string title, string category, DateTime timestamp, string contentHtml, string contentTextMin, string contentText)
+        public async Task SaveAsync(ICrawlerEngine crawler, string url, string title, string category, DateTime timestamp, 
+            string contentHtml, string contentTextMin, string contentText)
         {
             if (crawler == null)
                 throw new ArgumentNullException("Crawler is not defined!");
@@ -79,17 +88,20 @@ namespace InformationRetrievalManager.Crawler
             // Save data into files
             // HTML
             await _fileManager.WriteTextToFileAsync(
-                url + Environment.NewLine + contentHtml + Environment.NewLine + Environment.NewLine + Environment.NewLine, $"{crawledDataDirPath}/{MakeFilename(_contentHtmlFilename, crawler.CrawlingTimestamp)}",
+                url + Environment.NewLine + contentHtml + Environment.NewLine + Environment.NewLine + Environment.NewLine, 
+                $"{crawledDataDirPath}/{MakeFilename(_contentHtmlFilename, crawler.CrawlingTimestamp)}",
                 true
                 );
             // Minified
             await _fileManager.WriteTextToFileAsync(
-                url + Environment.NewLine + contentTextMin + Environment.NewLine + Environment.NewLine + Environment.NewLine, $"{crawledDataDirPath}/{MakeFilename(_contentMinFilename, crawler.CrawlingTimestamp)}",
+                url + Environment.NewLine + contentTextMin + Environment.NewLine + Environment.NewLine + Environment.NewLine, 
+                $"{crawledDataDirPath}/{MakeFilename(_contentMinFilename, crawler.CrawlingTimestamp)}",
                 true
                 );
             // Tidyfied
             await _fileManager.WriteTextToFileAsync(
-                url + Environment.NewLine + contentText + Environment.NewLine + Environment.NewLine + Environment.NewLine, $"{crawledDataDirPath}/{MakeFilename(_contentTidyFilename, crawler.CrawlingTimestamp)}",
+                url + Environment.NewLine + contentText + Environment.NewLine + Environment.NewLine + Environment.NewLine, 
+                $"{crawledDataDirPath}/{MakeFilename(_contentTidyFilename, crawler.CrawlingTimestamp)}",
                 true
                 );
 
@@ -116,6 +128,52 @@ namespace InformationRetrievalManager.Crawler
                 fs.Write(jsonByted, 0, jsonByted.Length); // Include a leading comma character if required
                 fs.Write(System.Text.Encoding.UTF8.GetBytes("]"), 0, 1);
                 fs.SetLength(fs.Position); // Only needed if new content may be smaller than old
+            }
+        }
+
+        /// <inheritdoc/>
+        public void SaveUpdate(ICrawlerEngine crawler, string url, string title, string category, DateTime timestamp, 
+            string contentText, string filePath)
+        {
+            if (crawler == null)
+                throw new ArgumentNullException("Crawler is not defined!");
+
+            if (!crawler.IsCurrentlyCrawling || !crawler.IsSiteSet)
+                return;
+
+            string crawledDataDirPath = $"{Constants.CrawlerDataStorageDir}/{crawler.GenerateCrawlerSiteIdentificationToken()}";
+            string dataFilename = MakeFilename(_dataFilename, crawler.CrawlingTimestamp, "json");
+
+            // Check if the dir exists...
+            if (!Directory.Exists(crawledDataDirPath))
+                Directory.CreateDirectory(crawledDataDirPath);
+
+            // Create the base of JSON file, if the file does not exist...
+            if (!File.Exists($"{crawledDataDirPath}/{dataFilename}"))
+                // .. create it from the dated one
+                File.Copy(filePath, $"{crawledDataDirPath}/{dataFilename}");
+
+            // Init update request values
+            if (_updateRequestDatedDataoffset < 0)
+                _updateRequestDatedDataoffset = new FileInfo(filePath).Length;
+
+            // Prepare data for serialization...
+            var model = new CrawlerDataModel
+            {
+                Title = title,
+                SourceUrl = url,
+                Category = category,
+                Timestamp = timestamp,
+                Content = contentText
+            };
+            string json = JsonConvert.SerializeObject(model);
+
+            // Append to JSON file
+            using (var fs = new FileStream($"{crawledDataDirPath}/{dataFilename}", FileMode.Open))
+            {
+                var jsonByted = System.Text.Encoding.UTF8.GetBytes($"{json},");
+                var offset = fs.Seek(1 - _updateRequestDatedDataoffset, SeekOrigin.End); // We are expecting, the first character is array bracket
+                _fileManager.InsertIntoFile(fs, offset, jsonByted);
             }
         }
 
