@@ -41,7 +41,7 @@ namespace InformationRetrievalManager
         /// Application version. 
         /// What user can see in the app UI, e.g.
         /// </summary>
-        public string ApplicationVersion { get; private set; } = "v 1 . 0";
+        public string ApplicationVersion { get; private set; } = "v 2 . 0";
 
         /// <summary>
         /// Window default title.
